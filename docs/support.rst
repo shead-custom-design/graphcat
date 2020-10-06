@@ -22,9 +22,9 @@ And here are our test coverage stats, also updated automatically when modificati
 
 * https://coveralls.io/r/shead-custom-design/graphcat
 
-For Graphcat questions, comments, or suggestions, get in touch with the team at:
+For Graphcat questions, comments, or suggestions, get in touch with the team using chat at:
 
-* https://gitter.im/shead-custom-design/graphcat
+* https://graphcat.zulipchat.com
 
 Otherwise, you can contact Tim directly:
 
