@@ -21,7 +21,7 @@ features such as the following:
 
 You can see the full Graphcat documentation with tutorials at
 https://graphcat.readthedocs.io ... for questions, comments, or suggestions, get
-in touch with our team at https://gitter.im/shead-custom-design/graphcat.
+in touch with our team at https://graphcat.zulipchat.com.
 
 License
 =======
