@@ -23,6 +23,9 @@ You can see the full Graphcat documentation with tutorials at
 https://graphcat.readthedocs.io ... for questions, comments, or suggestions, get
 in touch with our team at https://graphcat.zulipchat.com.
 
+* Current build status: [![Build Status](https://img.shields.io/travis/shead-custom-design/graphcat/main.svg)](https://travis-ci.org/shead-custom-design/graphcat/branches)
+* Current code coverage: [![Coverage](https://img.shields.io/coveralls/shead-custom-design/graphcat.svg)](https://coveralls.io/r/shead-custom-design/graphcat?branch=main)
+
 License
 =======
 
