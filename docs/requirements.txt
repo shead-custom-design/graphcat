@@ -1,3 +1,4 @@
 blinker
+nbsphinx
 networkx
 sphinx_rtd_theme
