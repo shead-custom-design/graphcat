@@ -13,7 +13,6 @@
 # limitations under the License.
 
 from behave import *
-import nose.tools
 
 import os
 import pkgutil

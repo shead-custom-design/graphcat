@@ -18,6 +18,6 @@ import subprocess
 
 os.remove(".coverage")
 shutil.rmtree(".cover")
-subprocess.call(["coverage", "run", "--append", "--source", "graphcat", "-m", "behave"])
+subprocess.call(["coverage", "run", "--source", "graphcat", "-m", "behave"])
 subprocess.call(["coverage", "report"])
 subprocess.call(["coverage", "html", "--directory", ".cover"])
