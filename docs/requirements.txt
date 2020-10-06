@@ -1,2 +1,3 @@
+blinker
 networkx
 sphinx_rtd_theme
