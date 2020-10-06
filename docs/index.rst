@@ -5,8 +5,8 @@
 Welcome!
 ========
 
-Welcome to Graphcat ... an elegant, minimalist, flexible Python library
-to manage computation graphs.
+Welcome to Graphcat ... the lightweight, flexible Python library for managing
+computational graphs.
 
 Documentation
 =============
