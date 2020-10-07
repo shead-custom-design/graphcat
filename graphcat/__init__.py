@@ -15,7 +15,7 @@
 """Functionality for managing and executing computational graphs.
 """
 
-__version__ = "0.2.0-dev"
+__version__ = "0.2.0"
 
 import enum
 import functools
