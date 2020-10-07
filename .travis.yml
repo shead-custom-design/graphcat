@@ -15,3 +15,7 @@ script:
     - coverage report
 after_script:
     - coveralls
+
+notifications:
+    webhooks:
+        - https://graphcat.zulipchat.com/api/v1/external/travis?api_key=ZS0kyNb2Mg3Ycg5NiJkl28ZeeFaxhip0&stream=repo&topic=builds
