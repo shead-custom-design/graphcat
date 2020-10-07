@@ -21,15 +21,15 @@ import graphcat
 
 
 def display(graph):
-    """Display a graphcat graph inline in a Jupyter notebook.
+    """Display a :class:`graphcat.Graph` inline in a Jupyter notebook.
 
-    This is extremely useful for debugging graphs.  The structure and current
-    state of the graph is displayed as an inline SVG graphic.  Each graph
-    node is rendered as a box with the node's label.  Arrows are drawn
-    between nodes, pointing from upstream producers of data to downstream
-    consumers.  Arrows are labelled with their role, if any.  The color of each box
-    shows its state: white for outdated nodes, red for nodes that are outdated
-    due to an error, and light gray for nodes that are ready.
+    This is extremely useful for understanding and debugging graphs.  The
+    structure and current state of the graph is displayed as an inline SVG
+    graphic.  Each task is rendered as a box with the task label.  Arrows are
+    drawn between tasks, pointing from upstream producers of data to downstream
+    consumers.  Arrows are labelled to show named inputs, if any.  The color of
+    each box shows its state: white for unfinished tasks, red for tasks that
+    are failed, and black for tasks that are finished.
 
     Parameters
     ----------
