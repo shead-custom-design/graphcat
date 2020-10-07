@@ -2,4 +2,5 @@ blinker
 ipython
 nbsphinx
 networkx
+pygraphviz
 sphinx_rtd_theme
