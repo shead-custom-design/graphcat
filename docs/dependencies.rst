@@ -20,6 +20,12 @@ using pip, these are automatically installed for you):
 * blinker - fast & simple signaling for Python - https://pythonhosted.org/blinker
 * networkx - network analysis in Python - https://networkx.github.io
 
+If you are using Jupyter notebooks, you will want the following to
+enable Graphcat's notebook integration:
+
+* PyGraphviz - Python interface for Graphviz - https://pygraphviz.github.io
+* Graphviz - graph visualization software - http://www.graphviz.org
+
 Source Installation
 -------------------
 

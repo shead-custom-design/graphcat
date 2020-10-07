@@ -32,11 +32,11 @@ setup(
     ],
     description="Lightweight, flexible toolkit for managing computational graphs.",
     extras_require={
-        "docs": ["nbsphinx", "sphinx", "sphinx-rtd-theme"],
     },
     install_requires=[
         "blinker",
         "networkx",
+        "pygraphviz",
     ],
     long_description="""Graphcat provides a lightweight, flexible toolkit for managing computational graphs.
     See the Graphcat documentation at http://graphcat.readthedocs.io, and the Graphcat sources at http://github.com/shead-custom-design/graphcat""",
