@@ -377,30 +377,6 @@ class Graph(object):
         self.mark_unfinished(label)
         self._graph.remove_node(label)
 
-    def set_task_fn(self, label, fn):
-        """Change the function that will be executed whan a task is updated.
-
-        Note that this will mark downstream tasks for update.
-
-        Parameters
-        ----------
-        label: hashable object, required
-            Label identifying the task whose function will be set.
-        fn: callable object, optional
-            New function to be executed when the task is updated.  If `None`
-            (the default), :func:`null` will be used instead.
-
-        Raises
-        ------
-        :class:`ValueError`
-            If the task with `label` doesn't exist.
-        """
-        self._require_task_present(label)
-        if fn is None:
-            fn = null
-        self._graph.nodes[label]["fn"] = fn
-        self.mark_unfinished(label)
-
     def set_input(self, source, target, input):
         """Change the target input that an existing relationship will feed.
 
@@ -425,6 +401,87 @@ class Graph(object):
         self._require_relationship_present(source, target)
         self._graph.edges[(target, source)]["input"] = input
         self.mark_unfinished(target)
+
+    def set_relationships(self, source, targets):
+        """Make source a dependency of target.
+
+        To indicate that `target` depends on (is a consumer of data from)
+        `source` use :meth:`add_relationship`::
+
+            graph.add_relationship("png_reader", "blur")
+
+        For tasks that require multiple inputs, assign unique values to `input` so that they
+        can distinguish among them::
+
+            graph.add_relationship("png_reader", "blur", input="image")
+            graph.add_relationship("blur_radius", "blur", input="radius")
+
+        Parameters
+        ----------
+        source: hashable object, required
+            Label identifying the task that will act as a data source.
+        target: hashable object, required
+            Label identifying the task that will act as a data consumer.
+        input: hashable object, optional
+            Identifies which `target` input this relationship will feed.  Left unspecified, this will default to :class:`Input.DEFAULT`.
+
+        Raises
+        ------
+        :class:`ValueError`
+            If `source` or `target` don't exist.
+        """
+        self._require_task_present(source)
+        if isinstance(targets, tuple):
+            targets = [targets]
+        for target, input in targets:
+            self._require_task_present(target)
+            self._graph.add_edge(target, source, input=input) # Edges point from tasks to their dependencies.
+            self.mark_unfinished(target)
+
+    def set_task(self, label, fn):
+        """Add a task to the graph if it doesn't exist, and set the task function.
+
+        Parameters
+        ----------
+        label: hashable object, required
+            Unique label that will identify the task.
+        fn: callable, optional
+            The `fn` object will be called whenever the task is executed.  It must take two keyword arguments
+            as parameters, `label` and `inputs`.  `label` will contain the unique task label.  `inputs` will
+            be a dict mapping each relationship's named `input` to a sequence of outputs returned from this task's dependencies
+            (upstream tasks).  If `None` (the default), :func:`null` will be used.
+        """
+        if fn is None:
+            fn = null
+        if label in self._graph:
+            self._graph.nodes[label]["fn"] = fn
+            self.mark_unfinished(label)
+        else:
+            self._graph.add_node(label, fn=fn, state=TaskState.UNFINISHED, output=None)
+
+    def set_task_fn(self, label, fn):
+        """Change the function that will be executed whan a task is updated.
+
+        Note that this will mark downstream tasks for update.
+
+        Parameters
+        ----------
+        label: hashable object, required
+            Label identifying the task whose function will be set.
+        fn: callable object, optional
+            New function to be executed when the task is updated.  If `None`
+            (the default), :func:`null` will be used instead.
+
+        Raises
+        ------
+        :class:`ValueError`
+            If the task with `label` doesn't exist.
+        """
+        self._require_task_present(label)
+        if fn is None:
+            fn = null
+        self._graph.nodes[label]["fn"] = fn
+        self.mark_unfinished(label)
 
     def update(self, label):
         """Update a task and all its transitive dependencies.
