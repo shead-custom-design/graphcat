@@ -18,6 +18,7 @@ Documentation
    dependencies.rst
    compatibility.rst
    tutorial.ipynb
+   case-studies.rst
    contributing.rst
    release-notes.rst
    reference.rst
