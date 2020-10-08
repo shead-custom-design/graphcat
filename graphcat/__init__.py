@@ -86,8 +86,9 @@ class Graph(object):
     """
     def __init__(self):
         self._graph = networkx.DiGraph()
-        self._on_failed = blinker.Signal()
+        self._on_changed = blinker.Signal()
         self._on_execute = blinker.Signal()
+        self._on_failed = blinker.Signal()
         self._on_finished = blinker.Signal()
         self._on_update = blinker.Signal()
 
@@ -231,16 +232,17 @@ class Graph(object):
         for label in labels:
             self._graph.nodes[label]["output"] = None
             self._graph.nodes[label]["state"] = TaskState.UNFINISHED
+        self._on_changed.send(self)
 
     @property
-    def on_failed(self):
-        """Signal emitted when a task fails during execution.
+    def on_changed(self):
+        """Signal emitted whenever a part of the graph becomes unfinished.
 
         Returns
         -------
         signal: :class:`blinker.base.Signal`
         """
-        return self._on_failed
+        return self._on_changed
 
     @property
     def on_execute(self):
@@ -251,6 +253,16 @@ class Graph(object):
         signal: :class:`blinker.base.Signal`
         """
         return self._on_execute
+
+    @property
+    def on_failed(self):
+        """Signal emitted when a task fails during execution.
+
+        Returns
+        -------
+        signal: :class:`blinker.base.Signal`
+        """
+        return self._on_failed
 
     @property
     def on_finished(self):
