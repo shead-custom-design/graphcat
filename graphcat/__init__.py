@@ -159,7 +159,7 @@ class Graph(object):
         self._require_task_absent(label)
         if fn is None:
             fn = null
-        self._graph.add_node(label, fn=fn, state=TaskState.UNFINISHED, updating=False, output=None)
+        self._graph.add_node(label, fn=fn, state=TaskState.UNFINISHED, output=None)
 
 
     def state(self, label):
