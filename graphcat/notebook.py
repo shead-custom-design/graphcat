@@ -63,7 +63,7 @@ def display(graph):
 
     for edge in graph._graph.edges():
         input = graph._graph.edges[edge]["input"]
-        if input == graphcat.Input.DEFAULT:
+        if input == None:
             input = ""
         agraph.add_edge(edge[1], edge[0], label=input) # We want edges to point from dependencies to dependees.
 

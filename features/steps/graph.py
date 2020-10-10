@@ -24,6 +24,7 @@ import test
 
 class EventRecorder(object):
     def __init__(self, graph):
+        self._changed = []
         self._exceptions = []
         self._executed = []
         self._failed = []
@@ -32,10 +33,15 @@ class EventRecorder(object):
         self._outputs = []
         self._updated = []
 
+        graph.on_changed.connect(self.on_changed)
         graph.on_execute.connect(self.on_execute)
         graph.on_failed.connect(self.on_failed)
         graph.on_finished.connect(self.on_finished)
         graph.on_update.connect(self.on_update)
+
+    @property
+    def changed(self):
+        return self._changed
 
     @property
     def exceptions(self):
@@ -65,20 +71,23 @@ class EventRecorder(object):
     def updated(self):
         return self._updated
 
-    def on_execute(self, sender, label, inputs):
-        self._executed.append(label)
+    def on_changed(self, graph):
+        self._changed.append(graph)
+
+    def on_execute(self, graph, name, inputs):
+        self._executed.append(name)
         self._inputs.append(inputs)
 
-    def on_failed(self, sender, label, exception):
-        self._failed.append(label)
+    def on_failed(self, graph, name, exception):
+        self._failed.append(name)
         self._exceptions.append(exception)
 
-    def on_finished(self, sender, label, output):
-        self._finished.append(label)
+    def on_finished(self, graph, name, output):
+        self._finished.append(name)
         self._outputs.append(output)
 
-    def on_update(self, sender, label):
-        self._updated.append(label)
+    def on_update(self, graph, name):
+        self._updated.append(name)
 
 
 #################################################################
@@ -111,33 +120,33 @@ class NodeOutput(object):
     def __init__(self, graph):
         self._graph = graph
 
-    def __call__(self, label):
-        return self._graph.output(label)
+    def __call__(self, name):
+        return self._graph.output(name)
 
 
-@when(u'adding a variable task {label} with value {value}')
-def step_impl(context, label, value):
-    label = eval(label)
+@when(u'adding a variable task {name} with value {value}')
+def step_impl(context, name, value):
+    name = eval(name)
     value = eval(value)
     context.events = EventRecorder(context.graph)
 
     if not hasattr(context, "variables"):
         context.variables = {}
 
-    context.variables[label] = graphcat.VariableTask(context.graph, label, value)
+    context.variables[name] = graphcat.VariableTask(context.graph, name, value)
 
 
-@when(u'changing the variable task {label} to value {value}')
-def step_impl(context, label, value):
-    label = eval(label)
+@when(u'changing the variable task {name} to value {value}')
+def step_impl(context, name, value):
+    name = eval(name)
     value = eval(value)
     context.events = EventRecorder(context.graph)
-    context.variables[label].set(value)
+    context.variables[name].set(value)
 
 
-@when(u'adding an expression task {label} with expression {expression}')
-def step_impl(context, label, expression):
-    label = eval(label)
+@when(u'adding an expression task {name} with expression {expression}')
+def step_impl(context, name, expression):
+    name = eval(name)
     expression = eval(expression)
     context.events = EventRecorder(context.graph)
 
@@ -145,212 +154,260 @@ def step_impl(context, label, expression):
         context.expressions = {}
 
     locals = {"out": NodeOutput(context.graph)}
-    context.expressions[label] = graphcat.ExpressionTask(context.graph, label, expression, locals)
+    context.expressions[name] = graphcat.ExpressionTask(context.graph, name, expression, locals)
 
 
-@when(u'changing the expression task {label} to expression {expression}')
-def step_impl(context, label, expression):
-    label = eval(label)
+@when(u'changing the expression task {name} to expression {expression}')
+def step_impl(context, name, expression):
+    name = eval(name)
     expression = eval(expression)
     context.events = EventRecorder(context.graph)
 
     locals = {"out": NodeOutput(context.graph)}
-    context.expressions[label].set(expression, locals)
+    context.expressions[name].set(expression, locals)
 
 
-@when(u'adding tasks {labels} with functions {functions}')
-def step_impl(context, labels, functions):
-    labels = eval(labels)
+@when(u'adding tasks {names} with functions {functions}')
+def step_impl(context, names, functions):
+    names = eval(names)
     functions = eval(functions)
     context.events = EventRecorder(context.graph)
-    for label, function in zip(labels, functions):
-        context.graph.add_task(label, function)
+    for name, function in zip(names, functions):
+        context.graph.add_task(name, function)
 
 
-@when(u'adding task {label} an exception should be raised')
-def step_impl(context, label):
-    label = eval(label)
+@when(u'adding task {name} an exception should be raised')
+def step_impl(context, name):
+    name = eval(name)
     context.events = EventRecorder(context.graph)
     with test.assert_raises(ValueError):
-        context.graph.add_task(label)
+        context.graph.add_task(name)
 
 
-@when(u'adding relationship {relationship} an exception should be raised')
-def step_impl(context, relationship):
-    source, target = eval(relationship)
+@when(u'adding link {link} an exception should be raised')
+def step_impl(context, link):
+    source, target = eval(link)
     context.events = EventRecorder(context.graph)
     with test.assert_raises(ValueError):
+        context.graph.add_links(source, target)
+
+
+@when(u'adding links {links} with add_links')
+def step_impl(context, links):
+    links = eval(links)
+    context.events = EventRecorder(context.graph)
+    for source, target in links:
+        context.graph.add_links(source, target)
+
+
+@when(u'adding links {links} to inputs {inputs}')
+def step_impl(context, links, inputs):
+    links = eval(links)
+    inputs = eval(inputs)
+    context.events = EventRecorder(context.graph)
+    for (source, target), input in zip(links, inputs):
+        context.graph.add_links(source, (target, input))
+
+
+@when(u'adding links {links} with add_relationship')
+def step_impl(context, links):
+    links = eval(links)
+    context.events = EventRecorder(context.graph)
+    for source, target in links:
         context.graph.add_relationship(source, target)
 
 
-@when(u'adding relationships {relationships} to inputs {inputs}')
-def step_impl(context, relationships, inputs):
-    relationships = eval(relationships)
+@when(u'setting links {links} for task {name}')
+def step_impl(context, name, links):
+    name = eval(name)
+    links = eval(links)
+    context.events = EventRecorder(context.graph)
+    context.graph.set_links(name, links)
+
+
+@when(u'setting link {target} for task {source}')
+def step_impl(context, source, target):
+    source = eval(source)
+    target = eval(target)
+    context.events = EventRecorder(context.graph)
+    context.graph.set_links(source, target)
+
+
+@when(u'setting link {links} inputs to {inputs}')
+def step_impl(context, links, inputs):
+    links = eval(links)
     inputs = eval(inputs)
     context.events = EventRecorder(context.graph)
-    for (source, target), input in zip(relationships, inputs):
-        context.graph.add_relationship(source, target, input=input)
-
-
-@when(u'adding relationships {relationships}')
-def step_impl(context, relationships):
-    relationships = eval(relationships)
-    context.events = EventRecorder(context.graph)
-    for source, target in relationships:
-        context.graph.add_relationship(source, target)
-
-
-@when(u'setting relationship {relationships} inputs to {inputs}')
-def step_impl(context, relationships, inputs):
-    relationships = eval(relationships)
-    inputs = eval(inputs)
-    context.events = EventRecorder(context.graph)
-    for (source, target), input in zip(relationships, inputs):
+    for (source, target), input in zip(links, inputs):
         context.graph.set_input(source, target, input=input)
 
 
-@when(u'adding tasks {labels}')
-def step_impl(context, labels):
-    labels = eval(labels)
+@when(u'adding tasks {names}')
+def step_impl(context, names):
+    names = eval(names)
     context.events = EventRecorder(context.graph)
-    for label in labels:
-        context.graph.add_task(label)
+    for name in names:
+        context.graph.add_task(name)
 
 
-@when(u'updating task {label}')
-def step_impl(context, label):
-    label = eval(label)
+@when(u'updating task {name}')
+def step_impl(context, name):
+    name = eval(name)
     context.events = EventRecorder(context.graph)
-    context.graph.update(label)
+    context.graph.update(name)
 
 
-@when(u'relabelling tasks {oldlabels} as {newlabels}')
-def step_impl(context, oldlabels, newlabels):
-    oldlabels = eval(oldlabels)
-    newlabels = eval(newlabels)
+@when(u'renaming tasks {oldnames} as {newnames} with move_task')
+def step_impl(context, oldnames, newnames):
+    oldnames = eval(oldnames)
+    newnames = eval(newnames)
     context.events = EventRecorder(context.graph)
-    for oldlabel, newlabel in zip(oldlabels, newlabels):
-        context.graph.relabel_task(oldlabel, newlabel)
+    for oldname, newname in zip(oldnames, newnames):
+        context.graph.move_task(oldname, newname)
 
 
-@when(u'removing relationship {relationship} an exception should be raised')
-def step_impl(context, relationship):
-    source, target = eval(relationship)
+@when(u'renaming tasks {oldnames} as {newnames} with relabel_task')
+def step_impl(context, oldnames, newnames):
+    oldnames = eval(oldnames)
+    newnames = eval(newnames)
+    context.events = EventRecorder(context.graph)
+    for oldname, newname in zip(oldnames, newnames):
+        context.graph.relabel_task(oldname, newname)
+
+
+@when(u'removing link {link} an exception should be raised')
+def step_impl(context, link):
+    source, target = eval(link)
     context.events = EventRecorder(context.graph)
     with test.assert_raises(ValueError):
         context.graph.remove_relationship(source, target)
 
 
-@when(u'removing relationships {relationships}')
-def step_impl(context, relationships):
-    relationships = eval(relationships)
+@when(u'removing links {links}')
+def step_impl(context, links):
+    links = eval(links)
     context.events = EventRecorder(context.graph)
-    for source, target in relationships:
+    for source, target in links:
         context.graph.remove_relationship(source, target)
 
 
-@when(u'updating tasks {labels}')
-def step_impl(context, labels):
-    labels = eval(labels)
+@when(u'updating tasks {names}')
+def step_impl(context, names):
+    names = eval(names)
     context.events = EventRecorder(context.graph)
-    for label in labels:
-        context.graph.update(label)
+    for name in names:
+        context.graph.update(name)
 
 
-@when(u'removing tasks {labels}')
-def step_impl(context, labels):
-    labels = eval(labels)
+@when(u'removing tasks {names} with remove_task')
+def step_impl(context, names):
+    names = eval(names)
     context.events = EventRecorder(context.graph)
-    for label in labels:
-        context.graph.remove_task(label)
+    for name in names:
+        context.graph.remove_task(name)
 
 
-@when(u'the task {label} function is changed to {function}')
-def step_impl(context, label, function):
-    label = eval(label)
+@when(u'removing tasks {names} with clear_tasks')
+def step_impl(context, names):
+    names = eval(names)
+    context.events = EventRecorder(context.graph)
+    context.graph.clear_tasks(names)
+
+
+@when(u'the task {name} function is changed to {function} with set_task_fn')
+def step_impl(context, name, function):
+    name = eval(name)
     function = eval(function)
     context.events = EventRecorder(context.graph)
-    context.graph.set_task_fn(label, function)
+    context.graph.set_task_fn(name, function)
+
+
+@when(u'the task {name} function is changed to {function}')
+def step_impl(context, name, function):
+    name = eval(name)
+    function = eval(function)
+    context.events = EventRecorder(context.graph)
+    context.graph.set_task(name, function)
+
 
 
 #################################################################
 # Thens
 
-@then(u'the graph should contain tasks {labels}')
-def step_impl(context, labels):
-    labels = eval(labels)
-    for label in labels:
-	    test.assert_true(context.graph._graph.has_node(label))
+@then(u'the graph should contain tasks {names}')
+def step_impl(context, names):
+    names = eval(names)
+    test.assert_equal(context.graph.tasks(), set(names))
 
 
-@then(u'the graph should contain relationships {relationships}')
-def step_impl(context, relationships):
-    relationships = eval(relationships)
-    for source, target in relationships:
-        test.assert_true(context.graph._graph.has_edge(target, source))
+@then(u'the graph should contain links {links}')
+def step_impl(context, links):
+    links = eval(links)
+    all_links = [(source, target) for source, (target, input) in context.graph.links()]
+    test.assert_equal(sorted(links), sorted(all_links))
 
 
-@then(u'the outputs of tasks {labels} should be {outputs}')
-def step_impl(context, labels, outputs):
-    labels = eval(labels)
+@then(u'the outputs of tasks {names} should be {outputs}')
+def step_impl(context, names, outputs):
+    names = eval(names)
     outputs = eval(outputs)
-    for label, output in zip(labels, outputs):
-        test.assert_equal(context.graph.output(label), output)
+    for name, output in zip(names, outputs):
+        test.assert_equal(context.graph.output(name), output)
 
 
-@then(u'the tasks {labels} should be failed')
-def step_impl(context, labels):
-    labels = eval(labels)
-    for label in labels:
-        test.assert_equal(context.graph.state(label), graphcat.TaskState.FAILED)
+@then(u'the tasks {names} should be failed')
+def step_impl(context, names):
+    names = eval(names)
+    for name in names:
+        test.assert_equal(context.graph.state(name), graphcat.TaskState.FAILED)
 
 
-@then(u'the tasks {labels} should be finished')
-def step_impl(context, labels):
-    labels = eval(labels)
-    for label in labels:
-        test.assert_equal(context.graph.state(label), graphcat.TaskState.FINISHED)
+@then(u'the tasks {names} should be finished')
+def step_impl(context, names):
+    names = eval(names)
+    for name in names:
+        test.assert_equal(context.graph.state(name), graphcat.TaskState.FINISHED)
 
 
-@then(u'the tasks {labels} should be unfinished')
-def step_impl(context, labels):
-    labels = eval(labels)
-    for label in labels:
-        test.assert_equal(context.graph.state(label), graphcat.TaskState.UNFINISHED)
+@then(u'the tasks {names} should be unfinished')
+def step_impl(context, names):
+    names = eval(names)
+    for name in names:
+        test.assert_equal(context.graph.state(name), graphcat.TaskState.UNFINISHED)
 
 
-@then(u'tasks {labels} are updated')
-def step_impl(context, labels):
-    labels = eval(labels)
-    test.assert_equal(labels, context.events.updated)
+@then(u'tasks {names} are updated')
+def step_impl(context, names):
+    names = eval(names)
+    test.assert_equal(names, context.events.updated)
 
 
-@then(u'tasks {labels} are executed with inputs {inputs}')
-def step_impl(context, labels, inputs):
-    labels = eval(labels)
+@then(u'tasks {names} are executed with inputs {inputs}')
+def step_impl(context, names, inputs):
+    names = eval(names)
     inputs = eval(inputs)
-    test.assert_equal(labels, context.events.executed)
+    test.assert_equal(names, context.events.executed)
     test.assert_equal(inputs, context.events.inputs)
 
 
-@then(u'tasks {labels} are executed')
-def step_impl(context, labels):
-    labels = eval(labels)
-    test.assert_equal(labels, context.events.executed)
+@then(u'tasks {names} are executed')
+def step_impl(context, names):
+    names = eval(names)
+    test.assert_equal(names, context.events.executed)
 
 
-@then(u'tasks {labels} are finished')
-def step_impl(context, labels):
-    labels = eval(labels)
-    test.assert_equal(labels, context.events.finished)
+@then(u'tasks {names} are finished')
+def step_impl(context, names):
+    names = eval(names)
+    test.assert_equal(names, context.events.finished)
 
 
-@then(u'the task {labels} outputs should be {outputs}')
-def step_impl(context, labels, outputs):
-    labels = eval(labels)
+@then(u'the task {names} outputs should be {outputs}')
+def step_impl(context, names, outputs):
+    names = eval(names)
     outputs = eval(outputs)
-    for label, output in zip(labels, outputs):
-        test.assert_equal(context.graph.output(label), output)
+    for name, output in zip(names, outputs):
+        test.assert_equal(context.graph.output(name), output)
 
 
 @then(u'the log should contain {calls}')
@@ -367,4 +424,10 @@ def step_impl(context, calls):
 def step_impl(context):
     graphcat.notebook.display(context.graph)
 
+
+@then(u'tasks {names} should have links {links}')
+def step_impl(context, names, links):
+    names = eval(names)
+    links = eval(links)
+    test.assert_equal(sorted(links), sorted(context.graph.links(names)))
 

@@ -16,8 +16,10 @@ import os
 import shutil
 import subprocess
 
-os.remove(".coverage")
-shutil.rmtree(".cover")
+if os.path.exists(".coverage"):
+    os.remove(".coverage")
+if os.path.exists(".cover"):
+    shutil.rmtree(".cover")
 subprocess.call(["coverage", "run", "--source", "graphcat", "-m", "behave"])
 subprocess.call(["coverage", "report"])
 subprocess.call(["coverage", "html", "--directory", ".cover"])
