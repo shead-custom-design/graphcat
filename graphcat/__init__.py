@@ -190,10 +190,10 @@ class Graph(object):
         :class:`ValueError`
             If `label` already exists.
         """
-        self._require_task_absent(label)
+        self._require_task_absent(name)
         if fn is None:
             fn = null
-        self.set_task(label, fn)
+        self.set_task(name, fn)
 
 
     def clear_tasks(self, names=None):
