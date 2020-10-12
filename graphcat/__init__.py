@@ -115,7 +115,7 @@ class Graph(object):
             raise ValueError(f"Task {name} already exists.")
 
 
-    def _require_relationship_present(self, source, target):
+    def _require_link_present(self, source, target):
         if self._graph.number_of_edges(target, source) != 1:
             raise ValueError(f"Edge {source} -> {target} doesn't exist.")
 
@@ -166,7 +166,7 @@ class Graph(object):
         self.mark_unfinished(target)
 
 
-    def add_task(self, label, fn=None):
+    def add_task(self, name, fn=None):
         """Add a task to the graph.
 
         This function will raise an exception if the task already exists.
@@ -177,13 +177,13 @@ class Graph(object):
 
         Parameters
         ----------
-        label: hashable object, required
+        name: hashable object, required
             Unique label that will identify the task.
         fn: callable, optional
             The `fn` object will be called whenever the task is executed.  It must take two keyword arguments
-            as parameters, `label` and `inputs`.  `label` will contain the unique task label.  `inputs` will
-            be a dict mapping each relationship's named `input` to a sequence of outputs returned from this task's dependencies
-            (upstream tasks).  If :any:`None` (the default), :func:`null` will be used.
+            as parameters, `label` and `inputs`.  `name` will contain the unique task name.  `inputs` will
+            be a dict mapping named inputs to a sequence of outputs returned from upstream tasks.
+            If :any:`None` (the default), :func:`null` will be used.
 
         Raises
         ------
@@ -411,7 +411,7 @@ class Graph(object):
         warnings.warn("graphcat.Graph.remove_relationship is deprecated, use graphcat.Graph.clear_links instead.", DeprecationWarning, stacklevel=2)
         self._require_task_present(source)
         self._require_task_present(target)
-        self._require_relationship_present(source, target)
+        self._require_link_present(source, target)
         self.mark_unfinished(source)
         self._graph.remove_edge(target, source)
 
@@ -434,7 +434,7 @@ class Graph(object):
         warnings.warn("graphcat.Graph.set_input is deprecated, use graphcat.Graph.set_links instead.", DeprecationWarning, stacklevel=2)
         self._require_task_present(source)
         self._require_task_present(target)
-        self._require_relationship_present(source, target)
+        self._require_link_present(source, target)
         self._graph.edges[(target, source)]["input"] = input
         self.mark_unfinished(target)
 
@@ -494,8 +494,7 @@ class Graph(object):
         fn: callable, required
             The `fn` object will be called whenever the task is executed.  It must take two keyword arguments
             as parameters, `name` and `inputs`.  `name` will contain the unique task name.  `inputs` will
-            be a dict mapping each relationship's named `input` to a sequence of outputs returned from this task's dependencies
-            (upstream tasks).
+            be a dict mapping named inputs to sequences of outputs returned from upstream tasks.
         """
         if name in self._graph:
             self._graph.nodes[name]["fn"] = fn
@@ -608,7 +607,7 @@ class Graph(object):
 class Input(enum.Enum):
     """Enumerates special :class:`Graph` named inputs."""
     DEPENDENCY = 1
-    """Named input for relationships that are used only as dependencies, not data sources."""
+    """Named input for links that are used only as dependencies, not data sources."""
 
 
 class Logger(object):
