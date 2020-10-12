@@ -209,14 +209,6 @@ def step_impl(context, links, inputs):
         context.graph.add_links(source, (target, input))
 
 
-@when(u'adding links {links} with add_relationship')
-def step_impl(context, links):
-    links = eval(links)
-    context.events = EventRecorder(context.graph)
-    for source, target in links:
-        context.graph.add_relationship(source, target)
-
-
 @when(u'setting links {links} for task {name}')
 def step_impl(context, name, links):
     name = eval(name)
@@ -239,7 +231,7 @@ def step_impl(context, links, inputs):
     inputs = eval(inputs)
     context.events = EventRecorder(context.graph)
     for (source, target), input in zip(links, inputs):
-        context.graph.set_input(source, target, input=input)
+        context.graph.set_task(source, (target, input))
 
 
 @when(u'adding tasks {names}')
@@ -266,21 +258,12 @@ def step_impl(context, oldnames, newnames):
         context.graph.move_task(oldname, newname)
 
 
-@when(u'renaming tasks {oldnames} as {newnames} with relabel_task')
-def step_impl(context, oldnames, newnames):
-    oldnames = eval(oldnames)
-    newnames = eval(newnames)
-    context.events = EventRecorder(context.graph)
-    for oldname, newname in zip(oldnames, newnames):
-        context.graph.relabel_task(oldname, newname)
-
-
 @when(u'removing link {link} an exception should be raised')
 def step_impl(context, link):
     source, target = eval(link)
     context.events = EventRecorder(context.graph)
     with test.assert_raises(ValueError):
-        context.graph.remove_relationship(source, target)
+        context.graph.clear_links(source, target)
 
 
 @when(u'removing links {links}')
@@ -288,7 +271,7 @@ def step_impl(context, links):
     links = eval(links)
     context.events = EventRecorder(context.graph)
     for source, target in links:
-        context.graph.remove_relationship(source, target)
+        context.graph.clear_links(source, target)
 
 
 @when(u'updating tasks {names}')
@@ -299,27 +282,11 @@ def step_impl(context, names):
         context.graph.update(name)
 
 
-@when(u'removing tasks {names} with remove_task')
-def step_impl(context, names):
-    names = eval(names)
-    context.events = EventRecorder(context.graph)
-    for name in names:
-        context.graph.remove_task(name)
-
-
 @when(u'removing tasks {names} with clear_tasks')
 def step_impl(context, names):
     names = eval(names)
     context.events = EventRecorder(context.graph)
     context.graph.clear_tasks(names)
-
-
-@when(u'the task {name} function is changed to {function} with set_task_fn')
-def step_impl(context, name, function):
-    name = eval(name)
-    function = eval(function)
-    context.events = EventRecorder(context.graph)
-    context.graph.set_task_fn(name, function)
 
 
 @when(u'the task {name} function is changed to {function}')

@@ -25,7 +25,6 @@ Feature: Graph
         Examples:
             | tasks           | links         | update tasks | finished before | unfinished before |  added links         | api               | new tasks       | new links                                | finished after  | unfinished after |
             | ["A", "B", "C"] | [("A", "B")]  | ["A", "B"]   | ["A", "B"]      | ["C"]             |  [("C", "B")]        | add_links         | ["A", "B", "C"] | [("A", "B"), ("C", "B")] | ["A"]           | ["B", "C"]       |
-            | ["A", "B", "C"] | [("A", "B")]  | ["A", "B"]   | ["A", "B"]      | ["C"]             |  [("C", "B")]        | add_relationship  | ["A", "B", "C"] | [("A", "B"), ("C", "B")] | ["A"]           | ["B", "C"]       |
 
 
     Scenario Outline: Adding Tasks
@@ -67,13 +66,10 @@ Feature: Graph
             | tasks           | links                    | update tasks    | finished before | unfinished before | old names  | new names   | api            | new tasks       | new links                | finished after  | unfinished after |
             | ["A", "B", "C"] | [("A", "B"), ("A", "C")] | ["A", "B", "C"] | ["A", "B", "C"] | []                | ["A"]      | ["D"]       | move_task      | ["D", "B", "C"] | [("D", "B"), ("D", "C")] | []              | ["D", "B", "C"]  |
             | ["A", "B", "C"] | [("A", "B"), ("A", "C")] | ["A", "B", "C"] | ["A", "B", "C"] | []                | ["B"]      | ["D"]       | move_task      | ["A", "D", "C"] | [("A", "D"), ("A", "C")] | ["A", "C"]      | ["D"]            |
-            | ["A", "B", "C"] | [("A", "B"), ("A", "C")] | ["A", "B", "C"] | ["A", "B", "C"] | []                | ["A"]      | ["D"]       | relabel_task   | ["D", "B", "C"] | [("D", "B"), ("D", "C")] | []              | ["D", "B", "C"]  |
-            | ["A", "B", "C"] | [("A", "B"), ("A", "C")] | ["A", "B", "C"] | ["A", "B", "C"] | []                | ["B"]      | ["D"]       | relabel_task   | ["A", "D", "C"] | [("A", "D"), ("A", "C")] | ["A", "C"]      | ["D"]            |
 
         Examples: Fan-In
             | tasks           | links                    | update tasks    | finished before | unfinished before | old names  | new names   | api            | new tasks       | new links                | finished after  | unfinished after |
             | ["A", "B", "C"] | [("A", "B"), ("C", "B")] | ["A", "B", "C"] | ["A", "B", "C"] | []                | ["B"]      | ["D"]       | move_task      | ["A", "D", "C"] | [("A", "D"), ("C", "D")] | ["A", "C"]      | ["D"]            |
-            | ["A", "B", "C"] | [("A", "B"), ("C", "B")] | ["A", "B", "C"] | ["A", "B", "C"] | []                | ["B"]      | ["D"]       | relabel_task   | ["A", "D", "C"] | [("A", "D"), ("C", "D")] | ["A", "C"]      | ["D"]            |
 
 
     Scenario Outline: Removing Links
@@ -119,15 +115,11 @@ Feature: Graph
             | tasks           | links                    | update tasks    | finished before | unfinished before | removed    | api             | new tasks       | new links                | finished after  | unfinished after |
             | ["A", "B", "C"] | [("A", "B"), ("A", "C")] | ["A", "B", "C"] | ["A", "B", "C"] | []                | ["A"]      | clear_tasks     | ["B", "C"]      | []                       | []              | ["B", "C"]       |
             | ["A", "B", "C"] | [("A", "B"), ("A", "C")] | ["A", "B", "C"] | ["A", "B", "C"] | []                | ["B"]      | clear_tasks     | ["A", "C"]      | [("A", "C")]             | ["A", "C"]      | []               |
-            | ["A", "B", "C"] | [("A", "B"), ("A", "C")] | ["A", "B", "C"] | ["A", "B", "C"] | []                | ["A"]      | remove_task     | ["B", "C"]      | []                       | []              | ["B", "C"]       |
-            | ["A", "B", "C"] | [("A", "B"), ("A", "C")] | ["A", "B", "C"] | ["A", "B", "C"] | []                | ["B"]      | remove_task     | ["A", "C"]      | [("A", "C")]             | ["A", "C"]      | []               |
 
         Examples: Fan-In
             | tasks           | links                    | update tasks    | finished before | unfinished before | removed    | api             | new tasks       | new links                | finished after  | unfinished after |
             | ["A", "B", "C"] | [("A", "B"), ("C", "B")] | ["A", "B", "C"] | ["A", "B", "C"] | []                | ["A"]      | clear_tasks     | ["B", "C"]      | [("C", "B")]             | ["C"]           | ["B"]            |
             | ["A", "B", "C"] | [("A", "B"), ("C", "B")] | ["A", "B", "C"] | ["A", "B", "C"] | []                | ["B"]      | clear_tasks     | ["A", "C"]      | []                       | ["A", "C"]      | []               |
-            | ["A", "B", "C"] | [("A", "B"), ("C", "B")] | ["A", "B", "C"] | ["A", "B", "C"] | []                | ["A"]      | remove_task     | ["B", "C"]      | [("C", "B")]             | ["C"]           | ["B"]            |
-            | ["A", "B", "C"] | [("A", "B"), ("C", "B")] | ["A", "B", "C"] | ["A", "B", "C"] | []                | ["B"]      | remove_task     | ["A", "C"]      | []                       | ["A", "C"]      | []               |
 
 
     Scenario Outline: Updating Tasks
@@ -236,10 +228,6 @@ Feature: Graph
         Then the tasks ["A"] should be finished
         And the tasks ["B", "C"] should be unfinished
         And the task ["A", "B", "C"] outputs should be [1, None, 3]
-        When the task "C" function is changed to None with set_task_fn
-        Then the tasks ["A", "B"] should be finished
-        And the tasks ["C"] should be unfinished
-        And the task ["A", "B", "C"] outputs should be [1, None, None]
 
 
     Scenario: Expression Tasks

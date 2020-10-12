@@ -154,18 +154,6 @@ class Graph(object):
         self.mark_unfinished(unfinished)
 
 
-    def add_relationship(self, source, target, input=None):
-        """.. deprecated:: 0.3.0
-
-            Use :meth:`add_links` or :meth:`set_links` instead.
-        """
-        warnings.warn("graphcat.Graph.add_relationship is deprecated, use graphcat.Graph.add_links or graphcat.Graph.set_links instead.", DeprecationWarning, stacklevel=2)
-        self._require_task_present(source)
-        self._require_task_present(target)
-        self._graph.add_edge(target, source, input=input) # Edges point from tasks to their dependencies.
-        self.mark_unfinished(target)
-
-
     def add_task(self, name, fn=None):
         """Add a task to the graph.
 
@@ -194,6 +182,14 @@ class Graph(object):
         if fn is None:
             fn = null
         self.set_task(name, fn)
+
+
+    def clear_links(self, source, target):
+        self._require_task_present(source)
+        self._require_task_present(target)
+        self._require_link_present(source, target)
+        self.mark_unfinished(source)
+        self._graph.remove_edge(target, source)
 
 
     def clear_tasks(self, names=None):
@@ -394,51 +390,6 @@ class Graph(object):
         return self._graph.nodes[name]["output"]
 
 
-    def relabel_task(self, oldname, newname):
-        """.. deprecated:: 0.3.0
-
-            Use :meth:`move_task` instead.
-        """
-        warnings.warn("graphcat.Graph.relabel_task is deprecated, use graphcat.Graph.move_task instead.", DeprecationWarning, stacklevel=2)
-        self.move_task(oldname, newname)
-
-
-    def remove_relationship(self, source, target):
-        """.. deprecated:: 0.3.0
-
-            Use :meth:`clear_links` instead.
-        """
-        warnings.warn("graphcat.Graph.remove_relationship is deprecated, use graphcat.Graph.clear_links instead.", DeprecationWarning, stacklevel=2)
-        self._require_task_present(source)
-        self._require_task_present(target)
-        self._require_link_present(source, target)
-        self.mark_unfinished(source)
-        self._graph.remove_edge(target, source)
-
-
-    def remove_task(self, name):
-        """.. deprecated:: 0.3.0
-
-            Use :meth:`clear_tasks` instead.
-        """
-        warnings.warn("graphcat.Graph.remove_task is deprecated, use graphcat.Graph.clear_tasks instead.", DeprecationWarning, stacklevel=2)
-        self._require_task_present(name)
-        self.clear_tasks(name)
-
-
-    def set_input(self, source, target, input):
-        """.. deprecated:: 0.3.0
-
-            Use :meth:`set_links` instead.
-        """
-        warnings.warn("graphcat.Graph.set_input is deprecated, use graphcat.Graph.set_links instead.", DeprecationWarning, stacklevel=2)
-        self._require_task_present(source)
-        self._require_task_present(target)
-        self._require_link_present(source, target)
-        self._graph.edges[(target, source)]["input"] = input
-        self.mark_unfinished(target)
-
-
     def set_links(self, source, targets):
         """Set links between `source` and `targets`.
 
@@ -501,18 +452,6 @@ class Graph(object):
         else:
             self._graph.add_node(name, fn=fn, state=TaskState.UNFINISHED, output=None)
         self.mark_unfinished(name)
-
-
-    def set_task_fn(self, name, fn):
-        """.. deprecated:: 0.3.0
-
-            Use :meth:`set_task` instead.
-        """
-        warnings.warn("graphcat.Graph.set_task_fn is deprecated, use graphcat.Graph.set_task instead.", DeprecationWarning, stacklevel=2)
-        self._require_task_present(name)
-        if fn is None:
-            fn = null
-        self.set_task(name, fn)
 
 
     def state(self, name):
