@@ -313,6 +313,9 @@ class Graph(object):
     def on_changed(self):
         """Signal emitted whenever a part of the graph becomes unfinished.
 
+        Functions invoked by this signal must have the signature fn(graph),
+        where `graph` is this object.
+
         Returns
         -------
         signal: :class:`blinker.base.Signal`
@@ -323,6 +326,10 @@ class Graph(object):
     @property
     def on_execute(self):
         """Signal emitted before a task is executed.
+
+        Functions invoked by this signal must have the signature fn(graph, name, input),
+        where `graph` is this object, `name` is the name of the task to be
+        executed, and `input` is a dict containing the task inputs.
 
         Returns
         -------
@@ -335,6 +342,10 @@ class Graph(object):
     def on_failed(self):
         """Signal emitted when a task fails during execution.
 
+        Functions invoked by this signal must have the signature fn(graph, name, exception),
+        where `graph` is this object, `name` is the name of the task that failed, and
+        `exception` is the exception thrown by the task.
+
         Returns
         -------
         signal: :class:`blinker.base.Signal`
@@ -346,6 +357,11 @@ class Graph(object):
     def on_finished(self):
         """Signal emitted when a task executes successfully.
 
+        Functions invoked by this signal must have the signature fn(graph, name, output),
+        where `graph` is this object, `name` is the name of the task that
+        executed successfully, and `output` is the return value from the task
+        function.
+
         Returns
         -------
         signal: :class:`blinker.base.Signal`
@@ -356,6 +372,10 @@ class Graph(object):
     @property
     def on_update(self):
         """Signal emitted when a task is updated.
+
+        Functions invoked by this signal must have the signature fn(graph, name),
+        where `graph` is this object and `name` is the name of the task to be
+        updated.
 
         Returns
         -------
@@ -584,33 +604,33 @@ class Logger(object):
         self._log_outputs = log_outputs
         self._log = log
 
-        graph.on_failed.connect(self.on_failed)
         graph.on_execute.connect(self.on_execute)
+        graph.on_failed.connect(self.on_failed)
         graph.on_finished.connect(self.on_finished)
         graph.on_update.connect(self.on_update)
 
-    def on_failed(self, sender, name, exception):
-        """Called when a task raises an exception during execution."""
-        if self._log_exceptions:
-            self._log.error(f"Task {name} failed. Exception: {exception}")
-        else:
-            self._log.error(f"Task {name} failed.")
-
-    def on_execute(self, sender, name, inputs):
+    def on_execute(self, graph, name, inputs):
         """Called when a task is executed."""
         if self._log_inputs:
             self._log.info(f"Task {name} executing. Inputs: {inputs}")
         else:
             self._log.info(f"Task {name} executing.")
 
-    def on_finished(self, sender, name, output):
+    def on_failed(self, graph, name, exception):
+        """Called when a task raises an exception during execution."""
+        if self._log_exceptions:
+            self._log.error(f"Task {name} failed. Exception: {exception}")
+        else:
+            self._log.error(f"Task {name} failed.")
+
+    def on_finished(self, graph, name, output):
         """Called when a task has executed sucessfully."""
         if self._log_outputs:
             self._log.info(f"Task {name} finished. Output: {output}")
         else:
             self._log.info(f"Task {name} finished.")
 
-    def on_update(self, sender, name):
+    def on_update(self, graph, name):
         """Called when a task is updated."""
         self._log.debug(f"Task {name} updating.")
 
@@ -637,7 +657,7 @@ class UpdatedTasks(object):
         self._tasks = set()
         graph.on_update.connect(self._on_update)
 
-    def _on_update(self, sender, name):
+    def _on_update(self, graph, name):
         self._tasks.add(name)
 
     @property
