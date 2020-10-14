@@ -216,6 +216,14 @@ def step_impl(context, names):
         context.graph.add_task(name)
 
 
+@when(u'updating task {name} an exception should be raised')
+def step_impl(context, name):
+    name = eval(name)
+    context.events = EventRecorder(context.graph)
+    with test.assert_raises(RuntimeError):
+        context.graph.update(name)
+
+
 @when(u'updating task {name}')
 def step_impl(context, name):
     name = eval(name)

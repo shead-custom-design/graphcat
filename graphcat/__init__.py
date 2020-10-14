@@ -200,7 +200,7 @@ class Graph(object):
         Parameters
         ----------
         names: :any:`None`, hashable object, or list|set of hashable objects, optional
-            Names identifying the tasks to remove.  If any:`None` (the default), all tasks are removed, emptying the graph.
+            Names identifying the tasks to remove.  If :any:`None` (the default), all tasks are removed, emptying the graph.
         """
         names = self._require_valid_names(names)
         self.mark_unfinished(names)
@@ -242,7 +242,7 @@ class Graph(object):
         Parameters
         ----------
         names: :any:`None`, hashable object, or list|set of hashable objects, required
-            Task names to be marked as failed.  If any:`None` (the default), all tasks are marked as failed.
+            Task names to be marked as failed.  If :any:`None` (the default), all tasks are marked as failed.
         """
         names = self._require_valid_names(names)
 
@@ -269,7 +269,7 @@ class Graph(object):
         Parameters
         ----------
         names: :any:`None`, hashable object, or list|set of hashable objects, required
-            Task names to be marked as unfinished.  If any:`None` (the default), the entire graph is marked unfinished.
+            Task names to be marked as unfinished.  If :any:`None` (the default), the entire graph is marked unfinished.
         """
         names = self._require_valid_names(names)
 
@@ -344,7 +344,7 @@ class Graph(object):
 
         Functions invoked by this signal must have the signature fn(graph, name, exception),
         where `graph` is this object, `name` is the name of the task that failed, and
-        `exception` is the exception thrown by the task.
+        `exception` is the exception raised by the task.
 
         Returns
         -------
@@ -398,12 +398,14 @@ class Graph(object):
         Returns
         -------
         output: any object
-            The value returned when the task function was last executed, or any:`None`.
+            The value returned when the task function was last executed, or :any:`None`.
 
         Raises
         ------
         :class:`ValueError`
             If `name` doesn't exist.
+        :class:`Exception`
+            Any exception raised by a task function will be re-raised by :meth:`output`.
         """
         self._require_task_present(name)
         self.update(name)
@@ -519,11 +521,14 @@ class Graph(object):
         ------
         :class:`ValueError`
             If the task with `name` doesn't exist.
+        :class:`Exception`
+            Any exception raised by a task function will be re-raised by :meth:`update`.
         """
 
         self._require_task_present(name)
 
         # Keep track of failures.
+        exception = None
         failed = None
 
         # Iterate over every task to be executed, in order ...
@@ -534,7 +539,7 @@ class Graph(object):
             self._on_update.send(self, name=name)
 
             # Only execute this task if it isn't finished and a failure hasn't already occurred.
-            if failed is None and task["state"] != TaskState.FINISHED:
+            if exception is None and task["state"] != TaskState.FINISHED:
 
                 try:
                     # Gather inputs for the function.
@@ -553,14 +558,14 @@ class Graph(object):
                     self._on_finished.send(self, name=name, output=task["output"])
                 except Exception as e:
                     # The function raised an exception, notify observers.
+                    exception = e
                     failed = name
-                    task["output"] = None
-                    task["state"] = TaskState.FAILED
                     self._on_failed.send(self, name=name, exception=e)
 
         # If a failure occurred, mark all downstream tasks.
         if failed is not None:
             self.mark_failed(failed)
+            raise exception
 
 
 class Input(enum.Enum):

@@ -182,7 +182,7 @@ Feature: Graph
         Given an empty graph
         When adding tasks ["A", "B", "C"] with functions [graphcat.null, graphcat.raise_exception(RuntimeError()), graphcat.null]
         And adding links [("A", "B"), ("B", "C")]
-        And updating task "C"
+        And updating task "C" an exception should be raised
         Then the tasks ["A"] should be finished
         And the tasks ["B", "C"] should be failed
 
@@ -269,7 +269,7 @@ Feature: Graph
         And updating tasks ["A"]
         Then the log should contain [("debug", "Task A updating."), ("info", "Task A executing. Inputs: {}"), ("info", "Task A finished. Output: None")]
         When adding tasks ["B"] with functions [graphcat.raise_exception(RuntimeError("Whoops!"))]
-        And updating tasks ["B"]
+        And updating task "B" an exception should be raised
         Then the log should contain [("debug", "Task B updating."), ("info", "Task B executing. Inputs: {}"), ("error", "Task B failed. Exception: Whoops!")]
 
 
@@ -281,7 +281,7 @@ Feature: Graph
         And updating tasks ["A"]
         Then the log should contain [("debug", "Task A updating."), ("info", "Task A executing."), ("info", "Task A finished.")]
         When adding tasks ["B"] with functions [graphcat.raise_exception(RuntimeError("Whoops!"))]
-        And updating tasks ["B"]
+        And updating task "B" an exception should be raised
         Then the log should contain [("debug", "Task B updating."), ("info", "Task B executing."), ("error", "Task B failed.")]
 
 
@@ -289,7 +289,7 @@ Feature: Graph
         Given an empty graph
         When adding tasks ["A", "B", "C", "D"] with functions [None, None, None, graphcat.raise_exception(RuntimeError("Whoops!"))]
         And adding links [("A", "B"), ("A", "C"), ("B", "D")]
-        And updating tasks ["D"]
+        And updating task "D" an exception should be raised
         Then displaying the graph in a notebook should produce a visualization
 
 
