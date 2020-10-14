@@ -26,6 +26,10 @@ Feature: Graph
             | tasks           | links                 | update tasks | finished before | unfinished before |  added links          | new tasks       | new links                                | finished after  | unfinished after |
             | ["A", "B", "C"] | [("A", ("B", None))]  | ["A", "B"]   | ["A", "B"]      | ["C"]             |  [("C", ("B", None))] | ["A", "B", "C"] | [("A", ("B", None)), ("C", ("B", None))] | ["A"]           | ["B", "C"]       |
 
+        Examples: Parallel Edges
+            | tasks           | links                 | update tasks | finished before | unfinished before |  added links          | new tasks       | new links                                | finished after  | unfinished after |
+            | ["A", "B"]      | [("A", ("B", 0))]     | ["A", "B"]   | ["A", "B"]      | []                |  [("A", ("B", 1))]    | ["A", "B"]      | [("A", ("B", 0)), ("A", ("B", 1))]       | ["A"]           | ["B"]            |
+
 
     Scenario Outline: Adding Tasks
         Given an empty graph

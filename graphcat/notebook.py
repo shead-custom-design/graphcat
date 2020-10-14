@@ -61,10 +61,9 @@ def display(graph):
 
         agraph.add_node(node, color=color, fillcolor=fillcolor, fontcolor=fontcolor)
 
-    for edge in graph._graph.edges():
-        input = graph._graph.edges[edge]["input"]
-        if input == None:
+    for target, source, input in graph._graph.edges(data="input"):
+        if input is None:
             input = ""
-        agraph.add_edge(edge[1], edge[0], label=input) # We want edges to point from dependencies to dependees.
+        agraph.add_edge(source, target, label=input) # We want edges to point from dependencies to dependents.
 
     IPython.display.display(IPython.display.SVG(data=agraph.draw(prog="dot", format="svg")))

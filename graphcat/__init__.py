@@ -17,6 +17,7 @@
 
 __version__ = "0.4.0-dev"
 
+import collections
 import enum
 import functools
 import logging
@@ -89,7 +90,7 @@ class Graph(object):
     downstream tasks.
     """
     def __init__(self):
-        self._graph = networkx.DiGraph()
+        self._graph = networkx.MultiDiGraph()
         self._on_changed = blinker.Signal()
         self._on_execute = blinker.Signal()
         self._on_failed = blinker.Signal()
@@ -224,11 +225,11 @@ class Graph(object):
         """
         names = self._require_valid_names(names)
 
-        result = []
-        for target, source in self._graph.edges():
+        results = []
+        for target, source, input in self._graph.edges(data="input"):
             if source in names:
-                result.append((source, (target, self._graph.edges[(target, source)]["input"])))
-        return result
+                results.append((source, (target, input)))
+        return results
 
 
     def mark_failed(self, names=None):
@@ -543,13 +544,11 @@ class Graph(object):
 
                 try:
                     # Gather inputs for the function.
-                    inputs = {}
-                    for edge in self._graph.out_edges(name):
-                        output = self._graph.nodes[edge[1]]["output"]
-                        edge_input = self._graph.edges[edge]["input"]
-                        if edge_input not in inputs:
-                            inputs[edge_input] = []
-                        inputs[edge_input].append(output)
+                    inputs = collections.defaultdict(list)
+                    for target, source, input in self._graph.out_edges(name, data="input"):
+                        output = self._graph.nodes[source]["output"]
+                        inputs[input].append(output)
+                    inputs = dict(inputs)
 
                     # Execute the function and store the output.
                     self._on_execute.send(self, name=name, inputs=inputs)
