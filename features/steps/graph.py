@@ -192,46 +192,20 @@ def step_impl(context, link):
         context.graph.add_links(source, target)
 
 
-@when(u'adding links {links} with add_links')
+@when(u'adding links {links}')
 def step_impl(context, links):
     links = eval(links)
     context.events = EventRecorder(context.graph)
-    for source, target in links:
-        context.graph.add_links(source, target)
+    for source, targets in links:
+        context.graph.add_links(source, targets)
 
 
-@when(u'adding links {links} to inputs {inputs}')
-def step_impl(context, links, inputs):
-    links = eval(links)
-    inputs = eval(inputs)
-    context.events = EventRecorder(context.graph)
-    for (source, target), input in zip(links, inputs):
-        context.graph.add_links(source, (target, input))
-
-
-@when(u'setting links {links} for task {name}')
-def step_impl(context, name, links):
-    name = eval(name)
+@when(u'setting links {links}')
+def step_impl(context, links):
     links = eval(links)
     context.events = EventRecorder(context.graph)
-    context.graph.set_links(name, links)
-
-
-@when(u'setting link {target} for task {source}')
-def step_impl(context, source, target):
-    source = eval(source)
-    target = eval(target)
-    context.events = EventRecorder(context.graph)
-    context.graph.set_links(source, target)
-
-
-@when(u'setting link {links} inputs to {inputs}')
-def step_impl(context, links, inputs):
-    links = eval(links)
-    inputs = eval(inputs)
-    context.events = EventRecorder(context.graph)
-    for (source, target), input in zip(links, inputs):
-        context.graph.set_task(source, (target, input))
+    for source, targets in links:
+        context.graph.set_links(source, targets)
 
 
 @when(u'adding tasks {names}')
@@ -310,8 +284,7 @@ def step_impl(context, names):
 @then(u'the graph should contain links {links}')
 def step_impl(context, links):
     links = eval(links)
-    all_links = [(source, target) for source, (target, input) in context.graph.links()]
-    test.assert_equal(sorted(links), sorted(all_links))
+    test.assert_equal(sorted(links), sorted(context.graph.links()))
 
 
 @then(u'the outputs of tasks {names} should be {outputs}')
