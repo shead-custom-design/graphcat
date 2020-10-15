@@ -267,17 +267,6 @@ Feature: Graph
         And the task ["A", "B", "C"] outputs should be [3, 2, 3.1]
 
 
-    Scenario: Variable Tasks
-        Given an empty graph
-        When adding a variable task "A" with value 3.14
-        Then the graph should contain tasks ["A"]
-        And the tasks ["A"] should be unfinished
-        And the task ["A"] outputs should be [3.14]
-        When changing the variable task "A" to value "foo"
-        Then the tasks ["A"] should be unfinished
-        And the task ["A"] outputs should be ["foo"]
-
-
     Scenario: Graph Logger
         Given an empty graph
         And a log

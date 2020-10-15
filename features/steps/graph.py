@@ -124,26 +124,6 @@ class NodeOutput(object):
         return self._graph.output(name)
 
 
-@when(u'adding a variable task {name} with value {value}')
-def step_impl(context, name, value):
-    name = eval(name)
-    value = eval(value)
-    context.events = EventRecorder(context.graph)
-
-    if not hasattr(context, "variables"):
-        context.variables = {}
-
-    context.variables[name] = graphcat.VariableTask(context.graph, name, value)
-
-
-@when(u'changing the variable task {name} to value {value}')
-def step_impl(context, name, value):
-    name = eval(name)
-    value = eval(value)
-    context.events = EventRecorder(context.graph)
-    context.variables[name].set(value)
-
-
 @when(u'adding an expression task {name} with expression {expression}')
 def step_impl(context, name, expression):
     name = eval(name)
