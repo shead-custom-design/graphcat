@@ -126,6 +126,19 @@ Feature: Graph
             | ["A", "B", "C"] | [("A", ("B", None)), ("C", ("B", None))] | ["A", "B", "C"] | ["A", "B", "C"] | []                | ["B"]      | clear_tasks     | ["A", "C"]      | []                       | ["A", "C"]      | []               |
 
 
+    Scenario Outline: Setting Parameters
+        Given an empty graph
+        When adding tasks <tasks>
+        And setting parameter <target> <input> <source> <value>
+        Then the graph should contain tasks <result tasks>
+        And the graph should contain links <result links>
+
+        Examples:
+            | tasks      | target     | input        | source       | value          |  result tasks        | result links                |
+            | ["A"]      | "A"        | None         | "A/B"        | "foo"          |  ["A", "A/B"]        | [("A/B", ("A", None))]      |
+            | ["A"]      | "A"        | 0            | "A/B"        | "foo"          |  ["A", "A/B"]        | [("A/B", ("A", 0))]         |
+
+
     Scenario Outline: Updating Tasks
         Given an empty graph
         When adding tasks <tasks>

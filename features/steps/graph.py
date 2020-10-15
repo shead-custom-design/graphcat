@@ -208,6 +208,16 @@ def step_impl(context, links):
         context.graph.set_links(source, targets)
 
 
+@when(u'setting parameter {target} {input} {source} {value}')
+def step_impl(context, source, value, target, input):
+    source = eval(source)
+    value = eval(value)
+    target = eval(target)
+    input = eval(input)
+    context.events = EventRecorder(context.graph)
+    context.graph.set_parameter(target, input, source, value)
+
+
 @when(u'adding tasks {names}')
 def step_impl(context, names):
     names = eval(names)

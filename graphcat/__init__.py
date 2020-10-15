@@ -108,17 +108,17 @@ class Graph(object):
 
     def _require_task_present(self, name):
         if name not in self._graph:
-            raise ValueError(f"Task {name} doesn't exist.")
+            raise ValueError(f"Task {name!r} doesn't exist.")
 
 
     def _require_task_absent(self, name):
         if name in self._graph:
-            raise ValueError(f"Task {name} already exists.")
+            raise ValueError(f"Task {name!r} already exists.")
 
 
     def _require_link_present(self, source, target):
         if self._graph.number_of_edges(target, source) != 1:
-            raise ValueError(f"Edge {source} -> {target} doesn't exist.")
+            raise ValueError(f"Edge {source!r} -> {target!r} doesn't exist.")
 
 
     def add_links(self, source, targets):
@@ -456,6 +456,34 @@ class Graph(object):
         self.mark_unfinished(unfinished)
 
 
+    def set_parameter(self, target, input, source, value):
+        """Create and link a 'parameter' task in one step.
+
+        Because they're so ubiquitous, this method simplifies the creation of
+        "parameter" tasks - tasks that return a value for use as a parameter in
+        some other task.  It consolidates creating the parameter task and
+        linking it with an existing computational task into one step.
+
+        Parameters
+        ----------
+        target: hashable object, required
+            Name of the task that will use the parameter.
+        input: hashable object, required
+            Named input that will receive the parameter.
+        source: hashable object, required
+            Name of the task that will store the parameter.
+        value: any Python object, required
+            Parameter value.
+
+        Raises
+        ------
+        :class:`ValueError`
+            If `target` doesn't exist.
+        """
+        self.set_task(source, constant(value))
+        self.set_links(source, (target, input))
+
+
     def set_task(self, name, fn):
         """Add a task to the graph if it doesn't exist, and set its task function.
 
@@ -678,30 +706,11 @@ class UpdatedTasks(object):
 
 
 class VariableTask(object):
-    """Manage a task that acts as a variable.
+    """.. deprecated:: 0.4.0
 
-    Use :class:`Variable` to create a task that
-    will return a given value::
-
-        var = graphcat.Variable(graph, name="theta", value=math.pi)
-
-    when the value needs to change (from user input, for example),
-    just use the :meth:`set` method::
-
-        var.set(math.pi / 2)
-
-    ... which will automatically cause downstream tasks that depend on the
-    variable to execute the next time they're updated.
-
-    Parameters
-    ----------
-    graph: :class:`Graph`, required
-        The graph that will contain the variable task.
-    name: hashable value, required
-        The name for the variable task.
-    value: Any value, required
-        Initial value of the variable.
+    Use :meth:`set_task` or :meth:`set_parameter` instead.
     """
+    warnings.warn("graphcat.VariableTask is deprecated, use Graph.set_task() or Graph.set_parameter() instead.", DeprecationWarning, stacklevel=2)
     def __init__(self, graph, name, value):
         self._graph = graph
         self._name = name
