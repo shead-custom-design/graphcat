@@ -7,6 +7,14 @@
 Release Notes
 =============
 
+Graphcat 0.4.0 - October 15, 2020
+---------------------------------
+* Added graphcat.Graph.clear_links().
+* graphcat.Graph.output() and graphcat.Graph.update() re-raise exceptions thrown by task functions.
+* Allow parallel links between tasks.
+* Deprecated graphcat.VariableTask.
+* Added graphcat.Graph.set_parameter().
+
 Graphcat 0.3.0 - October 11, 2020
 ---------------------------------
 * Emit a signal when the graph is changed.
