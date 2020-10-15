@@ -705,31 +705,6 @@ class UpdatedTasks(object):
 
 
 
-class VariableTask(object):
-    """.. deprecated:: 0.4.0
-
-    Use :meth:`set_task` or :meth:`set_parameter` instead.
-    """
-    warnings.warn("graphcat.VariableTask is deprecated, use Graph.set_task() or Graph.set_parameter() instead.", DeprecationWarning, stacklevel=2)
-    def __init__(self, graph, name, value):
-        self._graph = graph
-        self._name = name
-        self._graph.add_task(name, constant(value))
-
-    def set(self, value):
-        """Change the underlying task value.
-
-        This will cause downstream tasks to execute the next time they're
-        updated.
-
-        Parameters
-        ----------
-        value: Any value, required
-            New value of the variable.
-        """
-        self._graph.set_task(self._name, constant(value))
-
-
 def constant(value):
     """Factory for task functions that return constant values when executed.
 
