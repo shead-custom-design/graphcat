@@ -1,4 +1,4 @@
-.. image:: ../artwork/graphcat.png
+.. image:: ../artwork/logo.png
   :width: 200px
   :align: right
 
@@ -25,8 +25,8 @@ use during their day-to-day work.
 
   anaconda-installation.rst
 
-Using Pip / Easy Install
-------------------------
+Using Pip
+---------
 
 If your package manager doesn't support Graphcat, or doesn't have the latest
 version, your next option should be Python setup tools like `pip`.  You can

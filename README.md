@@ -1,6 +1,6 @@
 # Welcome!
 
-<img src="artwork/graphcat.png" width="300" style="float:right"/>
+<img src="artwork/logo.png" width="300" style="float:right"/>
 
 Welcome to Graphcat ... the lightweight, flexible Python toolkit for managing
 computational graphs.
