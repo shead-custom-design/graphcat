@@ -42,7 +42,7 @@ def display(graph):
     white = "white"
 
     agraph = pygraphviz.AGraph(directed=True, strict=False, ranksep="0.4")
-    agraph.node_attr.update(fontname="Helvetica", shape="box", style="filled", margin="0.1,0.05", width="0.4", height="0")
+    agraph.node_attr.update(fontname="Helvetica", fontsize=8, shape="box", style="filled", margin="0.08,0.04", width="0.4", height="0")
     agraph.edge_attr.update(fontname="Helvetica", fontsize=8, color=black)
 
     for node in graph._graph.nodes():
