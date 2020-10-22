@@ -39,6 +39,7 @@ Documentation
    compatibility.rst
    tutorial.ipynb
    case-studies.rst
+   projects.rst
    contributing.rst
    release-notes.rst
    reference.rst
