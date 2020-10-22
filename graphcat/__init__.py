@@ -98,6 +98,10 @@ class Graph(object):
         self._on_update = blinker.Signal()
 
 
+    def __contains__(self, name):
+        return name in self._graph
+
+
     def _require_valid_names(self, names):
         if names is None:
             return self.tasks()
