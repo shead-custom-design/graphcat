@@ -369,3 +369,9 @@ def step_impl(context, names, links):
     links = eval(links)
     test.assert_equal(sorted(links), sorted(context.graph.links(names)))
 
+
+@then(u'testing if the graph contains task {task} should return {result}')
+def step_impl(context, task, result):
+    task = eval(task)
+    result = eval(result)
+    test.assert_equal(task in context.graph, result)

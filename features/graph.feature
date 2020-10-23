@@ -335,3 +335,10 @@ Feature: Graph
         Then the graph should contain links [("A", ("B", "foo"))]
 
 
+    Scenario: Membership
+        Given an empty graph
+        When adding tasks ["A", "B"]
+        Then the graph should contain tasks ["A", "B"]
+        And testing if the graph contains task "A" should return True
+        And testing if the graph contains task "C" should return False
+
