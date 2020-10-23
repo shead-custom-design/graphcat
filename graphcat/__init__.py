@@ -402,6 +402,35 @@ class Graph(object):
         return self._graph.nodes[name]["output"]
 
 
+    def set_expression(self, name, expression, locals={}):
+        """Create a task that will execute a Python expression.
+
+        The task will automatically track implicit dependencies.
+
+        Parameters
+        ----------
+        name: hashable object, required
+            Unique name for the new expression task.
+        expression: string, required
+            Python expression that will be executed whenever the task is executed.
+        locals: dict, optional
+            Optional dictionary containing local objects that will be available for
+            use in the expression.
+        """
+        self.set_task(name, execute(expression, locals))
+
+        sources = list(self._graph.successors(name))
+        for source in sources:
+            self._graph.remove_edge(name, source)
+
+        updated = UpdatedTasks(self)
+        self.update(name)
+
+        sources = updated.tasks.difference([name])
+        for source in sources:
+            self._graph.add_edge(name, source, input=Input.DEPENDENCY)
+
+
     def set_links(self, source, targets):
         """Set links between `source` and `targets`.
 
@@ -492,35 +521,6 @@ class Graph(object):
         else:
             self._graph.add_node(name, fn=fn, state=TaskState.UNFINISHED, output=None)
         self.mark_unfinished(name)
-
-
-    def set_expression(self, name, expression, locals={}):
-        """Create a task that will execute a Python expression.
-
-        The task will automatically track implicit dependencies.
-
-        Parameters
-        ----------
-        name: hashable object, required
-            Unique name for the new expression task.
-        expression: string, required
-            Python expression that will be executed whenever the task is executed.
-        locals: dict, optional
-            Optional dictionary containing local objects that will be available for
-            use in the expression.
-        """
-        self.set_task(name, execute(expression, locals))
-
-        sources = list(self._graph.successors(name))
-        for source in sources:
-            self._graph.remove_edge(name, source)
-
-        updated = UpdatedTasks(self)
-        self.update(name)
-
-        sources = updated.tasks.difference([name])
-        for source in sources:
-            self._graph.add_edge(name, source, input=Input.DEPENDENCY)
 
 
     def state(self, name):
