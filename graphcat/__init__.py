@@ -94,11 +94,6 @@ class Graph(object):
             raise ValueError(f"Task {name!r} already exists.")
 
 
-    def _require_link_present(self, source, target):
-        if self._graph.number_of_edges(target, source) != 1:
-            raise ValueError(f"Edge {source!r} -> {target!r} doesn't exist.")
-
-
     def add_links(self, source, targets):
         """Add links between `source` and `targets`.
 
@@ -164,11 +159,27 @@ class Graph(object):
 
 
     def clear_links(self, source, target):
+        """Remove links from the graph.
+
+        This method will remove all links from `source` to `target`.
+
+        Parameters
+        ----------
+        source: hashable object, required
+            Source task name.
+        target: hashable object, required
+            Target task name.
+
+        Raises
+        ------
+        :class:`ValueError`
+            If `source` or `task` don't exist.
+        """
         self._require_task_present(source)
         self._require_task_present(target)
-        self._require_link_present(source, target)
         self.mark_unfinished(source)
-        self._graph.remove_edge(target, source)
+        while self._graph.number_of_edges(target, source):
+            self._graph.remove_edge(target, source)
 
 
     def clear_tasks(self, names=None):
