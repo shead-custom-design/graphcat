@@ -35,48 +35,22 @@ class DeprecationWarning(Warning):
 
 
 class ExpressionTask(object):
-    """Manage a task that executes Python expressions and tracks implicit dependencies.
+    """.. deprecated:: 0.5.0
 
-    Parameters
-    ----------
-    graph: class:`Graph`, required
-        The graph where the new expression task will be created.
-    name: hashable object, required
-        Unique name for the new expression task.
-    expression: string, required
-        Python expression that will be executed whenever the task is executed.
-    locals: dict, optional
-        Optional dictionary containing local objects that will be available for
-        use in the expression.
+    Use :meth:`Graph.set_expression` instead.
     """
     def __init__(self, graph, name, expression, locals={}):
+        warnings.warn("graphcat.ExpressionTask is deprecated, use Graph.set_expression() instead.", DeprecationWarning, stacklevel=2)
         self._graph = graph
         self._name = name
         self.set(expression, locals)
 
     def set(self, expression, locals={}):
-        """Change the Python expression to be executed.
+        """.. deprecated:: 0.5.0
 
-        Parameters
-        ----------
-        expression: string, required
-            New Python expression that will be executed whenever the task is executed.
-        locals: dict, optional
-            Optional dictionary containing local objects that will be available for
-            use in the expression.
+        Use :meth:`Graph.set_expression` instead.
         """
-        self._graph.set_task(self._name, execute(expression, locals))
-
-        sources = list(self._graph._graph.successors(self._name))
-        for source in sources:
-            self._graph._graph.remove_edge(self._name, source)
-
-        updated = UpdatedTasks(self._graph)
-        self._graph.update(self._name)
-
-        sources = updated.tasks.difference([self._name])
-        for source in sources:
-            self._graph._graph.add_edge(self._name, source, input=Input.DEPENDENCY)
+        self._graph.set_expression(self._name, expression, locals)
 
 
 class Graph(object):
@@ -507,6 +481,35 @@ class Graph(object):
         else:
             self._graph.add_node(name, fn=fn, state=TaskState.UNFINISHED, output=None)
         self.mark_unfinished(name)
+
+
+    def set_expression(self, name, expression, locals={}):
+        """Create a task that will execute a Python expression.
+
+        The task will automatically track implicit dependencies.
+
+        Parameters
+        ----------
+        name: hashable object, required
+            Unique name for the new expression task.
+        expression: string, required
+            Python expression that will be executed whenever the task is executed.
+        locals: dict, optional
+            Optional dictionary containing local objects that will be available for
+            use in the expression.
+        """
+        self.set_task(name, execute(expression, locals))
+
+        sources = list(self._graph.successors(name))
+        for source in sources:
+            self._graph.remove_edge(name, source)
+
+        updated = UpdatedTasks(self)
+        self.update(name)
+
+        sources = updated.tasks.difference([name])
+        for source in sources:
+            self._graph.add_edge(name, source, input=Input.DEPENDENCY)
 
 
     def state(self, name):
