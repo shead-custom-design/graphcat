@@ -228,9 +228,8 @@ Feature: Graph
         Given an empty graph
         When adding tasks ["A", "B", "C"]
         And adding links [("A", "B"), ("B", "C")]
-        And removing link ("A", "C") an exception should be raised
-        Then tasks [] are updated
-        And the graph should contain tasks ["A", "B", "C"]
+        And removing link ("A", "C") no exception should be raised
+        Then the graph should contain tasks ["A", "B", "C"]
         And the graph should contain links [("A", ("B", None)), ("B", ("C", None))]
 
 

@@ -214,13 +214,6 @@ def step_impl(context, name):
         context.graph.update(name)
 
 
-@when(u'updating task {name}')
-def step_impl(context, name):
-    name = eval(name)
-    context.events = EventRecorder(context.graph)
-    context.graph.update(name)
-
-
 @when(u'renaming tasks {oldnames} as {newnames} with move_task')
 def step_impl(context, oldnames, newnames):
     oldnames = eval(oldnames)
@@ -230,12 +223,11 @@ def step_impl(context, oldnames, newnames):
         context.graph.move_task(oldname, newname)
 
 
-@when(u'removing link {link} an exception should be raised')
+@when(u'removing link {link} no exception should be raised')
 def step_impl(context, link):
     source, target = eval(link)
     context.events = EventRecorder(context.graph)
-    with test.assert_raises(ValueError):
-        context.graph.clear_links(source, target)
+    context.graph.clear_links(source, target)
 
 
 @when(u'removing links {links}')
