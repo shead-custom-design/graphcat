@@ -341,3 +341,12 @@ Feature: Graph
         And testing if the graph contains task "A" should return True
         And testing if the graph contains task "C" should return False
 
+
+    Scenario: Passthrough
+        Given an empty graph
+        When adding tasks ["A", "B", "C"] with functions [graphcat.constant(42), graphcat.constant(10), graphcat.passthrough("lhs")]
+        And adding links [("A", ("C", "lhs")), ("B", ("C", "rhs"))]
+        And updating tasks ["C"]
+        Then the task ["A", "B", "C"] outputs should be [42, 10, 42]
+
+

@@ -787,6 +787,28 @@ def null(name, inputs):
     pass
 
 
+def passthrough(input, index=0):
+    """Factory for task functions that pass-through incoming data.
+
+    Callers can use this function to temporarily bypass tasks in the graph.
+
+    Parameters
+    ----------
+    input: hashable object, required
+        The named input that will pass-through to the task output.
+    index: integer, required
+        Index of the named inputs that will pass-through to the task output.
+
+    Returns
+    -------
+    fn: function
+        Task function that will pass input `input` index `index` to its output.
+    """
+    def implementation(name, inputs):
+        return inputs[input][index]
+    return implementation
+
+
 def raise_exception(exception):
     """Factory for task functions that raise an exception when executed.
 
