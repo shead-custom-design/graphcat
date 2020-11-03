@@ -34,25 +34,6 @@ class DeprecationWarning(Warning):
     pass
 
 
-class ExpressionTask(object):
-    """.. deprecated:: 0.5.0
-
-    Use :meth:`Graph.set_expression` instead.
-    """
-    def __init__(self, graph, name, expression, locals={}):
-        warnings.warn("graphcat.ExpressionTask is deprecated, use Graph.set_expression() instead.", DeprecationWarning, stacklevel=2)
-        self._graph = graph
-        self._name = name
-        self.set(expression, locals)
-
-    def set(self, expression, locals={}):
-        """.. deprecated:: 0.5.0
-
-        Use :meth:`Graph.set_expression` instead.
-        """
-        self._graph.set_expression(self._name, expression, locals)
-
-
 class Graph(object):
     """Manages a computational graph.
 
