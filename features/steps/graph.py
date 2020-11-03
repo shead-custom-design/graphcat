@@ -129,12 +129,8 @@ def step_impl(context, name, expression):
     name = eval(name)
     expression = eval(expression)
     context.events = EventRecorder(context.graph)
-
-    if not hasattr(context, "expressions"):
-        context.expressions = {}
-
     locals = {"out": NodeOutput(context.graph)}
-    context.expressions[name] = graphcat.ExpressionTask(context.graph, name, expression, locals)
+    context.graph.set_expression(name, expression, locals)
 
 
 @when(u'changing the expression task {name} to expression {expression}')
@@ -142,9 +138,8 @@ def step_impl(context, name, expression):
     name = eval(name)
     expression = eval(expression)
     context.events = EventRecorder(context.graph)
-
     locals = {"out": NodeOutput(context.graph)}
-    context.expressions[name].set(expression, locals)
+    context.graph.set_expression(name, expression, locals)
 
 
 @when(u'adding tasks {names} with functions {functions}')
