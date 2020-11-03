@@ -7,6 +7,14 @@
 Release Notes
 =============
 
+Graphcat 0.5.0 - November 2, 2020
+---------------------------------
+* Make graphcat.notebook.display() output diagrams more compact.
+* Add API to test whether the graph contains a task with a given name.
+* Deprecated graphcat.ExpressionTask in favor of graphcat.Graph.set_expression().
+* Clarify the graphcat.clearn_links documentation.
+* Added graphcat.passthrough() for temporarily disabling tasks.
+
 Graphcat 0.4.0 - October 15, 2020
 ---------------------------------
 * Added graphcat.Graph.clear_links().
