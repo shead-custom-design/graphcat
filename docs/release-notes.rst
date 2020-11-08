@@ -7,6 +7,12 @@
 Release Notes
 =============
 
+Graphcat 0.6.0 - November 8, 2020
+---------------------------------
+* Update dependencies every time an expression task executes.
+* Handle automatic dependency tracking for tasks that are renamed.
+* Deprecated graphcat.Graph.move_task() in favor of graphcat.Graph.rename_task().
+
 Graphcat 0.5.0 - November 2, 2020
 ---------------------------------
 * Make graphcat.notebook.display() output diagrams more compact.
