@@ -249,21 +249,32 @@ Feature: Graph
 
     Scenario: Expression Tasks
         Given an empty graph
-        When adding tasks ["A", "B"] with functions [graphcat.constant(1), graphcat.constant(2)]
-        And adding an expression task "C" with expression "3+4"
-        And updating tasks ["A", "B", "C"]
-        Then the graph should contain tasks ["A", "B", "C"]
+        When adding tasks ["A", "B", "choice"] with functions [graphcat.constant(1), graphcat.constant(2), graphcat.constant(True)]
+        And adding an expression task "expr" with expression "3+4"
+        Then the graph should contain tasks ["A", "B", "choice", "expr"]
         And the graph should contain links []
-        And the tasks ["A", "B", "C"] should be finished
-        And the task ["A", "B", "C"] outputs should be [1, 2, 7]
-        When changing the expression task "C" to expression "out('A') + 1.1"
-        Then the task ["A", "B", "C"] outputs should be [1, 2, 2.1]
-        And the graph should contain links [("A", ("C", graphcat.Input.AUTODEPENDENCY))]
+        And the tasks ["A", "B", "choice", "expr"] should be unfinished
+        And the task ["expr"] outputs should be [7]
+        And the graph should contain links []
+        When changing the expression task "expr" to expression "out('A') if out('choice') else out('B')"
+        Then the task ["expr"] outputs should be [1]
+        And the graph should contain links [("A", ("expr", graphcat.Input.AUTODEPENDENCY)), ("choice", ("expr", graphcat.Input.AUTODEPENDENCY))]
         When the task "A" function is changed to graphcat.constant(3)
-        Then the task ["A", "B", "C"] outputs should be [3, 2, 4.1]
-        When changing the expression task "C" to expression "out('B') + 1.1"
-        Then the task ["A", "B", "C"] outputs should be [3, 2, 3.1]
-        And the graph should contain links [("B", ("C", graphcat.Input.AUTODEPENDENCY))]
+        Then the task ["expr"] outputs should be [3]
+        When the task "choice" function is changed to graphcat.constant(False)
+        Then the task ["expr"] outputs should be [2]
+        And the graph should contain links [("B", ("expr", graphcat.Input.AUTODEPENDENCY)), ("choice", ("expr", graphcat.Input.AUTODEPENDENCY))]
+        When the task "B" function is changed to graphcat.constant(4)
+        Then the task ["expr"] outputs should be [4]
+        When renaming tasks ["B"] as ["C"] with move_task
+        Then the graph should contain tasks ["A", "C", "choice", "expr"]
+        And the graph should contain links [("C", ("expr", graphcat.Input.AUTODEPENDENCY)), ("choice", ("expr", graphcat.Input.AUTODEPENDENCY))]
+        When changing the expression task "expr" to expression "out('A') if out('choice') else out('C')"
+        Then the task ["expr"] outputs should be [4]
+        When renaming tasks ["expr"] as ["expression"] with move_task
+        Then the graph should contain tasks ["A", "C", "choice", "expression"]
+        And the graph should contain links [("C", ("expression", graphcat.Input.AUTODEPENDENCY)), ("choice", ("expression", graphcat.Input.AUTODEPENDENCY))]
+        And the task ["expression"] outputs should be [4]
 
 
     Scenario: Graph Logger

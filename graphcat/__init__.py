@@ -36,6 +36,7 @@ class AutomaticDependencies(object):
         self.graph = graph
         self.name = name
         self.fn = fn
+        graph.on_task_renamed.connect(self.on_task_renamed)
 
     def __call__(self, *args, **kwargs):
         # Remove old, automatically generated dependencies.
@@ -54,6 +55,10 @@ class AutomaticDependencies(object):
             self.graph._graph.add_edge(self.name, source, input=Input.AUTODEPENDENCY)
 
         return result
+
+    def on_task_renamed(self, graph, oldname, newname):
+        if oldname == self.name:
+            self.name = newname
 
 
 class DeprecationWarning(Warning):
