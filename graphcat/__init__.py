@@ -288,15 +288,6 @@ class Graph(object):
         self._on_changed.send(self)
 
 
-    def move_task(self, oldname, newname):
-        """.. deprecated:: 0.6.0
-
-        Use :meth:`Graph.rename_task` instead.
-        """
-        warnings.warn("graphcat.Graph.move_task() is deprecated, use graphcat.Graph.rename_task() isntead.", DeprecationWarning, stacklevel=2)
-        self.rename_task(oldname, newname)
-
-
     @property
     def on_changed(self):
         """Signal emitted whenever a part of the graph becomes unfinished.

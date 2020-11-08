@@ -60,7 +60,7 @@ Feature: Graph
         And the graph should contain links <links>
         And the tasks <finished before> should be finished
         And the tasks <unfinished before> should be unfinished
-        When renaming tasks <old names> as <new names> with <api>
+        When renaming tasks <old names> as <new names>
         Then tasks <old names> should be renamed to <new names>
         Then the graph should contain tasks <new tasks>
         And the graph should contain links <new links>
@@ -68,13 +68,13 @@ Feature: Graph
         And the tasks <unfinished after> should be unfinished
 
         Examples: Fan-Out
-            | tasks           | links                                    | update tasks    | finished before | unfinished before | old names  | new names   | api            | new tasks       | new links                                | finished after  | unfinished after |
-            | ["A", "B", "C"] | [("A", ("B", None)), ("A", ("C", None))] | ["A", "B", "C"] | ["A", "B", "C"] | []                | ["A"]      | ["D"]       | move_task      | ["D", "B", "C"] | [("D", ("B", None)), ("D", ("C", None))] | []              | ["D", "B", "C"]  |
-            | ["A", "B", "C"] | [("A", ("B", None)), ("A", ("C", None))] | ["A", "B", "C"] | ["A", "B", "C"] | []                | ["B"]      | ["D"]       | move_task      | ["A", "D", "C"] | [("A", ("D", None)), ("A", ("C", None))] | ["A", "C"]      | ["D"]            |
+            | tasks           | links                                    | update tasks    | finished before | unfinished before | old names  | new names   | new tasks       | new links                                | finished after  | unfinished after |
+            | ["A", "B", "C"] | [("A", ("B", None)), ("A", ("C", None))] | ["A", "B", "C"] | ["A", "B", "C"] | []                | ["A"]      | ["D"]       | ["D", "B", "C"] | [("D", ("B", None)), ("D", ("C", None))] | []              | ["D", "B", "C"]  |
+            | ["A", "B", "C"] | [("A", ("B", None)), ("A", ("C", None))] | ["A", "B", "C"] | ["A", "B", "C"] | []                | ["B"]      | ["D"]       | ["A", "D", "C"] | [("A", ("D", None)), ("A", ("C", None))] | ["A", "C"]      | ["D"]            |
 
         Examples: Fan-In
-            | tasks           | links                                    | update tasks    | finished before | unfinished before | old names  | new names   | api            | new tasks       | new links                                | finished after  | unfinished after |
-            | ["A", "B", "C"] | [("A", ("B", None)), ("C", ("B", None))] | ["A", "B", "C"] | ["A", "B", "C"] | []                | ["B"]      | ["D"]       | move_task      | ["A", "D", "C"] | [("A", ("D", None)), ("C", ("D", None))] | ["A", "C"]      | ["D"]            |
+            | tasks           | links                                    | update tasks    | finished before | unfinished before | old names  | new names   | new tasks       | new links                                | finished after  | unfinished after |
+            | ["A", "B", "C"] | [("A", ("B", None)), ("C", ("B", None))] | ["A", "B", "C"] | ["A", "B", "C"] | []                | ["B"]      | ["D"]       | ["A", "D", "C"] | [("A", ("D", None)), ("C", ("D", None))] | ["A", "C"]      | ["D"]            |
 
 
     Scenario Outline: Removing Links
@@ -266,12 +266,12 @@ Feature: Graph
         And the graph should contain links [("B", ("expr", graphcat.Input.AUTODEPENDENCY)), ("choice", ("expr", graphcat.Input.AUTODEPENDENCY))]
         When the task "B" function is changed to graphcat.constant(4)
         Then the task ["expr"] outputs should be [4]
-        When renaming tasks ["B"] as ["C"] with move_task
+        When renaming tasks ["B"] as ["C"]
         Then the graph should contain tasks ["A", "C", "choice", "expr"]
         And the graph should contain links [("C", ("expr", graphcat.Input.AUTODEPENDENCY)), ("choice", ("expr", graphcat.Input.AUTODEPENDENCY))]
         When changing the expression task "expr" to expression "out('A') if out('choice') else out('C')"
         Then the task ["expr"] outputs should be [4]
-        When renaming tasks ["expr"] as ["expression"] with move_task
+        When renaming tasks ["expr"] as ["expression"]
         Then the graph should contain tasks ["A", "C", "choice", "expression"]
         And the graph should contain links [("C", ("expression", graphcat.Input.AUTODEPENDENCY)), ("choice", ("expression", graphcat.Input.AUTODEPENDENCY))]
         And the task ["expression"] outputs should be [4]

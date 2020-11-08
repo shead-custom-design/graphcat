@@ -182,13 +182,13 @@ def step_impl(context, name):
         context.graph.update(name)
 
 
-@when(u'renaming tasks {oldnames} as {newnames} with move_task')
+@when(u'renaming tasks {oldnames} as {newnames}')
 def step_impl(context, oldnames, newnames):
     oldnames = eval(oldnames)
     newnames = eval(newnames)
     context.events = EventRecorder(context.graph)
     for oldname, newname in zip(oldnames, newnames):
-        context.graph.move_task(oldname, newname)
+        context.graph.rename_task(oldname, newname)
 
 
 @when(u'removing link {link} no exception should be raised')
