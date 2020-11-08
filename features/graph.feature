@@ -256,14 +256,13 @@ Feature: Graph
         And the tasks ["A", "B", "C"] should be finished
         And the task ["A", "B", "C"] outputs should be [1, 2, 7]
         When changing the expression task "C" to expression "out('A') + 1.1"
-        Then the graph should contain links [("A", ("C", graphcat.Input.DEPENDENCY))]
-        And the tasks ["A", "B", "C"] should be finished
-        And the task ["A", "B", "C"] outputs should be [1, 2, 2.1]
+        Then the task ["A", "B", "C"] outputs should be [1, 2, 2.1]
+        And the graph should contain links [("A", ("C", graphcat.Input.AUTODEPENDENCY))]
         When the task "A" function is changed to graphcat.constant(3)
         Then the task ["A", "B", "C"] outputs should be [3, 2, 4.1]
         When changing the expression task "C" to expression "out('B') + 1.1"
-        Then the graph should contain links [("B", ("C", graphcat.Input.DEPENDENCY))]
-        And the task ["A", "B", "C"] outputs should be [3, 2, 3.1]
+        Then the task ["A", "B", "C"] outputs should be [3, 2, 3.1]
+        And the graph should contain links [("B", ("C", graphcat.Input.AUTODEPENDENCY))]
 
 
     Scenario: Graph Logger

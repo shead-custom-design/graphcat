@@ -29,6 +29,33 @@ import networkx
 log = logging.getLogger(__name__)
 
 
+class AutomaticDependencies(object):
+    """Function decorator that automatically tracks dependencies.
+    """
+    def __init__(self, graph, name, fn):
+        self.graph = graph
+        self.name = name
+        self.fn = fn
+
+    def __call__(self, *args, **kwargs):
+        # Remove old, automatically generated dependencies.
+        edges = list(self.graph._graph.out_edges(self.name, data="input", keys=True))
+        for target, source, key, input in edges:
+            if input == Input.AUTODEPENDENCY:
+                self.graph._graph.remove_edge(target, source, key)
+
+        # Keep track of dependencies while the task executes.
+        updated = UpdatedTasks(self.graph)
+        result = self.fn(*args, **kwargs)
+
+        # Create new dependencies.
+        sources = updated.tasks.difference([self.name])
+        for source in sources:
+            self.graph._graph.add_edge(self.name, source, input=Input.AUTODEPENDENCY)
+
+        return result
+
+
 class DeprecationWarning(Warning):
     """Warning category for deprecated code."""
     pass
@@ -386,7 +413,8 @@ class Graph(object):
     def set_expression(self, name, expression, locals={}):
         """Create a task that will execute a Python expression.
 
-        The task will automatically track implicit dependencies.
+        The task will automatically track implicit dependencies that
+        arise from executing the expression.
 
         Parameters
         ----------
@@ -398,18 +426,9 @@ class Graph(object):
             Optional dictionary containing local objects that will be available for
             use in the expression.
         """
-        self.set_task(name, execute(expression, locals))
-
-        sources = list(self._graph.successors(name))
-        for source in sources:
-            self._graph.remove_edge(name, source)
-
-        updated = UpdatedTasks(self)
-        self.update(name)
-
-        sources = updated.tasks.difference([name])
-        for source in sources:
-            self._graph.add_edge(name, source, input=Input.DEPENDENCY)
+        fn = execute(expression, locals)
+        fn = AutomaticDependencies(self, name, fn)
+        self.set_task(name, fn)
 
 
     def set_links(self, source, targets):
@@ -596,8 +615,8 @@ class Graph(object):
 
 class Input(enum.Enum):
     """Enumerates special :class:`Graph` named inputs."""
-    DEPENDENCY = 1
-    """Named input for links that are used only as dependencies, not data sources."""
+    AUTODEPENDENCY = 1
+    """Named input for links that are generated automatically for use as dependencies, not data sources."""
 
 
 class Logger(object):
@@ -697,11 +716,11 @@ class UpdatedTasks(object):
 
         Returns
         -------
-        tasks: set
-            Python set containing the names for every task that has been updated.
+        tasks: :class:`set`
+            Python :class:`set` containing the names for every task that has
+            been updated.
         """
         return self._tasks
-
 
 
 def constant(value):
@@ -754,7 +773,10 @@ def execute(code, locals={}):
         task is executed.
     """
     def implementation(name, inputs):
-        return eval(code, {}, dict(locals))
+        try:
+            return eval(code, {}, dict(locals))
+        except Exception as e: # pragma: no cover
+            raise RuntimeError(f"Uncaught exception executing expression {code!r}: {e}")
     return implementation
 
 
