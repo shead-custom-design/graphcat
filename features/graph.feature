@@ -61,6 +61,7 @@ Feature: Graph
         And the tasks <finished before> should be finished
         And the tasks <unfinished before> should be unfinished
         When renaming tasks <old names> as <new names> with <api>
+        Then tasks <old names> should be renamed to <new names>
         Then the graph should contain tasks <new tasks>
         And the graph should contain links <new links>
         And the tasks <finished after> should be finished

@@ -24,70 +24,43 @@ import test
 
 class EventRecorder(object):
     def __init__(self, graph):
-        self._changed = []
-        self._exceptions = []
-        self._executed = []
-        self._failed = []
-        self._finished = []
-        self._inputs = []
-        self._outputs = []
-        self._updated = []
+        self.changed = []
+        self.exceptions = []
+        self.executed = []
+        self.failed = []
+        self.finished = []
+        self.inputs = []
+        self.outputs = []
+        self.task_renamed = []
+        self.updated = []
 
         graph.on_changed.connect(self.on_changed)
         graph.on_execute.connect(self.on_execute)
         graph.on_failed.connect(self.on_failed)
         graph.on_finished.connect(self.on_finished)
+        graph.on_task_renamed.connect(self.on_task_renamed)
         graph.on_update.connect(self.on_update)
 
-    @property
-    def changed(self):
-        return self._changed
-
-    @property
-    def exceptions(self):
-        return self._exceptions
-
-    @property
-    def executed(self):
-        return self._executed
-
-    @property
-    def failed(self):
-        return self._failed
-
-    @property
-    def finished(self):
-        return self._finished
-
-    @property
-    def inputs(self):
-        return self._inputs
-
-    @property
-    def outputs(self):
-        return self._outputs
-
-    @property
-    def updated(self):
-        return self._updated
-
     def on_changed(self, graph):
-        self._changed.append(graph)
+        self.changed.append(graph)
 
     def on_execute(self, graph, name, inputs):
-        self._executed.append(name)
-        self._inputs.append(inputs)
+        self.executed.append(name)
+        self.inputs.append(inputs)
 
     def on_failed(self, graph, name, exception):
-        self._failed.append(name)
-        self._exceptions.append(exception)
+        self.failed.append(name)
+        self.exceptions.append(exception)
 
     def on_finished(self, graph, name, output):
-        self._finished.append(name)
-        self._outputs.append(output)
+        self.finished.append(name)
+        self.outputs.append(output)
+
+    def on_task_renamed(self, graph, oldname, newname):
+        self.task_renamed.append((oldname, newname))
 
     def on_update(self, graph, name):
-        self._updated.append(name)
+        self.updated.append(name)
 
 
 #################################################################
@@ -299,6 +272,13 @@ def step_impl(context, names):
     names = eval(names)
     for name in names:
         test.assert_equal(context.graph.state(name), graphcat.TaskState.UNFINISHED)
+
+
+@then(u'tasks {oldnames} should be renamed to {newnames}')
+def step_impl(context, oldnames, newnames):
+    oldnames = eval(oldnames)
+    newnames = eval(newnames)
+    test.assert_equal(list(zip(oldnames, newnames)), context.events.task_renamed)
 
 
 @then(u'tasks {names} are updated')

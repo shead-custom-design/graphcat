@@ -77,6 +77,7 @@ class Graph(object):
         self._on_execute = blinker.Signal()
         self._on_failed = blinker.Signal()
         self._on_finished = blinker.Signal()
+        self._on_task_renamed = blinker.Signal()
         self._on_update = blinker.Signal()
 
 
@@ -283,28 +284,12 @@ class Graph(object):
 
 
     def move_task(self, oldname, newname):
-        """Change an existing task's name.
+        """.. deprecated:: 0.6.0
 
-        This modifies an existing task's name and modifies any related links
-        as-necessary.  In addition, the task and any downstream dependents will
-        become unfinished.
-
-        Parameters
-        ----------
-        oldname: hashable object, required
-            Existing original task name.
-        newname: hashable object, required
-            Unique new task name.
-
-        Raises
-        ------
-        :class:`ValueError`
-            If the task with `oldname` doesn't exist, or a task with `newname` already exists.
+        Use :meth:`Graph.rename_task` instead.
         """
-        self._require_task_present(oldname)
-        self._require_task_absent(newname)
-        networkx.relabel_nodes(self._graph, mapping = {oldname: newname}, copy=False)
-        self.mark_unfinished(newname)
+        warnings.warn("graphcat.Graph.move_task() is deprecated, use graphcat.Graph.rename_task() isntead.", DeprecationWarning, stacklevel=2)
+        self.rename_task(oldname, newname)
 
 
     @property
@@ -368,6 +353,22 @@ class Graph(object):
 
 
     @property
+    def on_task_renamed(self):
+        """Signal emitted when a task is renamed.
+
+        Functions invoked by this signal must have the signature
+        fn(graph, oldname, newname), where `graph` is this object, `oldname` is
+        the original name of the task, and `newname` is its
+        current name.
+
+        Returns
+        -------
+        signal: :class:`blinker.base.Signal`
+        """
+        return self._on_task_renamed
+
+
+    @property
     def on_update(self):
         """Signal emitted when a task is updated.
 
@@ -408,6 +409,32 @@ class Graph(object):
         self._require_task_present(name)
         self.update(name)
         return self._graph.nodes[name]["output"]
+
+
+    def rename_task(self, oldname, newname):
+        """Change an existing task's name.
+
+        This modifies an existing task's name and modifies any related links
+        as-necessary.  In addition, the task and any downstream dependents will
+        become unfinished.
+
+        Parameters
+        ----------
+        oldname: hashable object, required
+            Existing original task name.
+        newname: hashable object, required
+            Unique new task name.
+
+        Raises
+        ------
+        :class:`ValueError`
+            If the task with `oldname` doesn't exist, or a task with `newname` already exists.
+        """
+        self._require_task_present(oldname)
+        self._require_task_absent(newname)
+        networkx.relabel_nodes(self._graph, mapping = {oldname: newname}, copy=False)
+        self.mark_unfinished(newname)
+        self._on_task_renamed.send(self, oldname=oldname, newname=newname)
 
 
     def set_expression(self, name, expression, locals={}):
