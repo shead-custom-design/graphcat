@@ -29,40 +29,6 @@ import networkx
 log = logging.getLogger(__name__)
 
 
-class AutomaticDependencies(object): # pragma: no cover
-    """.. deprecated:: 0.7.0
-
-    Use :func:`automatic_dependencies` instead.
-    """
-    def __init__(self, graph, name, fn):
-        self.graph = graph
-        self.name = name
-        self.fn = fn
-        graph.on_task_renamed.connect(self._on_task_renamed)
-
-    def __call__(self, *args, **kwargs):
-        # Remove old, automatically generated dependencies.
-        edges = list(self.graph._graph.out_edges(self.name, data="input", keys=True))
-        for target, source, key, input in edges:
-            if input == Input.AUTODEPENDENCY:
-                self.graph._graph.remove_edge(target, source, key)
-
-        # Keep track of dependencies while the task executes.
-        updated = UpdatedTasks(self.graph)
-        result = self.fn(*args, **kwargs)
-
-        # Create new dependencies.
-        sources = updated.tasks.difference([self.name])
-        for source in sources:
-            self.graph._graph.add_edge(self.name, source, input=Input.AUTODEPENDENCY)
-
-        return result
-
-    def _on_task_renamed(self, graph, oldname, newname):
-        if oldname == self.name:
-            self.name = newname
-
-
 class DeprecationWarning(Warning):
     """Warning category for deprecated code."""
     pass
