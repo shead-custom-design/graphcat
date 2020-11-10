@@ -621,7 +621,7 @@ class Graph(object):
 
                     # Execute the function and store the output.
                     self._on_execute.send(self, name=name, inputs=inputs)
-                    task["output"] = task["fn"](name=name, inputs=inputs)
+                    task["output"] = task["fn"](graph=self, name=name, inputs=inputs)
                     task["state"] = TaskState.FINISHED
                     self._on_finished.send(self, name=name, output=task["output"])
                 except Exception as e:
@@ -773,7 +773,7 @@ def constant(value):
     fn: function
         Task function that will always return `value` when executed.
     """
-    def implementation(name, inputs):
+    def implementation(graph, name, inputs):
         return value
     return implementation
 
@@ -795,7 +795,7 @@ def execute(code, locals={}):
         Task function that will execute Python code when the
         task is executed.
     """
-    def implementation(name, inputs):
+    def implementation(graph, name, inputs):
         try:
             return eval(code, {}, dict(locals))
         except Exception as e: # pragma: no cover
@@ -803,7 +803,7 @@ def execute(code, locals={}):
     return implementation
 
 
-def null(name, inputs):
+def null(graph, name, inputs):
     """Task function that does nothing.
 
     This is the default if you don't specify a function for
@@ -830,7 +830,7 @@ def passthrough(input, index=0):
     fn: function
         Task function that will pass input `input` index `index` to its output.
     """
-    def implementation(name, inputs):
+    def implementation(graph, name, inputs):
         return inputs[input][index]
     return implementation
 
@@ -850,7 +850,7 @@ def raise_exception(exception):
     fn: function
         Task function that will always raise `exception` when executed.
     """
-    def implementation(name, inputs):
+    def implementation(graph, name, inputs):
         raise exception
     return implementation
 
