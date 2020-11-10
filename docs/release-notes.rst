@@ -7,6 +7,11 @@
 Release Notes
 =============
 
+Graphcat 0.7.0 - November 10, 2020
+----------------------------------
+* Breaking change: pass the graph as a parameter for task functions.
+* Deprecated the graphcat.AutomaticDependencies class in favor of the graphcat.automatic_dependencies function decorator.
+
 Graphcat 0.6.0 - November 8, 2020
 ---------------------------------
 * Update dependencies every time an expression task executes.

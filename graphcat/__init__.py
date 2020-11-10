@@ -15,7 +15,7 @@
 """Functionality for managing and executing computational graphs.
 """
 
-__version__ = "0.7.0-dev"
+__version__ = "0.7.0"
 
 import collections
 import enum
@@ -750,6 +750,15 @@ class UpdatedTasks(object):
 
 def automatic_dependencies(fn):
     """Function decorator that automatically tracks dependencies.
+
+    Use this to decorate task functions that need dependency tracking, such as
+    :func:`execute`.
+
+    See Also
+    --------
+    :meth:`Graph.set_expression`
+        Convenience method that configures a task to evaluate expressions and
+        automatically track dependencies.
     """
     @functools.wraps(fn)
     def implementation(graph, name, inputs):
@@ -805,6 +814,17 @@ def constant(value):
 
 def execute(code, locals={}):
     """Factory for task functions that execute Python expressions.
+
+    If your expressions can access the output from other tasks in the graph,
+    you will want to use this function with the :func:`automatic_dependencies`
+    decorator, or use :meth:`Graph.set_expression` which sets up dependency
+    tracking for you.
+
+    See Also
+    --------
+    :meth:`Graph.set_expression`
+        Convenience method that configures a task to evaluate expressions and
+        automatically track dependencies.
 
     Parameters
     ----------
