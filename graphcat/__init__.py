@@ -29,14 +29,16 @@ import networkx
 log = logging.getLogger(__name__)
 
 
-class AutomaticDependencies(object):
-    """Function decorator that automatically tracks dependencies.
+class AutomaticDependencies(object): # pragma: no cover
+    """.. deprecated:: 0.7.0
+
+    Use :func:`automatic_dependencies` instead.
     """
     def __init__(self, graph, name, fn):
         self.graph = graph
         self.name = name
         self.fn = fn
-        graph.on_task_renamed.connect(self.on_task_renamed)
+        graph.on_task_renamed.connect(self._on_task_renamed)
 
     def __call__(self, *args, **kwargs):
         # Remove old, automatically generated dependencies.
@@ -56,7 +58,7 @@ class AutomaticDependencies(object):
 
         return result
 
-    def on_task_renamed(self, graph, oldname, newname):
+    def _on_task_renamed(self, graph, oldname, newname):
         if oldname == self.name:
             self.name = newname
 
@@ -450,7 +452,7 @@ class Graph(object):
             use in the expression.
         """
         fn = execute(expression, locals)
-        fn = AutomaticDependencies(self, name, fn)
+        fn = automatic_dependencies(fn)
         self.set_task(name, fn)
 
 
@@ -744,6 +746,29 @@ class UpdatedTasks(object):
             been updated.
         """
         return self._tasks
+
+
+def automatic_dependencies(fn):
+    """Function decorator that automatically tracks dependencies.
+    """
+    @functools.wraps(fn)
+    def implementation(graph, name, inputs):
+        # Remove old, automatically generated dependencies.
+        edges = list(graph._graph.out_edges(name, data="input", keys=True))
+        for target, source, key, input in edges:
+            if input == Input.AUTODEPENDENCY:
+                graph._graph.remove_edge(target, source, key)
+
+        # Keep track of dependencies while the task executes.
+        updated = UpdatedTasks(graph)
+        result = fn(graph, name, inputs)
+
+        # Create new dependencies.
+        sources = updated.tasks.difference([name])
+        for source in sources:
+            graph._graph.add_edge(name, source, input=Input.AUTODEPENDENCY)
+        return result
+    return implementation
 
 
 def constant(value):
