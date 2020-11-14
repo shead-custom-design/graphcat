@@ -25,10 +25,10 @@ setup(
         "Intended Audience :: Science/Research",
         "License :: OSI Approved :: Apache Software License",
         "Natural Language :: English",
+        "Operating System :: OS Independent",
         "Programming Language :: Python :: 3",
         "Topic :: Scientific/Engineering",
         "Topic :: Software Development :: Libraries :: Python Modules",
-        "Topic :: Utilities",
     ],
     description="Lightweight, flexible toolkit for managing computational graphs.",
     extras_require={
@@ -41,11 +41,11 @@ setup(
     long_description="""Graphcat provides a lightweight, flexible toolkit for managing computational graphs.
     See the Graphcat documentation at http://graphcat.readthedocs.io, and the Graphcat sources at http://github.com/shead-custom-design/graphcat""",
     maintainer="Timothy M. Shead",
-    maintainer_email="tim@shead-custom-design.gov",
+    maintainer_email="tim@shead-custom-design.com",
     packages=find_packages(),
     scripts=[
     ],
-    url="http://graphcat.readthedocs.org",
+    url="http://graphcat.readthedocs.io",
     version=re.search(
         r"^__version__ = ['\"]([^'\"]*)['\"]",
         open(
