@@ -49,4 +49,4 @@ Graphcat 0.2.0 - October 7, 2020
 Graphcat 0.1.0 - October 6, 2020
 --------------------------------
 
-* Initial Release
+* Initial Release.
