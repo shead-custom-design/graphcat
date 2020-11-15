@@ -86,6 +86,12 @@ def step_impl(context):
 def step_impl(context):
     context.logger = graphcat.Logger(context.graph, log_exceptions=False, log_inputs=False, log_outputs=False, log=context.log)
 
+
+@given(u'a performance monitor')
+def step_impl(context):
+    context.performance_monitor = graphcat.PerformanceMonitor(context.graph)
+
+
 #################################################################
 # Whens
 
@@ -229,6 +235,17 @@ def step_impl(context, name, function):
     context.graph.set_task(name, function)
 
 
+@when(u'tasks {names} are marked unfinished')
+def step_impl(context, names):
+    names = eval(names)
+    for name in names:
+        context.graph.mark_unfinished(name)
+
+
+@when(u'the performance monitor is reset')
+def step_impl(context):
+    context.performance_monitor.reset()
+
 
 #################################################################
 # Thens
@@ -342,3 +359,13 @@ def step_impl(context, task, result):
     task = eval(task)
     result = eval(result)
     test.assert_equal(task in context.graph, result)
+
+
+@then(u'the performance monitor output should be {outputs}')
+def step_impl(context, outputs):
+    outputs = eval(outputs)
+
+    monitor = context.performance_monitor
+    test.assert_dict_list_values_close(outputs, monitor.tasks, places=None, delta=0.01)
+
+

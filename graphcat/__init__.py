@@ -21,6 +21,7 @@ import collections
 import enum
 import functools
 import logging
+import time
 import warnings
 
 import blinker
@@ -676,6 +677,51 @@ class Logger(object):
         self._log.debug(f"Task {name} updating.")
 
 
+class PerformanceMonitor(object):
+    """Tracks the performance of graph tasks as they're executed.
+
+    Parameters
+    ----------
+    graph: :class:`Graph`, required
+        Graph to watch for task execution.
+    """
+    def __init__(self, graph):
+        self.reset()
+        graph.on_execute.connect(self._on_execute)
+        graph.on_failed.connect(self._on_failed)
+        graph.on_finished.connect(self._on_finished)
+
+
+    def _on_execute(self, graph, name, inputs):
+        self._start = time.time()
+
+
+    def _on_failed(self, graph, name, exception):
+        self._tasks[name].append(time.time() - self._start) # pragma: no cover
+
+
+    def _on_finished(self, graph, name, output):
+        self._tasks[name].append(time.time() - self._start)
+
+
+    def reset(self):
+        """Clear performance data."""
+        self._tasks = collections.defaultdict(list)
+
+
+    @property
+    def tasks(self):
+        """Graph task execution times since this object was created / reset.
+
+        Returns
+        -------
+        tasks: :class:`set`
+            Python :class:`set` containing the names for every task that has
+            been updated.
+        """
+        return dict(self._tasks)
+
+
 class TaskState(enum.Enum):
     """Enumerates :class:`Graph` task states."""
     UNFINISHED = 1
@@ -775,6 +821,26 @@ def constant(value):
     """
     def implementation(graph, name, inputs):
         return value
+    return implementation
+
+
+def delay(seconds):
+    """Factory for task functions that sleep for a fixed time.
+
+    This is useful for testing and debugging.
+
+    Parameters
+    ----------
+    seconds: number, required
+        Number of seconds to sleep when executed.
+
+    Returns
+    -------
+    fn: function
+        Task function that will always sleep for `seconds` when executed.
+    """
+    def implementation(graph, name, inputs):
+        time.sleep(seconds)
     return implementation
 
 
