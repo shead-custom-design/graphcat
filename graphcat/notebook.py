@@ -20,7 +20,15 @@ import pygraphviz
 import graphcat
 
 
-def display(graph):
+def none(graph, node):
+    return False
+
+
+def leaves(graph, node):
+    return graph._graph.out_degree(node) == 0
+
+
+def display(graph, hide=None):
     """Display a :class:`graphcat.Graph` inline in a Jupyter notebook.
 
     This is extremely useful for understanding and debugging graphs.  The
@@ -35,33 +43,42 @@ def display(graph):
     ----------
     graph: :class:`graphcat.Graph`, required
         The graph to be visualized.
+    hide: Python callable, optional
+        Python callable that can be used to hide tasks in the displayed figure.
+        If :any:`None` (the default), all tasks will be displayed.
     """
+
+    if hide is None:
+        hide = none
+
+    nodes = [node for node in graph._graph.nodes() if not hide(graph, node)]
+    subgraph = graph._graph.subgraph(nodes)
 
     black = "#494744"
     red = "crimson"
     white = "white"
 
-    agraph = pygraphviz.AGraph(directed=True, strict=False, ranksep="0.4")
+    agraph = pygraphviz.AGraph(directed=True, strict=False, ranksep="0.4", rankdir="LR")
     agraph.node_attr.update(fontname="Helvetica", fontsize=8, shape="box", style="filled", margin="0.08,0.04", width="0.4", height="0")
     agraph.edge_attr.update(fontname="Helvetica", fontsize=8, color=black)
 
-    for node in graph._graph.nodes():
-        if graph._graph.nodes[node]["state"] == graphcat.TaskState.UNFINISHED:
+    for node in subgraph.nodes():
+        if subgraph.nodes[node]["state"] == graphcat.TaskState.UNFINISHED:
             color = black
             fontcolor = black
             fillcolor = white
-        if graph._graph.nodes[node]["state"] == graphcat.TaskState.FAILED:
+        if subgraph.nodes[node]["state"] == graphcat.TaskState.FAILED:
             color = red
             fontcolor = white
             fillcolor = red
-        if graph._graph.nodes[node]["state"] == graphcat.TaskState.FINISHED:
+        if subgraph.nodes[node]["state"] == graphcat.TaskState.FINISHED:
             color = black
             fontcolor = white
             fillcolor = black
 
         agraph.add_node(node, color=color, fillcolor=fillcolor, fontcolor=fontcolor)
 
-    for target, source, input in graph._graph.edges(data="input"):
+    for target, source, input in subgraph.edges(data="input"):
         if input is None:
             input = ""
         agraph.add_edge(source, target, label=input) # We want edges to point from dependencies to dependents.
