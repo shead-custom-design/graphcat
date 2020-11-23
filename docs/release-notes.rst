@@ -7,6 +7,12 @@
 Release Notes
 =============
 
+Graphcat 0.8.0 - November 23, 2020
+----------------------------------
+* Added graphcat.PerformanceMonitor for evaluating task performance.
+* graphcat.notebook.display() can optionally hide nodes that meet some criteria.
+* Corrected typos in setup.py and release-notes.rst.
+
 Graphcat 0.7.0 - November 10, 2020
 ----------------------------------
 * Breaking change: pass the graph as a parameter for task functions.
