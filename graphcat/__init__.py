@@ -35,8 +35,125 @@ class DeprecationWarning(Warning):
     pass
 
 
-class Graph(object):
-    """Manages a computational graph.
+class Input(enum.Enum):
+    """Enumerates special :class:`Graph` named inputs."""
+    AUTODEPENDENCY = 1
+    """Named input for links that are generated automatically for use as dependencies, not data sources."""
+
+
+class Logger(object):
+    """Log updates to the graph.
+
+    Create a :class:`Logger` object to see the behavior of
+    the graph during updates, using the Python :mod:`logging`
+    module::
+
+        logger = graphcat.Logger(graph)
+
+    This is useful for debugging and pedagogy.  The logger will
+    generate output for four types of event:
+
+    * updated - called when a task is updated.
+    * executed - called when a task is executed.
+    * finished - called if a task executes successfully.
+    * failed - called if a task raises an exception during execution.
+
+    Update events happen regardless of the state of a task.  Execute events
+    only happen if the task isn't already finished.
+
+    Callers can derive from Logger and override :meth:`on_failed`,
+    :meth:`on_finished`, :meth:`on_updated`, and :meth:`on_executed` to
+    customize their behavior.
+
+    Parameters
+    ----------
+    graph: class:`Graph`, required
+        The graph whose events will be logged.
+    """
+    def __init__(self, graph, log_exceptions=True, log_inputs=True, log_outputs=True, log=log):
+        self._log_exceptions = log_exceptions
+        self._log_inputs = log_inputs
+        self._log_outputs = log_outputs
+        self._log = log
+
+        graph.on_execute.connect(self.on_execute)
+        graph.on_failed.connect(self.on_failed)
+        graph.on_finished.connect(self.on_finished)
+        graph.on_update.connect(self.on_update)
+
+    def on_execute(self, graph, name, inputs):
+        """Called when a task is executed."""
+        if self._log_inputs:
+            self._log.info(f"Task {name} executing. Inputs: {inputs}")
+        else:
+            self._log.info(f"Task {name} executing.")
+
+    def on_failed(self, graph, name, exception):
+        """Called when a task raises an exception during execution."""
+        if self._log_exceptions:
+            self._log.error(f"Task {name} failed. Exception: {exception}")
+        else:
+            self._log.error(f"Task {name} failed.")
+
+    def on_finished(self, graph, name, output):
+        """Called when a task has executed sucessfully."""
+        if self._log_outputs:
+            self._log.info(f"Task {name} finished. Output: {output}")
+        else:
+            self._log.info(f"Task {name} finished.")
+
+    def on_update(self, graph, name):
+        """Called when a task is updated."""
+        self._log.debug(f"Task {name} updating.")
+
+
+class PerformanceMonitor(object):
+    """Tracks the performance of graph tasks as they're executed.
+
+    Parameters
+    ----------
+    graph: :class:`Graph`, required
+        Graph to watch for task execution.
+    """
+    def __init__(self, graph):
+        self.reset()
+        graph.on_execute.connect(self._on_execute)
+        graph.on_failed.connect(self._on_failed)
+        graph.on_finished.connect(self._on_finished)
+
+
+    def _on_execute(self, graph, name, inputs):
+        self._start = time.time()
+
+
+    def _on_failed(self, graph, name, exception):
+        self._tasks[name].append(time.time() - self._start) # pragma: no cover
+
+
+    def _on_finished(self, graph, name, output):
+        self._tasks[name].append(time.time() - self._start)
+
+
+    def reset(self):
+        """Clear performance data."""
+        self._tasks = collections.defaultdict(list)
+
+
+    @property
+    def tasks(self):
+        """Graph task execution times since this object was created / reset.
+
+        Returns
+        -------
+        tasks: :class:`set`
+            Python :class:`set` containing the names for every task that has
+            been updated.
+        """
+        return dict(self._tasks)
+
+
+class StaticGraph(object):
+    """Manages a static computational graph.
 
     The graph is a collection of named tasks, connected by links that define
     dependencies between tasks.  Updating a task implicitly updates all of its
@@ -605,121 +722,14 @@ class Graph(object):
             raise exception
 
 
-class Input(enum.Enum):
-    """Enumerates special :class:`Graph` named inputs."""
-    AUTODEPENDENCY = 1
-    """Named input for links that are generated automatically for use as dependencies, not data sources."""
+class Graph(StaticGraph):
+    """.. deprecated:: 0.9.0
 
-
-class Logger(object):
-    """Log updates to the graph.
-
-    Create a :class:`Logger` object to see the behavior of
-    the graph during updates, using the Python :mod:`logging`
-    module::
-
-        logger = graphcat.Logger(graph)
-
-    This is useful for debugging and pedagogy.  The logger will
-    generate output for four types of event:
-
-    * updated - called when a task is updated.
-    * executed - called when a task is executed.
-    * finished - called if a task executes successfully.
-    * failed - called if a task raises an exception during execution.
-
-    Update events happen regardless of the state of a task.  Execute events
-    only happen if the task isn't already finished.
-
-    Callers can derive from Logger and override :meth:`on_failed`,
-    :meth:`on_finished`, :meth:`on_updated`, and :meth:`on_executed` to
-    customize their behavior.
-
-    Parameters
-    ----------
-    graph: class:`Graph`, required
-        The graph whose events will be logged.
+    Use :class:`StaticGraph` instead.
     """
-    def __init__(self, graph, log_exceptions=True, log_inputs=True, log_outputs=True, log=log):
-        self._log_exceptions = log_exceptions
-        self._log_inputs = log_inputs
-        self._log_outputs = log_outputs
-        self._log = log
-
-        graph.on_execute.connect(self.on_execute)
-        graph.on_failed.connect(self.on_failed)
-        graph.on_finished.connect(self.on_finished)
-        graph.on_update.connect(self.on_update)
-
-    def on_execute(self, graph, name, inputs):
-        """Called when a task is executed."""
-        if self._log_inputs:
-            self._log.info(f"Task {name} executing. Inputs: {inputs}")
-        else:
-            self._log.info(f"Task {name} executing.")
-
-    def on_failed(self, graph, name, exception):
-        """Called when a task raises an exception during execution."""
-        if self._log_exceptions:
-            self._log.error(f"Task {name} failed. Exception: {exception}")
-        else:
-            self._log.error(f"Task {name} failed.")
-
-    def on_finished(self, graph, name, output):
-        """Called when a task has executed sucessfully."""
-        if self._log_outputs:
-            self._log.info(f"Task {name} finished. Output: {output}")
-        else:
-            self._log.info(f"Task {name} finished.")
-
-    def on_update(self, graph, name):
-        """Called when a task is updated."""
-        self._log.debug(f"Task {name} updating.")
-
-
-class PerformanceMonitor(object):
-    """Tracks the performance of graph tasks as they're executed.
-
-    Parameters
-    ----------
-    graph: :class:`Graph`, required
-        Graph to watch for task execution.
-    """
-    def __init__(self, graph):
-        self.reset()
-        graph.on_execute.connect(self._on_execute)
-        graph.on_failed.connect(self._on_failed)
-        graph.on_finished.connect(self._on_finished)
-
-
-    def _on_execute(self, graph, name, inputs):
-        self._start = time.time()
-
-
-    def _on_failed(self, graph, name, exception):
-        self._tasks[name].append(time.time() - self._start) # pragma: no cover
-
-
-    def _on_finished(self, graph, name, output):
-        self._tasks[name].append(time.time() - self._start)
-
-
-    def reset(self):
-        """Clear performance data."""
-        self._tasks = collections.defaultdict(list)
-
-
-    @property
-    def tasks(self):
-        """Graph task execution times since this object was created / reset.
-
-        Returns
-        -------
-        tasks: :class:`set`
-            Python :class:`set` containing the names for every task that has
-            been updated.
-        """
-        return dict(self._tasks)
+    def __init__(self):
+        super().__init__()
+        warnings.warn("graphcat.Graph is deprecated, use graphcat.StaticGraph instead.", DeprecationWarning, stacklevel=2)
 
 
 class TaskState(enum.Enum):
