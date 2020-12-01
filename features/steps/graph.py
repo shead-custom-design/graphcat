@@ -247,6 +247,15 @@ def step_impl(context):
     context.performance_monitor.reset()
 
 
+@when(u'filtering the graph with {hide} then the remaining nodes should match {names}')
+def step_impl(context, hide, names):
+    hide = eval(hide)
+    names = eval(names)
+
+    remaining = [name for name in context.graph.tasks() if not hide(context.graph, name)]
+    test.assert_equal(sorted(remaining), sorted(names))
+
+
 #################################################################
 # Thens
 

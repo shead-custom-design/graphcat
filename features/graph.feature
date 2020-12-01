@@ -309,6 +309,13 @@ Feature: Graph
         Then displaying the graph in a notebook should produce a visualization
 
 
+    Scenario: Notebook Subgraphs
+        Given an empty graph
+        When adding tasks ["A", "B", "C", "D"]
+        And adding links [("A", "B"), ("C", "B"), ("B", "D")]
+        When filtering the graph with graphcat.notebook.leaves then the remaining nodes should match ["B", "D"]
+
+
     Scenario: Named Inputs
         Given an empty graph
         When adding tasks ["A", "B", "C"] with functions [graphcat.constant(2), graphcat.constant(3), None]
