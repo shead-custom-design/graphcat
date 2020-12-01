@@ -21,10 +21,12 @@ import graphcat
 
 
 def none(graph, node):
+    """Do-nothing filter function used to display an entire :class:`graphcat.Graph` in :func:`display`."""
     return False
 
 
 def leaves(graph, node):
+    """Filter function that hides all leaf nodes when displaying a :class:`graphcat.Graph` in :func:`display`."""
     return graph._graph.out_degree(node) == 0
 
 

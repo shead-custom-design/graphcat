@@ -15,7 +15,7 @@
 """Functionality for managing and executing computational graphs.
 """
 
-__version__ = "0.9.0-dev"
+__version__ = "0.9.0"
 
 import collections
 import enum

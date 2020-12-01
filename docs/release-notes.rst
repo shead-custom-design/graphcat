@@ -7,6 +7,10 @@
 Release Notes
 =============
 
+Graphcat 0.9.0 - November 30, 2020
+----------------------------------
+* Deprecated graphcat.Graph, and added graphcat.StaticGraph instead.
+
 Graphcat 0.8.0 - November 23, 2020
 ----------------------------------
 * Added graphcat.PerformanceMonitor for evaluating task performance.
