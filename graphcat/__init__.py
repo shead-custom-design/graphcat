@@ -722,16 +722,6 @@ class StaticGraph(object):
             raise exception
 
 
-class Graph(StaticGraph):
-    """.. deprecated:: 0.9.0
-
-    Use :class:`StaticGraph` instead.
-    """
-    def __init__(self):
-        super().__init__()
-        warnings.warn("graphcat.Graph is deprecated, use graphcat.StaticGraph instead.", DeprecationWarning, stacklevel=2)
-
-
 class TaskState(enum.Enum):
     """Enumerates :class:`Graph` task states."""
     UNFINISHED = 1

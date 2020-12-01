@@ -69,7 +69,7 @@ class EventRecorder(object):
 
 @given(u'an empty graph')
 def step_impl(context):
-    context.graph = graphcat.Graph()
+    context.graph = graphcat.StaticGraph()
 
 
 @given(u'a log')
