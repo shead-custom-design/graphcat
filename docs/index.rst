@@ -37,13 +37,13 @@ Documentation
    installation.rst
    dependencies.rst
    compatibility.rst
+   contributing.rst
    tutorial.ipynb
    case-studies.rst
    projects.rst
-   contributing.rst
-   release-notes.rst
    reference.rst
    support.rst
+   release-notes.rst
 
 Indices and tables
 ==================

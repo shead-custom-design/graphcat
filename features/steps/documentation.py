@@ -49,9 +49,13 @@ def step_impl(context):
     context.references = sorted(context.references)
 
 
-@then(u'every module must have a section in the reference documentation')
-def step_impl(context):
+@then(u'every module must have a section in the reference documentation except {exceptions}')
+def step_impl(context, exceptions):
+    exceptions = eval(exceptions)
+
     for module in context.modules:
+        if module in exceptions:
+            continue
         if os.path.join(docs_dir, module + ".rst") not in context.references:
             raise AssertionError("No matching documentation found for the %s module." % module)
 
