@@ -315,7 +315,7 @@ def null(graph, name, inputs):
     pass
 
 
-def passthrough(input=None, index=0):
+def passthrough(input=None):
     """Factory for task functions that pass-through incoming data.
 
     Callers can use this function to temporarily bypass tasks in the graph.
@@ -324,8 +324,6 @@ def passthrough(input=None, index=0):
     ----------
     input: hashable object, required
         The named input that will pass-through to the task output.
-    index: integer, required
-        Index of the named inputs that will pass-through to the task output.
 
     Returns
     -------
@@ -333,7 +331,7 @@ def passthrough(input=None, index=0):
         Task function that will pass input `input` index `index` to its output.
     """
     def implementation(graph, name, inputs):
-        return inputs[input][index]
+        return inputs.getone(input)
     return implementation
 
 
