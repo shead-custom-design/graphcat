@@ -1,14 +1,13 @@
-Feature: Graph
-
+Feature: Dynamic Graphs
 
     Scenario: Empty Graph
-        Given an empty graph
+        Given an empty dynamic graph
         Then the graph should contain tasks []
         And the graph should contain links []
 
 
     Scenario Outline: Adding Links
-        Given an empty graph
+        Given an empty dynamic graph
         When adding tasks <tasks>
         And adding links <links>
         And updating tasks <update tasks>
@@ -32,7 +31,7 @@ Feature: Graph
 
 
     Scenario Outline: Adding Tasks
-        Given an empty graph
+        Given an empty dynamic graph
         When adding tasks <tasks>
         And adding links <links>
         And updating tasks <update tasks>
@@ -52,7 +51,7 @@ Feature: Graph
 
 
     Scenario Outline: Renaming Tasks
-        Given an empty graph
+        Given an empty dynamic graph
         When adding tasks <tasks>
         And adding links <links>
         And updating tasks <update tasks>
@@ -78,7 +77,7 @@ Feature: Graph
 
 
     Scenario Outline: Removing Links
-        Given an empty graph
+        Given an empty dynamic graph
         When adding tasks <tasks>
         And adding links <links>
         And updating tasks <update tasks>
@@ -102,7 +101,7 @@ Feature: Graph
 
 
     Scenario Outline: Removing Tasks
-        Given an empty graph
+        Given an empty dynamic graph
         When adding tasks <tasks>
         And adding links <links>
         And updating tasks <update tasks>
@@ -128,7 +127,7 @@ Feature: Graph
 
 
     Scenario Outline: Setting Parameters
-        Given an empty graph
+        Given an empty dynamic graph
         When adding tasks <tasks>
         And setting parameter <target> <input> <source> <value>
         Then the graph should contain tasks <result tasks>
@@ -141,7 +140,7 @@ Feature: Graph
 
 
     Scenario Outline: Updating Tasks
-        Given an empty graph
+        Given an empty dynamic graph
         When adding tasks <tasks>
         And adding links <links>
         Then the graph should contain tasks <tasks>
@@ -158,28 +157,28 @@ Feature: Graph
             | ["A", "B", "C"] | [("A", ("B", None)), ("A", ("C", None))] | []           | []                   | []              | []              | []              | ["A", "B", "C"]  |
             | ["A", "B", "C"] | [("A", ("B", None)), ("A", ("C", None))] | ["A"]        | ["A"]                | ["A"]           | ["A"]           | ["A"]           | ["B", "C"]       |
             | ["A", "B", "C"] | [("A", ("B", None)), ("A", ("C", None))] | ["A", "A"]   | ["A", "A"]           | ["A"]           | ["A"]           | ["A"]           | ["B", "C"]       |
-            | ["A", "B", "C"] | [("A", ("B", None)), ("A", ("C", None))] | ["B"]        | ["A", "B"]           | ["A", "B"]      | ["A", "B"]      | ["A", "B"]      | ["C"]            |
-            | ["A", "B", "C"] | [("A", ("B", None)), ("A", ("C", None))] | ["B", "C"]   | ["A", "B", "A", "C"] | ["A", "B", "C"] | ["A", "B", "C"] | ["A", "B", "C"] | []               |
+            | ["A", "B", "C"] | [("A", ("B", None)), ("A", ("C", None))] | ["B"]        | ["B"]                | ["B"]           | ["B"]           | ["B"]           | ["A", "C"]       |
+            | ["A", "B", "C"] | [("A", ("B", None)), ("A", ("C", None))] | ["B", "C"]   | ["B", "C"]           | ["B", "C"]      | ["B", "C"]      | ["B", "C"]      | ["A"]            |
 
         Examples: Fan-In
             | tasks           | links                                    | update tasks | updated              | executed        | finished        | finished tasks  | unfinished tasks |
             | ["A", "B", "C"] | [("A", ("C", None)), ("B", ("C", None))] | []           | []                   | []              | []              | []              | ["A", "B", "C"]  |
             | ["A", "B", "C"] | [("A", ("C", None)), ("B", ("C", None))] | ["A"]        | ["A"]                | ["A"]           | ["A"]           | ["A"]           | ["B", "C"]       |
-            | ["A", "B", "C"] | [("A", ("C", None)), ("B", ("C", None))] | ["C"]        | ["A", "B", "C"]      | ["A", "B", "C"] | ["A", "B", "C"] | ["A", "B", "C"] | []               |
-            | ["A", "B", "C"] | [("A", ("C", None)), ("B", ("C", None))] | ["C", "A"]   | ["A", "B", "C", "A"] | ["A", "B", "C"] | ["A", "B", "C"] | ["A", "B", "C"] | []               |
+            | ["A", "B", "C"] | [("A", ("C", None)), ("B", ("C", None))] | ["C"]        | ["C"]                | ["C"]           | ["C"]           | ["C"]           | ["A", "B"]       |
+            | ["A", "B", "C"] | [("A", ("C", None)), ("B", ("C", None))] | ["C", "A"]   | ["C", "A"]           | ["C", "A"]      | ["C", "A"]      | ["A", "C"]      | ["B"]            |
 
         Examples: Cycles
             | tasks           | links                                                        | update tasks | updated                        | executed        | finished        | finished tasks  | unfinished tasks |
             | ["A", "B", "C"] | [("A", ("B", None)), ("B", ("C", None)), ("C", ("A", None))] | []           | []                             | []              | []              | []              | ["A", "B", "C"]  |
-            | ["A", "B", "C"] | [("A", ("B", None)), ("B", ("C", None)), ("C", ("A", None))] | ["A"]        | ["B", "C", "A"]                | ["B", "C", "A"] | ["B", "C", "A"] | ["A", "B", "C"] | []               |
-            | ["A", "B", "C"] | [("A", ("B", None)), ("B", ("C", None)), ("C", ("A", None))] | ["B"]        | ["C", "A", "B"]                | ["C", "A", "B"] | ["C", "A", "B"] | ["A", "B", "C"] | []               |
-            | ["A", "B", "C"] | [("A", ("B", None)), ("B", ("C", None)), ("C", ("A", None))] | ["C"]        | ["A", "B", "C"]                | ["A", "B", "C"] | ["A", "B", "C"] | ["A", "B", "C"] | []               |
-            | ["A", "B", "C"] | [("A", ("B", None)), ("B", ("C", None)), ("C", ("A", None))] | ["C", "C"]   | ["A", "B", "C", "A", "B", "C"] | ["A", "B", "C"] | ["A", "B", "C"] | ["A", "B", "C"] | []               |
-            | ["A", "B", "C"] | [("A", ("B", None)), ("B", ("C", None)), ("C", ("A", None))] | ["C", "A"]   | ["A", "B", "C", "B", "C", "A"] | ["A", "B", "C"] | ["A", "B", "C"] | ["A", "B", "C"] | []               |
+            | ["A", "B", "C"] | [("A", ("B", None)), ("B", ("C", None)), ("C", ("A", None))] | ["A"]        | ["A"]                          | ["A"]           | ["A"]           | ["A"]           | ["B", "C"]       |
+            | ["A", "B", "C"] | [("A", ("B", None)), ("B", ("C", None)), ("C", ("A", None))] | ["B"]        | ["B"]                          | ["B"]           | ["B"]           | ["B"]           | ["A", "C"]       |
+            | ["A", "B", "C"] | [("A", ("B", None)), ("B", ("C", None)), ("C", ("A", None))] | ["C"]        | ["C"]                          | ["C"]           | ["C"]           | ["C"]           | ["A", "B"]       |
+            | ["A", "B", "C"] | [("A", ("B", None)), ("B", ("C", None)), ("C", ("A", None))] | ["C", "C"]   | ["C", "C"]                     | ["C"]           | ["C"]           | ["C"]           | ["A", "B"]       |
+            | ["A", "B", "C"] | [("A", ("B", None)), ("B", ("C", None)), ("C", ("A", None))] | ["C", "A"]   | ["C", "A"]                     | ["C", "A"]      | ["C", "A"]      | ["A", "C"]      | ["B"]            |
 
 
     Scenario Outline: Task Functions
-        Given an empty graph
+        Given an empty dynamic graph
         When adding tasks <tasks> with functions <functions>
         Then the outputs of tasks <tasks> should be <outputs>
 
@@ -197,16 +196,16 @@ Feature: Graph
 
 
     Scenario: Failing Task Function
-        Given an empty graph
+        Given an empty dynamic graph
         When adding tasks ["A", "B", "C"] with functions [graphcat.null, graphcat.raise_exception(RuntimeError()), graphcat.null]
         And adding links [("A", "B"), ("B", "C")]
-        And updating task "C" an exception should be raised
-        Then the tasks ["A"] should be finished
-        And the tasks ["B", "C"] should be failed
+        And updating task "B" an exception should be raised
+        Then the tasks [] should be finished
+        And the tasks ["B"] should be failed
 
 
     Scenario: Adding Duplicate Tasks
-        Given an empty graph
+        Given an empty dynamic graph
         When adding tasks ["A", "B", "C"]
         And adding links [("A", "B"), ("B", "C")]
         And adding task "A" an exception should be raised
@@ -216,7 +215,7 @@ Feature: Graph
 
 
     Scenario: Adding Link To Nonexistent Task
-        Given an empty graph
+        Given an empty dynamic graph
         When adding tasks ["A", "B", "C"]
         And adding links [("A", "B"), ("B", "C")]
         And adding link ("A", "D") an exception should be raised
@@ -226,7 +225,7 @@ Feature: Graph
 
 
     Scenario: Removing Nonexistent Link
-        Given an empty graph
+        Given an empty dynamic graph
         When adding tasks ["A", "B", "C"]
         And adding links [("A", "B"), ("B", "C")]
         And removing link ("A", "C") no exception should be raised
@@ -235,7 +234,7 @@ Feature: Graph
 
 
     Scenario: Changing Task Functions
-        Given an empty graph
+        Given an empty dynamic graph
         When adding tasks ["A", "B", "C"] with functions [graphcat.constant(1), graphcat.constant(2), graphcat.constant(3)]
         And adding links [("A", "B"), ("B", "C")]
         And updating tasks ["A", "B", "C"]
@@ -248,7 +247,7 @@ Feature: Graph
 
 
     Scenario: Expression Tasks
-        Given an empty graph
+        Given an empty dynamic graph
         When adding tasks ["A", "B", "choice"] with functions [graphcat.constant(1), graphcat.constant(2), graphcat.constant(True)]
         And adding an expression task "expr" with expression "3+4"
         Then the graph should contain tasks ["A", "B", "choice", "expr"]
@@ -278,7 +277,7 @@ Feature: Graph
 
 
     Scenario: Graph Logger
-        Given an empty graph
+        Given an empty dynamic graph
         And a log
         And a graph logger
         When adding tasks ["A"]
@@ -290,7 +289,7 @@ Feature: Graph
 
 
     Scenario: Simplified Graph Logger
-        Given an empty graph
+        Given an empty dynamic graph
         And a log
         And a graph logger with detailed outputs disabled
         When adding tasks ["A"]
@@ -302,7 +301,7 @@ Feature: Graph
 
 
     Scenario: Notebook Display
-        Given an empty graph
+        Given an empty dynamic graph
         When adding tasks ["A", "B", "C", "D"] with functions [None, None, None, graphcat.raise_exception(RuntimeError("Whoops!"))]
         And adding links [("A", "B"), ("A", "C"), ("B", "D")]
         And updating task "D" an exception should be raised
@@ -310,27 +309,43 @@ Feature: Graph
 
 
     Scenario: Notebook Subgraphs
-        Given an empty graph
+        Given an empty dynamic graph
         When adding tasks ["A", "B", "C", "D"]
         And adding links [("A", "B"), ("C", "B"), ("B", "D")]
         When filtering the graph with graphcat.notebook.leaves then the remaining nodes should match ["B", "D"]
 
 
     Scenario: Named Inputs
-        Given an empty graph
-        When adding tasks ["A", "B", "C"] with functions [graphcat.constant(2), graphcat.constant(3), None]
-        And adding links [("A", ("C", "lhs")), ("B", ("C", "rhs"))]
-        And updating tasks ["C"]
-        Then tasks ["A", "B", "C"] are executed with inputs [{}, {}, {"lhs": [2], "rhs": [3]}]
-        When setting links [("A", ("C", None)), ("B", ("C", None))]
-        Then the tasks ["A", "B"] should be finished
-        And the tasks ["C"] should be unfinished
-        When updating tasks ["C"]
-        Then tasks ["C"] are executed with inputs [{None: [2, 3]}]
+        Given an empty dynamic graph
+        When adding tasks ["A", "B", "C", "D"] with functions [graphcat.constant(2), graphcat.constant(3), graphcat.constant(4), None]
+        And adding links [("A", ("D", 0)), ("B", ("D", 1)), ("C", ("D", 1))]
+        And updating tasks ["A"]
+        Then tasks ["A"] are executed
+        And task "A" has 0 inputs
+        When updating tasks ["D"]
+        Then tasks ["D"] are executed
+        And task "D" has 3 inputs
+        And the task "D" inputs contain 0
+        And the task "D" inputs contain 1
+        And the task "D" inputs do not contain 2
+        And getting input 0 from task "D" returns 2
+        And getting input 1 from task "D" raises KeyError
+        And getting input 2 from task "D" returns None
+        And getting one input from task "D" input 0 returns 2
+        And getting one input from task "D" input 1 raises KeyError
+        And getting one input from task "D" input 2 raises KeyError
+        And getting all inputs from task "D" input 0 returns [2]
+        And getting all inputs from task "D" input 1 returns [3, 4]
+        And getting all inputs from task "D" input 2 returns []
+        And getting the task "D" input keys returns [0, 1, 1]
+        And getting the task "D" input values returns [2, 3, 4]
+        And getting the task "D" input items returns [(0, 2), (1, 3), (1, 4)]
+
+
 
 
     Scenario: Retrieving Task Links
-        Given an empty graph
+        Given an empty dynamic graph
         When adding tasks ["A", "B", "C"]
         And adding links [("A", ("C", "lhs")), ("B", ("C", "rhs"))]
         And adding links [("A", ("B", None))]
@@ -340,7 +355,7 @@ Feature: Graph
 
 
     Scenario: Setting Links
-        Given an empty graph
+        Given an empty dynamic graph
         When adding tasks ["A", "B", "C", "D"]
         And adding links [("A", "B"), ("A", "C")]
         Then the graph should contain links [("A", ("B", None)), ("A", ("C", None))]
@@ -353,7 +368,7 @@ Feature: Graph
 
 
     Scenario: Membership
-        Given an empty graph
+        Given an empty dynamic graph
         When adding tasks ["A", "B"]
         Then the graph should contain tasks ["A", "B"]
         And testing if the graph contains task "A" should return True
@@ -361,7 +376,7 @@ Feature: Graph
 
 
     Scenario: Passthrough
-        Given an empty graph
+        Given an empty dynamic graph
         When adding tasks ["A", "B", "C"] with functions [graphcat.constant(42), graphcat.constant(10), graphcat.passthrough("lhs")]
         And adding links [("A", ("C", "lhs")), ("B", ("C", "rhs"))]
         And updating tasks ["C"]
@@ -369,7 +384,7 @@ Feature: Graph
 
 
     Scenario: Performance Monitor
-        Given an empty graph
+        Given an empty dynamic graph
         And a performance monitor
         When adding tasks ["A", "B", "C"] with functions [graphcat.delay(2), graphcat.delay(1), graphcat.delay(0.1)]
         And adding links [("A", "B"), ("B", "C")]

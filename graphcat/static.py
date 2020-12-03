@@ -618,12 +618,6 @@ class NamedInputs(object):
         inputs = ", ".join([f"{key}: {value()}" for key, value in zip(self._keys, self._values)])
         return f"{{{inputs}}}"
 
-    def dict(self):
-        result = collections.defaultdict(list)
-        for key, value in zip(self._keys, self._values):
-            result[key].append(value())
-        return dict(result)
-
     def get(self, name, default=None):
         values = [value for key, value in zip(self._keys, self._values) if key == name]
         if len(values) == 0:

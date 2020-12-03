@@ -67,7 +67,12 @@ class EventRecorder(object):
 # Givens
 
 
-@given(u'an empty graph')
+@given(u'an empty dynamic graph')
+def step_impl(context):
+    context.graph = graphcat.DynamicGraph()
+
+
+@given(u'an empty static graph')
 def step_impl(context):
     context.graph = graphcat.StaticGraph()
 
@@ -320,6 +325,112 @@ def step_impl(context, names, inputs):
 
     test.assert_equal(names, context.events.executed)
     test.assert_equal(inputs, [inputs.dict() for inputs in context.events.inputs])
+
+
+@then(u'task {name} has {count} inputs')
+def step_impl(context, name, count):
+    name = eval(name)
+    count = eval(count)
+    index = context.events.executed.index(name)
+    inputs = context.events.inputs[index]
+    test.assert_equal(count, len(inputs))
+
+
+@then(u'the task {name} inputs contain {key}')
+def step_impl(context, name, key):
+    name = eval(name)
+    key = eval(key)
+    index = context.events.executed.index(name)
+    inputs = context.events.inputs[index]
+    test.assert_true(key in inputs)
+
+
+@then(u'the task {name} inputs do not contain {key}')
+def step_impl(context, name, key):
+    name = eval(name)
+    key = eval(key)
+    index = context.events.executed.index(name)
+    inputs = context.events.inputs[index]
+    test.assert_true(key not in inputs)
+
+
+@then(u'getting input {key} from task {name} returns {value}')
+def step_impl(context, key, name, value):
+    key = eval(key)
+    name = eval(name)
+    value = eval(value)
+    index = context.events.executed.index(name)
+    inputs = context.events.inputs[index]
+    test.assert_equal(inputs.get(key), value)
+
+
+@then(u'getting input {key} from task {name} raises {exception}')
+def step_impl(context, key, name, exception):
+    key = eval(key)
+    name = eval(name)
+    exception = eval(exception)
+    index = context.events.executed.index(name)
+    inputs = context.events.inputs[index]
+    with test.assert_raises(exception):
+        inputs.get(key)
+
+
+@then(u'getting one input from task {name} input {key} returns {value}')
+def step_impl(context, key, name, value):
+    key = eval(key)
+    name = eval(name)
+    value = eval(value)
+    index = context.events.executed.index(name)
+    inputs = context.events.inputs[index]
+    test.assert_equal(inputs.getone(key), value)
+
+
+@then(u'getting one input from task {name} input {key} raises {exception}')
+def step_impl(context, key, name, exception):
+    key = eval(key)
+    name = eval(name)
+    exception = eval(exception)
+    index = context.events.executed.index(name)
+    inputs = context.events.inputs[index]
+    with test.assert_raises(exception):
+        inputs.getone(key)
+
+
+@then(u'getting all inputs from task {name} input {key} returns {values}')
+def step_impl(context, name, key, values):
+    key = eval(key)
+    name = eval(name)
+    values = eval(values)
+    index = context.events.executed.index(name)
+    inputs = context.events.inputs[index]
+    test.assert_equal(values, inputs.getall(key))
+
+
+@then(u'getting the task {name} input keys returns {values}')
+def step_impl(context, name, values):
+    name = eval(name)
+    values = eval(values)
+    index = context.events.executed.index(name)
+    inputs = context.events.inputs[index]
+    test.assert_equal(values, list(inputs.keys()))
+
+
+@then(u'getting the task {name} input values returns {values}')
+def step_impl(context, name, values):
+    name = eval(name)
+    values = eval(values)
+    index = context.events.executed.index(name)
+    inputs = context.events.inputs[index]
+    test.assert_equal(values, [value() for value in inputs.values()])
+
+
+@then(u'getting the task {name} input items returns {values}')
+def step_impl(context, name, values):
+    name = eval(name)
+    values = eval(values)
+    index = context.events.executed.index(name)
+    inputs = context.events.inputs[index]
+    test.assert_equal(values, [(key, value()) for key, value in inputs.items()])
 
 
 @then(u'tasks {names} are executed')

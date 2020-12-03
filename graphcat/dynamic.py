@@ -192,30 +192,30 @@ class DynamicGraph(object):
         return results
 
 
-    def mark_failed(self, names=None):
-        """Set the failed state for tasks and all downstream dependents.
-
-        Normally, the failed state is set automatically by :meth:`update`.  This
-        method is provided for callers who want to set the failed state in
-        response to some outside event that the graph isn't aware of; this
-        should only happen in extremely rare situations.
-
-        Parameters
-        ----------
-        names: :any:`None`, hashable object, or list|set of hashable objects, required
-            Task names to be marked as failed.  If :any:`None` (the default), all tasks are marked as failed.
-        """
-        names = self._require_valid_names(names)
-
-        for name in list(names):
-            for ancestor in networkx.ancestors(self._graph, name):
-                names.add(ancestor)
-
-        for name in names:
-            self._graph.nodes[name]["output"] = None
-            self._graph.nodes[name]["state"] = graphcat.common.TaskState.FAILED
-
-        self._on_changed.send(self)
+#    def mark_failed(self, names=None):
+#        """Set the failed state for tasks and all downstream dependents.
+#
+#        Normally, the failed state is set automatically by :meth:`update`.  This
+#        method is provided for callers who want to set the failed state in
+#        response to some outside event that the graph isn't aware of; this
+#        should only happen in extremely rare situations.
+#
+#        Parameters
+#        ----------
+#        names: :any:`None`, hashable object, or list|set of hashable objects, required
+#            Task names to be marked as failed.  If :any:`None` (the default), all tasks are marked as failed.
+#        """
+#        names = self._require_valid_names(names)
+#
+#        for name in list(names):
+#            for ancestor in networkx.ancestors(self._graph, name):
+#                names.add(ancestor)
+#
+#        for name in names:
+#            self._graph.nodes[name]["output"] = None
+#            self._graph.nodes[name]["state"] = graphcat.common.TaskState.FAILED
+#
+#        self._on_changed.send(self)
 
 
     def mark_unfinished(self, names=None):
