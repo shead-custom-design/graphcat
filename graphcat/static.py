@@ -609,7 +609,7 @@ class NamedInputs(object):
     def __contains__(self, name):
         return name in self._keys
 
-    def __getitem__(self, key):
+    def __getitem__(self, key): # pragma: no cover
         """.. deprecated:: 0.10.0"""
         warnings.warn("NamedInputs.__getitem__() is deprecated, use NamedInputs.get(), NamedInputs.getone(), or NamedInputs.getall() instead.", DeprecationWarning, stacklevel=2)
         return self.getall(key)

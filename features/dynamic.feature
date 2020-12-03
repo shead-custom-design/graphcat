@@ -389,10 +389,10 @@ Feature: Dynamic Graphs
         When adding tasks ["A", "B", "C"] with functions [graphcat.delay(2), graphcat.delay(1), graphcat.delay(0.1)]
         And adding links [("A", "B"), ("B", "C")]
         And updating tasks ["C"]
-        Then the performance monitor output should be {"A": [2], "B": [1], "C": [0.1]}
+        Then the performance monitor output should be {"C": [0.1]}
         When tasks ["C"] are marked unfinished
         And updating tasks ["C"]
-        Then the performance monitor output should be {"A": [2], "B": [1], "C": [0.1, 0.1]}
+        Then the performance monitor output should be {"C": [0.1, 0.1]}
         When the performance monitor is reset
         Then the performance monitor output should be {}
 
