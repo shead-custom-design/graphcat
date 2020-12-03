@@ -5,4 +5,3 @@ graphcat module
     :members:
     :undoc-members:
     :show-inheritance:
-    :imported-members:

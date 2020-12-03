@@ -11,4 +11,7 @@ Contents:
    :maxdepth: 2
 
    graphcat.rst
+   graphcat.common.rst
+   graphcat.dynamic.rst
    graphcat.notebook.rst
+   graphcat.static.rst

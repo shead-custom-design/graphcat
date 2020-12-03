@@ -596,6 +596,15 @@ class StaticGraph(object):
 
 
 class NamedInputs(object):
+    """Access named inputs for a graph task.
+
+    Parameters
+    ----------
+    graph: :class:`StaticGraph`, required
+        Graph containing a task.
+    name: hashable object, required
+        Existing task unique name.
+    """
     def __init__(self, graph, name):
         def constant(value):
             def implementation():
@@ -607,6 +616,7 @@ class NamedInputs(object):
         self._values = [constant(graph._graph.nodes[source]["output"]) for target, source, input in edges]
 
     def __contains__(self, name):
+        """Return :any:`True` if `name` matches a named input for this task."""
         return name in self._keys
 
     def __getitem__(self, key): # pragma: no cover
@@ -615,6 +625,7 @@ class NamedInputs(object):
         return self.getall(key)
 
     def __len__(self):
+        """Return the number of named inputs for this task."""
         return len(self._keys)
 
     def __repr__(self):
@@ -622,6 +633,28 @@ class NamedInputs(object):
         return f"{{{inputs}}}"
 
     def get(self, name, default=None):
+        """Return a single input value.
+
+        Use this method to return a value when you expect to have either zero
+        or one input that matches `name`.
+
+        Parameters
+        ----------
+        name: hashable object, required
+            Name of the input value to return.
+        default: any Python value, optional
+            If an input matching `name` doesn't exist, this value will be
+            returned instead.  Defaults to :any:`None`.
+
+        Returns
+        -------
+        value: any Python value
+            The value of input `name`, or `default`.
+
+        Raises
+        ------
+        :class:`KeyError`: if more than one input matches `name`.
+        """
         values = [value for key, value in zip(self._keys, self._values) if key == name]
         if len(values) == 0:
             return default
@@ -631,9 +664,43 @@ class NamedInputs(object):
             raise KeyError(f"More than one input {name!r}")
 
     def getall(self, name):
+        """Return multiple input values.
+
+        Use this method to return every input value that matches `name`.
+
+        Parameters
+        ----------
+        name: hashable object, required
+            Name of the input value to return.
+
+        Returns
+        -------
+        values: list of Python values
+            Values from every input that matches `name`.  Returns an empty list
+            if there are none.
+        """
         return [value() for key, value in zip(self._keys, self._values) if key == name]
 
     def getone(self, name):
+        """Return a single input value.
+
+        Use this method to return a value when you expect to have exactly one
+        input that matches `name`.
+
+        Parameters
+        ----------
+        name: hashable object, required
+            Name of the input value to return.
+
+        Returns
+        -------
+        value: any Python value
+            The value of input `name`.
+
+        Raises
+        ------
+        :class:`KeyError`: if more or less than one input matches `name`.
+        """
         values = [value for key, value in zip(self._keys, self._values) if key == name]
         if len(values) == 0:
             raise KeyError(name)
@@ -643,12 +710,45 @@ class NamedInputs(object):
             raise KeyError(f"More than one input {name!r}")
 
     def items(self):
+        """Return names and values for every input attached to this task.
+
+        Note
+        ----
+        For each (name, value) pair returned by this method, the value is a
+        callable that returns the actual value from the upstream task.
+
+        Returns
+        -------
+        values: sequence of (hashable object, callable) tuples
+            The name and value of every input attached to this task.
+        """
         return zip(self._keys, self._values)
 
     def keys(self):
+        """Return names for every input attached to this task.
+
+        Returns
+        -------
+        names: sequence of hashable objects
+            The name of every input attached to this task.  Note that the same
+            name may appear more than once in the sequence.
+        """
         return self._keys
 
     def values(self):
+        """Return values for every input attached to this task.
+
+        Note
+        ----
+        Each value returned by this method is a callable that returns the
+        actual value from the upstream task.
+
+        Returns
+        -------
+        values: sequence of callables
+            The value of every input attached to this task, in the same
+            order as :meth:`keys`.
+        """
         return self._values
 
 
