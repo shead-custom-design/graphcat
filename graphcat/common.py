@@ -20,7 +20,6 @@ import enum
 import functools
 import logging
 import time
-import warnings
 
 
 log = logging.getLogger(__name__)
