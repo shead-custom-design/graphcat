@@ -317,8 +317,9 @@ def step_impl(context, names):
 def step_impl(context, names, inputs):
     names = eval(names)
     inputs = eval(inputs)
+
     test.assert_equal(names, context.events.executed)
-    test.assert_equal(inputs, context.events.inputs)
+    test.assert_equal(inputs, [inputs.dict() for inputs in context.events.inputs])
 
 
 @then(u'tasks {names} are executed')

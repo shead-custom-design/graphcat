@@ -569,11 +569,13 @@ class StaticGraph(object):
 
                 try:
                     # Gather inputs for the function.
-                    inputs = collections.defaultdict(list)
-                    for target, source, input in self._graph.out_edges(name, data="input"):
-                        output = self._graph.nodes[source]["output"]
-                        inputs[input].append(output)
-                    inputs = dict(inputs)
+                    inputs = NamedInputs(self, name)
+
+#                    inputs = collections.defaultdict(list)
+#                    for target, source, input in self._graph.out_edges(name, data="input"):
+#                        output = self._graph.nodes[source]["output"]
+#                        inputs[input].append(output)
+#                    inputs = dict(inputs)
 
                     # Execute the function and store the output.
                     self._on_execute.send(self, name=name, inputs=inputs)
@@ -590,5 +592,66 @@ class StaticGraph(object):
         if failed is not None:
             self.mark_failed(failed)
             raise exception
+
+
+class NamedInputs(object):
+    def __init__(self, graph, name):
+        def constant(value):
+            def implementation():
+                return value
+            return implementation
+
+        edges = graph._graph.out_edges(name, data="input")
+        self._keys = [input for target, source, input in edges]
+        self._values = [constant(graph._graph.nodes[source]["output"]) for target, source, input in edges]
+
+    def __contains__(self, name):
+        return name in self._keys
+
+    def __getitem__(self, key):
+        return self.getall(key)
+
+    def __len__(self):
+        return len(self._keys)
+
+    def __repr__(self):
+        inputs = ", ".join([f"{key}: {value()}" for key, value in zip(self._keys, self._values)])
+        return f"{{{inputs}}}"
+
+    def dict(self):
+        result = collections.defaultdict(list)
+        for key, value in zip(self._keys, self._values):
+            result[key].append(value())
+        return dict(result)
+
+    def get(self, name, default=None):
+        values = [value for key, value in zip(self._keys, self._values) if key == name]
+        if len(values) == 0:
+            return default
+        elif len(values) == 1:
+            return values[0]()
+        else:
+            raise KeyError(f"More than one input {name!r}")
+
+    def getall(self, name):
+        return [value() for key, value in zip(self._keys, self._values) if key == name]
+
+    def getone(self, name):
+        values = [value for key, value in zip(self._keys, self._values) if key == name]
+        if len(values) == 0:
+            raise KeyError(name)
+        elif len(values) == 1:
+            return values[0]()
+        else:
+            raise KeyError(f"More than one input {name!r}")
+
+    def items(self):
+        return zip(self._keys, self._values)
+
+    def keys(self):
+        return self._keys
+
+    def values(self):
+        return self._values
 
 
