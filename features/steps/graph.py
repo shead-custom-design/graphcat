@@ -12,12 +12,17 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from behave import *
-
+import sys
 import unittest.mock
 
+from behave import *
+
 import graphcat
-import graphcat.notebook
+
+try:
+    import graphcat.notebook
+except:
+    pass
 
 import test
 
@@ -66,6 +71,10 @@ class EventRecorder(object):
 #################################################################
 # Givens
 
+@given(u'the graphcat.notebook module is available')
+def step_impl(context):
+    if "graphcat.notebook" not in sys.modules:
+        context.scenario.skip()
 
 @given(u'an empty dynamic graph')
 def step_impl(context):

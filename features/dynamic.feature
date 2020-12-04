@@ -301,7 +301,8 @@ Feature: Dynamic Graphs
 
 
     Scenario: Notebook Display
-        Given an empty dynamic graph
+        Given the graphcat.notebook module is available
+        And an empty dynamic graph
         When adding tasks ["A", "B", "C", "D"] with functions [None, None, None, graphcat.raise_exception(RuntimeError("Whoops!"))]
         And adding links [("A", "B"), ("A", "C"), ("B", "D")]
         And updating task "D" an exception should be raised
@@ -309,7 +310,8 @@ Feature: Dynamic Graphs
 
 
     Scenario: Notebook Subgraphs
-        Given an empty dynamic graph
+        Given the graphcat.notebook module is available
+        And an empty dynamic graph
         When adding tasks ["A", "B", "C", "D"]
         And adding links [("A", "B"), ("C", "B"), ("B", "D")]
         When filtering the graph with graphcat.notebook.leaves then the remaining nodes should match ["B", "D"]
