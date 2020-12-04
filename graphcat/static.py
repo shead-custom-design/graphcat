@@ -606,6 +606,9 @@ class NamedInputs(object):
         Existing task unique name.
     """
     def __init__(self, graph, name):
+        if not isinstance(graph, StaticGraph):
+            raise ValueError("Graph input must be an instance of StaticGraph") # pragma: no cover
+
         def constant(value):
             def implementation():
                 return value

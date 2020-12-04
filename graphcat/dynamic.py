@@ -598,7 +598,7 @@ class NamedInputs(object):
     """
     def __init__(self, graph, name):
         if not isinstance(graph, DynamicGraph):
-            raise ValueError("Graph input must be an instance of DynamicGraph")
+            raise ValueError("Graph input must be an instance of DynamicGraph") # pragma: no cover
 
         edges = graph._graph.out_edges(name, data="input")
         self._keys = [input for target, source, input in edges]
