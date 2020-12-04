@@ -29,7 +29,7 @@ def assert_is_instance(obj, cls, msg=None):
     return unittest.TestCase().assertIsInstance(obj, cls, msg)
 
 def assert_raises(exception, *, msg=None):
-    return unittest.TestCase().assertRaises(exception, msg)
+    return unittest.TestCase().assertRaises(exception, msg=msg)
 
 def assert_sequence_equal(first, second, msg=None, seq_type=None):
     return unittest.TestCase().assertSequenceEqual(first, second, msg, seq_type)
