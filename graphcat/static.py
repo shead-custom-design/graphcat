@@ -622,11 +622,6 @@ class NamedInputs(object):
         """Return :any:`True` if `name` matches a named input for this task."""
         return name in self._keys
 
-    def __getitem__(self, key): # pragma: no cover
-        """.. deprecated:: 0.10.0"""
-        warnings.warn("NamedInputs.__getitem__() is deprecated, use NamedInputs.get(), NamedInputs.getone(), or NamedInputs.getall() instead.", DeprecationWarning, stacklevel=2)
-        return self.getall(key)
-
     def __len__(self):
         """Return the number of named inputs for this task."""
         return len(self._keys)
