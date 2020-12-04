@@ -7,6 +7,11 @@
 Release Notes
 =============
 
+Graphcat 0.10.0 - December 3, 2020
+----------------------------------
+* Introduced graphcat.DynamicGraph, which executes a computational graph with dynamic dependency checking.
+* Introduced NamedInputs helpers to provide a cleaner / more consistent API for accessing task inputs.
+
 Graphcat 0.9.0 - November 30, 2020
 ----------------------------------
 * Deprecated graphcat.Graph, and added graphcat.StaticGraph instead.
