@@ -3,4 +3,5 @@ ipython
 nbsphinx
 networkx
 pygraphviz
+sphinx-gallery
 sphinx_rtd_theme
