@@ -14,13 +14,18 @@
 
 from behave import *
 
+import glob
 import os
 import pkgutil
 import subprocess
 import sys
 
+import IPython
+import nbformat
+
 root_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
 docs_dir = os.path.join(root_dir, "docs")
+notebook_dir = os.path.join(root_dir, "notebooks")
 package_dir = os.path.join(root_dir, "graphcat")
 
 
@@ -66,3 +71,39 @@ def step_impl(context):
     for reference in context.references:
         if reference not in modules:
             raise AssertionError("No matching module found for %s." % reference)
+
+
+@given(u'all documentation notebooks')
+def step_impl(context):
+    context.notebooks = sorted(glob.glob(os.path.join(docs_dir, "*.ipynb")))
+
+
+@given(u'all testing notebooks')
+def step_impl(context):
+    context.notebooks = sorted(glob.glob(os.path.join(notebook_dir, "*.ipynb")))
+
+
+@then(u'every notebook runs without error')
+def step_impl(context):
+    sys.path.append(docs_dir)
+    cwd = os.getcwd()
+    os.chdir(docs_dir)
+    for notebook in context.notebooks:
+        context.execute_steps(f"Then notebook {notebook} runs without error")
+    os.chdir(cwd)
+    sys.path.remove(docs_dir)
+
+
+@then(u'notebook {notebook} runs without error')
+def step_impl(context, notebook):
+    with open(notebook) as stream:
+        notebook = nbformat.read(stream, as_version=4)
+
+    shell = IPython.core.interactiveshell.InteractiveShell.instance()
+    nblocals = dict()
+
+    for cell in notebook.cells:
+        if cell.cell_type == "code":
+            code = shell.input_transformer_manager.transform_cell(cell.source)
+            exec(code, nblocals)
+
