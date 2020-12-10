@@ -9,7 +9,7 @@ addons:
             - graphviz
 
 install:
-    - pip install behave blinker coveralls ipython nbformat networkx pygraphviz
+    - pip install behave blinker coveralls ipython nbformat networkx Pillow pygraphviz
 script:
     - coverage run --source graphcat -m behave
     - coverage report
