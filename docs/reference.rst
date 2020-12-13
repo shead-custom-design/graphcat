@@ -14,4 +14,5 @@ Contents:
    graphcat.common.rst
    graphcat.dynamic.rst
    graphcat.notebook.rst
+   graphcat.require.rst
    graphcat.static.rst

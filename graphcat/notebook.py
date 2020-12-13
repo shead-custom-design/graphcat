@@ -14,10 +14,13 @@
 
 """Integration with Jupyter notebooks, https://jupyter.org"""
 
-import IPython.display
-import pygraphviz
+try:
+    import IPython.display
+    import pygraphviz
+except: # pragma: no cover
+    pass
 
-import graphcat
+import graphcat.require
 
 
 def none(graph, node):
@@ -30,6 +33,7 @@ def leaves(graph, node):
     return graph._graph.out_degree(node) == 0
 
 
+@graphcat.require.loaded_module(("IPython.display", "pygraphviz"))
 def display(graph, hide=None):
     """Display a :class:`graphcat.Graph` inline in a Jupyter notebook.
 
