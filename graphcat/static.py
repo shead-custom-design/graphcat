@@ -192,19 +192,10 @@ class StaticGraph(object):
         return results
 
 
-    def mark_failed(self, names=None):
-        """Set the failed state for tasks and all downstream dependents.
+    def mark_failed(self, names=None): # pragma: no cover
+        """.. deprecated:: 0.11.0"""
+        warnings.warn("StaticGraph.mark_failed() is deprecated and will not be replaced with equivalent functionality.", DeprecationWarning, stacklevel=2)
 
-        Normally, the failed state is set automatically by :meth:`update`.  This
-        method is provided for callers who want to set the failed state in
-        response to some outside event that the graph isn't aware of; this
-        should only happen in extremely rare situations.
-
-        Parameters
-        ----------
-        names: :any:`None`, hashable object, or list|set of hashable objects, required
-            Task names to be marked as failed.  If :any:`None` (the default), all tasks are marked as failed.
-        """
         names = self._require_valid_names(names)
 
         for name in list(names):
@@ -555,8 +546,9 @@ class StaticGraph(object):
         self._require_task_present(name)
 
         # Keep track of failures.
+        update_name = name
+        failed_name = None
         exception = None
-        failed = None
 
         # Iterate over every task to be executed, in order ...
         for name in networkx.dfs_postorder_nodes(self._graph, name):
@@ -572,12 +564,6 @@ class StaticGraph(object):
                     # Gather inputs for the function.
                     inputs = NamedInputs(self, name)
 
-#                    inputs = collections.defaultdict(list)
-#                    for target, source, input in self._graph.out_edges(name, data="input"):
-#                        output = self._graph.nodes[source]["output"]
-#                        inputs[input].append(output)
-#                    inputs = dict(inputs)
-
                     # Execute the function and store the output.
                     self._on_execute.send(self, name=name, inputs=inputs)
                     task["output"] = task["fn"](graph=self, name=name, inputs=inputs)
@@ -586,12 +572,18 @@ class StaticGraph(object):
                 except Exception as e:
                     # The function raised an exception, notify observers.
                     exception = e
-                    failed = name
+                    failed_name = name
                     self._on_failed.send(self, name=name, exception=e)
 
-        # If a failure occurred, mark all downstream tasks.
-        if failed is not None:
-            self.mark_failed(failed)
+        # If a failure occurred, mark all tasks between the failed and updated task.
+        if exception is not None:
+            failed_names = set(failed_name) | networkx.ancestors(self._graph, failed_name)
+            failed_names = failed_names & (set(update_name) | networkx.descendants(self._graph, update_name))
+            for name in failed_names:
+                task = self._graph.nodes[name]
+                task["output"] = None
+                task["state"] = graphcat.common.TaskState.FAILED
+            self._on_changed.send(self)
             raise exception
 
 

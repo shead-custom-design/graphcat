@@ -197,11 +197,11 @@ Feature: Dynamic Graphs
 
     Scenario: Failing Task Function
         Given an empty dynamic graph
-        When adding tasks ["A", "B", "C"] with functions [graphcat.null, graphcat.raise_exception(RuntimeError()), graphcat.null]
+        When adding tasks ["A", "B", "C"] with functions [graphcat.touch_all_inputs, graphcat.raise_exception(RuntimeError()), graphcat.touch_all_inputs]
         And adding links [("A", "B"), ("B", "C")]
-        And updating task "B" an exception should be raised
-        Then the tasks [] should be finished
-        And the tasks ["B"] should be failed
+        And updating task "C" an exception should be raised
+        Then the tasks ["A"] should be unfinished
+        And the tasks ["B", "C"] should be failed
 
 
     Scenario: Adding Duplicate Tasks
