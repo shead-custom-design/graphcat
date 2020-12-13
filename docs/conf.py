@@ -60,6 +60,8 @@ extensions = [
 intersphinx_mapping = {
     "python": ("https://docs.python.org/3", None),
     "blinker": ("https://pythonhosted.org/blinker", None),
+    "pygraphviz": ("https://pygraphviz.github.io/documentation/pygraphviz-1.6", None),
+    "ipython": ("https://ipython.readthedocs.io/en/stable", None),
     }
 
 # Add any paths that contain templates here, relative to this directory.

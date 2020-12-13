@@ -12,6 +12,7 @@ Contents:
 
    graphcat.rst
    graphcat.common.rst
+   graphcat.diagram.rst
    graphcat.dynamic.rst
    graphcat.notebook.rst
    graphcat.require.rst
