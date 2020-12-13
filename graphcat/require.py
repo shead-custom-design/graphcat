@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Functionality for testing assertions.
+"""Functionality for testing preconditions and assertions.
 """
 
 import functools
@@ -20,6 +20,19 @@ import sys
 
 
 def loaded_module(modules):
+    """Function decorator that tests whether module(s) have already been loaded.
+
+    Parameters
+    ----------
+    modules: :class:`str` or sequence of :class:`str`, required
+        Names of the modules that must already be loaded for the wrapped
+        function to execute.
+
+    Raises
+    ------
+    :class:`RuntimeError`
+        If any module in `modules` isn't already loaded.
+    """
     if isinstance(modules, str):
         modules = (modules,) # pragma: no cover
     def implementation(f):
