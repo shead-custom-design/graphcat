@@ -20,6 +20,11 @@ from behave import *
 import graphcat
 
 try:
+    import graphcat.diagram
+except:
+    pass
+
+try:
     import graphcat.notebook
 except:
     pass
@@ -70,6 +75,11 @@ class EventRecorder(object):
 
 #################################################################
 # Givens
+
+@given(u'the graphcat.diagram module is available')
+def step_impl(context):
+    if "graphcat.diagram" not in sys.modules:
+        context.scenario.skip()
 
 @given(u'the graphcat.notebook module is available')
 def step_impl(context):

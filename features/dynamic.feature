@@ -301,7 +301,8 @@ Feature: Dynamic Graphs
 
 
     Scenario: Notebook Display
-        Given the graphcat.notebook module is available
+        Given the graphcat.diagram module is available
+        And the graphcat.notebook module is available
         And an empty dynamic graph
         When adding tasks ["A", "B", "C", "D"] with functions [None, None, None, graphcat.raise_exception(RuntimeError("Whoops!"))]
         And adding links [("A", "B"), ("A", "C"), ("B", "D")]
@@ -309,12 +310,12 @@ Feature: Dynamic Graphs
         Then displaying the graph in a notebook should produce a visualization
 
 
-    Scenario: Notebook Subgraphs
-        Given the graphcat.notebook module is available
+    Scenario: Diagram Subgraphs
+        Given the graphcat.diagram module is available
         And an empty dynamic graph
         When adding tasks ["A", "B", "C", "D"]
         And adding links [("A", "B"), ("C", "B"), ("B", "D")]
-        When filtering the graph with graphcat.notebook.leaves then the remaining nodes should match ["B", "D"]
+        When filtering the graph with graphcat.diagram.leaves then the remaining nodes should match ["B", "D"]
 
 
     Scenario: Named Inputs
