@@ -355,3 +355,11 @@ def raise_exception(exception):
     return implementation
 
 
+def touch_all_inputs(graph, name, inputs):
+    """Task function that retrieves all its inputs, but otherwise does nothing.
+
+    This is mainly useful for debugging :class:`dynamic graphs<graphcat.dynamic.DynamicGraph>`,
+    since the default :func:`null` task function won't execute upstream nodes.
+    """
+    values = [value() for value in inputs.values()]
+
