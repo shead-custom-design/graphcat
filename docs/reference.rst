@@ -17,3 +17,4 @@ Contents:
    graphcat.notebook.rst
    graphcat.require.rst
    graphcat.static.rst
+   graphcat.streaming.rst

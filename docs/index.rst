@@ -39,11 +39,11 @@ Documentation
    compatibility.rst
    contributing.rst
    tutorial.ipynb
-   case-studies.rst
-   projects.rst
+   gallery.rst
    reference.rst
    support.rst
    release-notes.rst
+   projects.rst
 
 Indices and tables
 ==================
