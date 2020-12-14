@@ -193,23 +193,6 @@ class StaticGraph(object):
         return results
 
 
-    def mark_failed(self, names=None): # pragma: no cover
-        """.. deprecated:: 0.11.0"""
-        warnings.warn("StaticGraph.mark_failed() is deprecated and will not be replaced with equivalent functionality.", DeprecationWarning, stacklevel=2)
-
-        names = self._require_valid_names(names)
-
-        for name in list(names):
-            for ancestor in networkx.ancestors(self._graph, name):
-                names.add(ancestor)
-
-        for name in names:
-            self._graph.nodes[name]["output"] = None
-            self._graph.nodes[name]["state"] = graphcat.common.TaskState.FAILED
-
-        self._on_changed.send(self)
-
-
     def mark_unfinished(self, names=None):
         """Set the unfinished state for tasks and all downstream dependents.
 
