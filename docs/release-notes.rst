@@ -7,34 +7,51 @@
 Release Notes
 =============
 
+Graphcat 0.11.0 - December 13, 2020
+-----------------------------------
+
+* Cycles are detected during dynamic graph updates.
+* A new signal notifies callers when cycles occur.
+* Static and dynamic graphs behave consistently when tasks fail.
+* Moved graph drawing into a separate module, so callers can customize graph diagrams.
+* Added graphcat.common.consume task function, for debugging dynamic graphs.
+* Made pygraphviz an optional dependency, instead of required.
+* Missing optional dependencies cause runtime failures, instead of failures at import.
+
 Graphcat 0.10.0 - December 3, 2020
 ----------------------------------
+
 * Introduced graphcat.DynamicGraph, which executes a computational graph with dynamic dependency checking.
 * Introduced NamedInputs helpers to provide a cleaner / more consistent API for accessing task inputs.
 
 Graphcat 0.9.0 - November 30, 2020
 ----------------------------------
+
 * Deprecated graphcat.Graph, and added graphcat.StaticGraph instead.
 
 Graphcat 0.8.0 - November 23, 2020
 ----------------------------------
+
 * Added graphcat.PerformanceMonitor for evaluating task performance.
 * graphcat.notebook.display() can optionally hide nodes that meet some criteria.
 * Corrected typos in setup.py and release-notes.rst.
 
 Graphcat 0.7.0 - November 10, 2020
 ----------------------------------
+
 * Breaking change: pass the graph as a parameter for task functions.
 * Deprecated the graphcat.AutomaticDependencies class in favor of the graphcat.automatic_dependencies function decorator.
 
 Graphcat 0.6.0 - November 8, 2020
 ---------------------------------
+
 * Update dependencies every time an expression task executes.
 * Handle automatic dependency tracking for tasks that are renamed.
 * Deprecated graphcat.Graph.move_task() in favor of graphcat.Graph.rename_task().
 
 Graphcat 0.5.0 - November 2, 2020
 ---------------------------------
+
 * Make graphcat.notebook.display() output diagrams more compact.
 * Add API to test whether the graph contains a task with a given name.
 * Deprecated graphcat.ExpressionTask in favor of graphcat.Graph.set_expression().
@@ -43,6 +60,7 @@ Graphcat 0.5.0 - November 2, 2020
 
 Graphcat 0.4.0 - October 15, 2020
 ---------------------------------
+
 * Added graphcat.Graph.clear_links().
 * graphcat.Graph.output() and graphcat.Graph.update() re-raise exceptions thrown by task functions.
 * Allow parallel links between tasks.
@@ -51,6 +69,7 @@ Graphcat 0.4.0 - October 15, 2020
 
 Graphcat 0.3.0 - October 11, 2020
 ---------------------------------
+
 * Emit a signal when the graph is changed.
 * Added an image processing use-case to the documentation.
 * Refactor the API and deprecate add_relationship(), relabel_task(), remove_relationship(), remove_task(), set_input(), and set_task_fn().
