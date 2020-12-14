@@ -19,7 +19,10 @@ try:
 except: # pragma: no cover
     pass
 
+import graphcat.dynamic
 import graphcat.require
+import graphcat.static
+import graphcat.streaming
 
 
 def none(graph, node):
@@ -80,9 +83,19 @@ def draw(graph, hide=None, rankdir="LR"):
     red = "crimson"
     white = "white"
 
+    if isinstance(graph, graphcat.static.StaticGraph):
+        arrowhead = "normal"
+        edgestyle = "solid"
+    elif isinstance(graph, graphcat.dynamic.DynamicGraph):
+        arrowhead = "onormal"
+        edgestyle = "solid"
+    elif isinstance(graph, graphcat.streaming.StreamingGraph):
+        arrowhead = "olnormal"
+        edgestyle = "solid"
+
     agraph = pygraphviz.AGraph(directed=True, strict=False, ranksep="0.4", rankdir=rankdir)
     agraph.node_attr.update(fontname="Helvetica", fontsize=8, shape="box", style="filled", margin="0.08,0.04", width="0.4", height="0")
-    agraph.edge_attr.update(fontname="Helvetica", fontsize=8, color=black)
+    agraph.edge_attr.update(fontname="Helvetica", fontsize=8, color=black, arrowhead=arrowhead, style=edgestyle)
 
     for node in subgraph.nodes():
         if subgraph.nodes[node]["state"] == graphcat.TaskState.UNFINISHED:
