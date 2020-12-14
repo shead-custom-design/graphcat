@@ -33,7 +33,7 @@ def leaves(graph, node):
 
 
 @graphcat.require.loaded_module("pygraphviz")
-def draw(graph, hide=None):
+def draw(graph, hide=None, rankdir="LR"):
     """Create a diagram of a computational graph.
 
     This is extremely useful for understanding and debugging computational
@@ -54,6 +54,9 @@ def draw(graph, hide=None):
     hide: Python callable, optional
         Python callable that can be used to hide tasks in the displayed figure.
         If :any:`None` (the default), all tasks will be displayed.
+    rankdir: :class:`str`, optional
+        Graphviz rankdir attribute that determines the direction of data flow
+        within the diagram.  Default: ``"LR"``, which is left-to-right flow.
 
     Returns
     -------
@@ -77,7 +80,7 @@ def draw(graph, hide=None):
     red = "crimson"
     white = "white"
 
-    agraph = pygraphviz.AGraph(directed=True, strict=False, ranksep="0.4", rankdir="LR")
+    agraph = pygraphviz.AGraph(directed=True, strict=False, ranksep="0.4", rankdir=rankdir)
     agraph.node_attr.update(fontname="Helvetica", fontsize=8, shape="box", style="filled", margin="0.08,0.04", width="0.4", height="0")
     agraph.edge_attr.update(fontname="Helvetica", fontsize=8, color=black)
 

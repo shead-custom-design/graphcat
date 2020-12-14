@@ -24,7 +24,7 @@ import graphcat.require
 
 
 @graphcat.require.loaded_module("IPython.display")
-def display(graph, hide=None):
+def display(graph, hide=None, rankdir="LR"):
     """Display a computational graph inline in a Jupyter notebook.
 
     This is extremely useful for understanding and debugging graphs.  The
@@ -38,7 +38,10 @@ def display(graph, hide=None):
     hide: Python callable, optional
         Python callable that can be used to hide tasks in the displayed figure.
         If :any:`None` (the default), all tasks will be displayed.
+    rankdir: :class:`str`, optional
+        Graphviz rankdir attribute that determines the direction of data flow
+        within the diagram.  Default: ``"LR"``, which is left-to-right flow.
     """
 
-    agraph = graphcat.diagram.draw(graph, hide=hide)
+    agraph = graphcat.diagram.draw(graph, hide=hide, rankdir=rankdir)
     IPython.display.display(IPython.display.SVG(data=agraph.draw(prog="dot", format="svg")))
