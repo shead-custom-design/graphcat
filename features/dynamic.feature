@@ -197,7 +197,7 @@ Feature: Dynamic Graphs
 
     Scenario: Failing Task Function
         Given an empty dynamic graph
-        When adding tasks ["A", "B", "C"] with functions [graphcat.touch_all_inputs, graphcat.raise_exception(RuntimeError()), graphcat.touch_all_inputs]
+        When adding tasks ["A", "B", "C"] with functions [graphcat.consume, graphcat.raise_exception(RuntimeError()), graphcat.consume]
         And adding links [("A", "B"), ("B", "C")]
         And updating task "C" an exception should be raised
         Then the tasks ["A"] should be unfinished
@@ -282,10 +282,10 @@ Feature: Dynamic Graphs
         And a graph logger
         When adding tasks ["A"]
         And updating tasks ["A"]
-        Then the log should contain [("debug", "Task A updating."), ("info", "Task A executing. Inputs: {}"), ("info", "Task A finished. Output: None")]
+        Then the log should contain [("info", "Task A updating."), ("info", "Task A executing. Inputs: {}"), ("info", "Task A finished. Output: None")]
         When adding tasks ["B"] with functions [graphcat.raise_exception(RuntimeError("Whoops!"))]
         And updating task "B" an exception should be raised
-        Then the log should contain [("debug", "Task B updating."), ("info", "Task B executing. Inputs: {}"), ("error", "Task B failed. Exception: Whoops!")]
+        Then the log should contain [("info", "Task B updating."), ("info", "Task B executing. Inputs: {}"), ("error", "Task B failed. Exception: Whoops!")]
 
 
     Scenario: Simplified Graph Logger
@@ -294,10 +294,10 @@ Feature: Dynamic Graphs
         And a graph logger with detailed outputs disabled
         When adding tasks ["A"]
         And updating tasks ["A"]
-        Then the log should contain [("debug", "Task A updating."), ("info", "Task A executing."), ("info", "Task A finished.")]
+        Then the log should contain [("info", "Task A updating."), ("info", "Task A executing."), ("info", "Task A finished.")]
         When adding tasks ["B"] with functions [graphcat.raise_exception(RuntimeError("Whoops!"))]
         And updating task "B" an exception should be raised
-        Then the log should contain [("debug", "Task B updating."), ("info", "Task B executing."), ("error", "Task B failed.")]
+        Then the log should contain [("info", "Task B updating."), ("info", "Task B executing."), ("error", "Task B failed.")]
 
 
     Scenario: Notebook Display

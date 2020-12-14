@@ -36,6 +36,7 @@ class DynamicGraph(object):
     def __init__(self):
         self._graph = networkx.MultiDiGraph()
         self._on_changed = blinker.Signal()
+        self._on_cycle = blinker.Signal()
         self._on_execute = blinker.Signal()
         self._on_failed = blinker.Signal()
         self._on_finished = blinker.Signal()
@@ -231,6 +232,20 @@ class DynamicGraph(object):
         signal: :class:`blinker.base.Signal`
         """
         return self._on_changed
+
+
+    @property
+    def on_cycle(self):
+        """Signal emitted if a cycle is detected during updating.
+
+        Functions invoked by this signal must have the signature fn(graph, name),
+        where `graph` is this object.
+
+        Returns
+        -------
+        signal: :class:`blinker.base.Signal`
+        """
+        return self._on_cycle
 
 
     @property
@@ -473,7 +488,7 @@ class DynamicGraph(object):
         if name in self._graph:
             self._graph.nodes[name]["fn"] = fn
         else:
-            self._graph.add_node(name, fn=fn, state=graphcat.common.TaskState.UNFINISHED, output=None)
+            self._graph.add_node(name, fn=fn, state=graphcat.common.TaskState.UNFINISHED, output=None, updating=False)
         self.mark_unfinished(name)
 
 
@@ -516,10 +531,15 @@ class DynamicGraph(object):
 
 
     def _update(self, name):
+        # Break cycles
+        task = self._graph.nodes[name]
+        if task["updating"]:
+            self._on_cycle.send(self, name=name)
+            return
+        task["updating"] = True
+
         # Notify observers that the task will be updated.
         self._on_update.send(self, name=name)
-
-        task = self._graph.nodes[name]
 
         # Only execute this task if it isn't already finished.
         if task["state"] != graphcat.common.TaskState.FINISHED:
@@ -537,7 +557,10 @@ class DynamicGraph(object):
                 task["output"] = None
                 task["state"] = graphcat.common.TaskState.FAILED
                 self._on_failed.send(self, name=name, exception=e)
+                task["updating"] = False
                 raise e
+
+        task["updating"] = False
 
 
     def update(self, name):

@@ -36,6 +36,7 @@ class StaticGraph(object):
     def __init__(self):
         self._graph = networkx.MultiDiGraph()
         self._on_changed = blinker.Signal()
+        self._on_cycle = blinker.Signal()
         self._on_execute = blinker.Signal()
         self._on_failed = blinker.Signal()
         self._on_finished = blinker.Signal()
@@ -248,6 +249,20 @@ class StaticGraph(object):
         signal: :class:`blinker.base.Signal`
         """
         return self._on_changed
+
+
+    @property
+    def on_cycle(self):
+        """Signal emitted if a cycle is detected during updating.
+
+        Functions invoked by this signal must have the signature fn(graph, name),
+        where `graph` is this object.
+
+        Returns
+        -------
+        signal: :class:`blinker.base.Signal`
+        """
+        return self._on_cycle
 
 
     @property

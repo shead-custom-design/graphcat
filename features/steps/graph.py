@@ -35,6 +35,7 @@ import test
 class EventRecorder(object):
     def __init__(self, graph):
         self.changed = []
+        self.cycles = []
         self.exceptions = []
         self.executed = []
         self.failed = []
@@ -45,6 +46,7 @@ class EventRecorder(object):
         self.updated = []
 
         graph.on_changed.connect(self.on_changed)
+        graph.on_cycle.connect(self.on_cycle)
         graph.on_execute.connect(self.on_execute)
         graph.on_failed.connect(self.on_failed)
         graph.on_finished.connect(self.on_finished)
@@ -53,6 +55,9 @@ class EventRecorder(object):
 
     def on_changed(self, graph):
         self.changed.append(graph)
+
+    def on_cycle(self, graph, name):
+        self.cycles.append(name)
 
     def on_execute(self, graph, name, inputs):
         self.executed.append(name)
@@ -468,8 +473,7 @@ def step_impl(context, names):
 def step_impl(context, names, outputs):
     names = eval(names)
     outputs = eval(outputs)
-    for name, output in zip(names, outputs):
-        test.assert_equal(context.graph.output(name), output)
+    test.assert_equal([context.graph.output(name) for name in names], outputs)
 
 
 @then(u'the log should contain {calls}')

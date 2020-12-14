@@ -37,7 +37,7 @@ class Input(enum.Enum):
 
 
 class Logger(object):
-    """Log updates to the graph.
+    """Log graph events.
 
     Create a :class:`Logger` object to see the behavior of
     the graph during updates, using the Python :mod:`logging`
@@ -49,6 +49,7 @@ class Logger(object):
     generate output for four types of event:
 
     * updated - called when a task is updated.
+    * cycle - called when a cycle is detected during updating.
     * executed - called when a task is executed.
     * finished - called if a task executes successfully.
     * failed - called if a task raises an exception during execution.
@@ -71,10 +72,16 @@ class Logger(object):
         self._log_outputs = log_outputs
         self._log = log
 
+        graph.on_cycle.connect(self.on_cycle)
         graph.on_execute.connect(self.on_execute)
         graph.on_failed.connect(self.on_failed)
         graph.on_finished.connect(self.on_finished)
         graph.on_update.connect(self.on_update)
+
+
+    def on_cycle(self, graph, name):
+        """Called when a cycle is detected."""
+        self._log.info(f"Task {name} cycle detected.")
 
     def on_execute(self, graph, name, inputs):
         """Called when a task is executed."""
@@ -99,7 +106,7 @@ class Logger(object):
 
     def on_update(self, graph, name):
         """Called when a task is updated."""
-        self._log.debug(f"Task {name} updating.")
+        self._log.info(f"Task {name} updating.")
 
 
 class PerformanceMonitor(object):
@@ -355,7 +362,7 @@ def raise_exception(exception):
     return implementation
 
 
-def touch_all_inputs(graph, name, inputs):
+def consume(graph, name, inputs):
     """Task function that retrieves all its inputs, but otherwise does nothing.
 
     This is mainly useful for debugging :class:`dynamic graphs<graphcat.dynamic.DynamicGraph>`,
