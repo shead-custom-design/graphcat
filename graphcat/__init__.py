@@ -24,3 +24,5 @@ log = logging.getLogger(__name__)
 from graphcat.common import *
 from graphcat.dynamic import DynamicGraph
 from graphcat.static import StaticGraph
+from graphcat.streaming import StreamingGraph
+

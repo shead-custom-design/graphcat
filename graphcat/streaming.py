@@ -12,17 +12,21 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Implements computational graphs using static dependency analysis.
+"""Implements computational graphs using dynamic dependency analysis and streaming.
 """
 
+import collections
+import functools
+
+import blinker
 import networkx
 
 import graphcat.common
 import graphcat.graph
 
 
-class StaticGraph(graphcat.graph.Graph):
-    """Manages a static computational graph.
+class StreamingGraph(graphcat.graph.Graph):
+    """Manages a dynamic streaming computational graph.
 
     The graph is a collection of named tasks, connected by links that define
     dependencies between tasks.  Updating a task implicitly updates all of its
@@ -35,7 +39,47 @@ class StaticGraph(graphcat.graph.Graph):
         super().__init__()
 
 
-    def output(self, name):
+    def _output(self, name, extent):
+        self._update(name, extent)
+        return self._graph.nodes[name]["output"]
+
+
+    def _update(self, name, extent):
+        # Break cycles
+        task = self._graph.nodes[name]
+        if task["updating"]:
+            self._on_cycle.send(self, name=name)
+            return
+        task["updating"] = True
+
+        # Notify observers that the task will be updated.
+        self._on_update.send(self, name=name, extent=extent)
+
+        # Only execute this task if it isn't already finished.
+        if task["state"] != graphcat.common.TaskState.FINISHED:
+            try:
+                # Get the task inputs.
+                inputs = NamedInputs(self, name)
+
+                # Execute the function and store the output.
+                self._on_execute.send(self, name=name, inputs=inputs, extent=extent)
+                task["extent"] = extent
+                task["output"] = task["fn"](graph=self, name=name, inputs=inputs, extent=extent)
+                task["state"] = graphcat.common.TaskState.FINISHED
+                self._on_finished.send(self, name=name, output=task["output"])
+            except Exception as e:
+                # The function raised an exception, notify observers.
+                task["extent"] = None
+                task["output"] = None
+                task["state"] = graphcat.common.TaskState.FAILED
+                self._on_failed.send(self, name=name, exception=e)
+                task["updating"] = False
+                raise e
+
+        task["updating"] = False
+
+
+    def output(self, name, extent):
         """Retrieve the output from a task.
 
         This implicitly updates the graph, so the returned value is
@@ -45,6 +89,8 @@ class StaticGraph(graphcat.graph.Graph):
         ----------
         name: hashable object, required
             Unique task name.
+        extent: hashable object, required
+            Domain object specifying the subset of the task's output to return. 
 
         Returns
         -------
@@ -59,7 +105,7 @@ class StaticGraph(graphcat.graph.Graph):
             Any exception raised by a task function will be re-raised by :meth:`output`.
         """
         self._require_task_present(name)
-        self.update(name)
+        self.update(name, extent)
         return self._graph.nodes[name]["output"]
 
 
@@ -80,17 +126,19 @@ class StaticGraph(graphcat.graph.Graph):
         if name in self._graph:
             self._graph.nodes[name]["fn"] = fn
         else:
-            self._graph.add_node(name, fn=fn, state=graphcat.common.TaskState.UNFINISHED, output=None)
+            self._graph.add_node(name, fn=fn, state=graphcat.common.TaskState.UNFINISHED, output=None, updating=False)
         self.mark_unfinished(name)
 
 
-    def update(self, name):
-        """Update a task and all its transitive dependencies.
+    def update(self, name, extent):
+        """Update a task and all of its transitive dependencies.
 
         Parameters
         ----------
         name: hashable object, required
             Name identifying the task to be updated.
+        extent: hashable object, required
+            Domain object specifying the subset of the task's output to compute.
 
         Raises
         ------
@@ -101,47 +149,7 @@ class StaticGraph(graphcat.graph.Graph):
         """
 
         self._require_task_present(name)
-
-        # Keep track of failures.
-        update_name = name
-        failed_name = None
-        exception = None
-
-        # Iterate over every task to be executed, in order ...
-        for name in networkx.dfs_postorder_nodes(self._graph, name):
-            task = self._graph.nodes[name]
-
-            # Notify observers that the task will be updated.
-            self._on_update.send(self, name=name)
-
-            # Only execute this task if it isn't finished and a failure hasn't already occurred.
-            if exception is None and task["state"] != graphcat.common.TaskState.FINISHED:
-
-                try:
-                    # Gather inputs for the function.
-                    inputs = NamedInputs(self, name)
-
-                    # Execute the function and store the output.
-                    self._on_execute.send(self, name=name, inputs=inputs)
-                    task["output"] = task["fn"](graph=self, name=name, inputs=inputs)
-                    task["state"] = graphcat.common.TaskState.FINISHED
-                    self._on_finished.send(self, name=name, output=task["output"])
-                except Exception as e:
-                    # The function raised an exception, notify observers.
-                    exception = e
-                    failed_name = name
-                    self._on_failed.send(self, name=name, exception=e)
-
-        # If a failure occurred, mark all tasks between the failed and updated task.
-        if exception is not None:
-            failed_names = set(failed_name) | networkx.ancestors(self._graph, failed_name)
-            failed_names = failed_names & (set(update_name) | networkx.descendants(self._graph, update_name))
-            for name in failed_names:
-                task = self._graph.nodes[name]
-                task["output"] = None
-                task["state"] = graphcat.common.TaskState.FAILED
-            self._on_changed.send(self)
-            raise exception
+        self._update(name, extent)
 
 
 class NamedInputs(object):
@@ -149,23 +157,18 @@ class NamedInputs(object):
 
     Parameters
     ----------
-    graph: :class:`StaticGraph`, required
+    graph: :class:`DynamicGraph`, required
         Graph containing a task.
     name: hashable object, required
         Existing task unique name.
     """
     def __init__(self, graph, name):
-        if not isinstance(graph, StaticGraph):
-            raise ValueError("Graph input must be an instance of StaticGraph") # pragma: no cover
-
-        def constant(value):
-            def implementation():
-                return value
-            return implementation
+        if not isinstance(graph, DynamicGraph):
+            raise ValueError("Graph input must be an instance of DynamicGraph") # pragma: no cover
 
         edges = graph._graph.out_edges(name, data="input")
         self._keys = [input for target, source, input in edges]
-        self._values = [constant(graph._graph.nodes[source]["output"]) for target, source, input in edges]
+        self._values = [functools.partial(graph._output, source) for target, source, input in edges]
 
     def __contains__(self, name):
         """Return :any:`True` if `name` matches a named input for this task."""
@@ -176,10 +179,10 @@ class NamedInputs(object):
         return len(self._keys)
 
     def __repr__(self):
-        inputs = ", ".join([f"{key}: {value()}" for key, value in zip(self._keys, self._values)])
+        inputs = ", ".join([repr(key) for key in self._keys])
         return f"{{{inputs}}}"
 
-    def get(self, name, default=None):
+    def get(self, name, extent, default=None):
         """Return a single input value.
 
         Use this method to return a value when you expect to have either zero
@@ -189,6 +192,8 @@ class NamedInputs(object):
         ----------
         name: hashable object, required
             Name of the input value to return.
+        extent: hashable object, required
+            Domain object specifying the subset of the input's value to return.
         default: any Python value, optional
             If an input matching `name` doesn't exist, this value will be
             returned instead.  Defaults to :any:`None`.
@@ -206,11 +211,11 @@ class NamedInputs(object):
         if len(values) == 0:
             return default
         elif len(values) == 1:
-            return values[0]()
+            return values[0](extent)
         else:
             raise KeyError(f"More than one input {name!r}")
 
-    def getall(self, name):
+    def getall(self, name, extent):
         """Return multiple input values.
 
         Use this method to return every input value that matches `name`.
@@ -219,6 +224,8 @@ class NamedInputs(object):
         ----------
         name: hashable object, required
             Name of the input value to return.
+        extent: hashable object, required
+            Domain object specifying the subset of each input's value to return.
 
         Returns
         -------
@@ -226,9 +233,9 @@ class NamedInputs(object):
             Values from every input that matches `name`.  Returns an empty list
             if there are none.
         """
-        return [value() for key, value in zip(self._keys, self._values) if key == name]
+        return [value(extent) for key, value in zip(self._keys, self._values) if key == name]
 
-    def getone(self, name):
+    def getone(self, name, extent):
         """Return a single input value.
 
         Use this method to return a value when you expect to have exactly one
@@ -238,6 +245,8 @@ class NamedInputs(object):
         ----------
         name: hashable object, required
             Name of the input value to return.
+        extent: hashable object, required
+            Domain object specifying the subset of each input's value to return.
 
         Returns
         -------
@@ -252,7 +261,7 @@ class NamedInputs(object):
         if len(values) == 0:
             raise KeyError(name)
         elif len(values) == 1:
-            return values[0]()
+            return values[0](extent)
         else:
             raise KeyError(f"More than one input {name!r}")
 
