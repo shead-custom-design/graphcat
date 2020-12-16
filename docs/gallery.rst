@@ -1,11 +1,7 @@
-.. image:: ../artwork/logo.png
-  :width: 200px
-  :align: right
-
 Gallery
 =======
 
-The following notebooks demonstrate various aspects of Graphcat.
+The following notebooks cover assorted topics on how to use Graphcat.
 
 .. nbgallery::
     :name: rst-gallery

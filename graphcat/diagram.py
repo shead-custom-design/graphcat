@@ -25,6 +25,26 @@ import graphcat.static
 import graphcat.streaming
 
 
+def performance(agraph, monitor):
+    all_times = [times[-1] for times in monitor.tasks.values()]
+    min_time = min(all_times)
+    max_time = max(all_times)
+
+    agraph = agraph.copy()
+    agraph.graph_attr["forcelabels"] = True
+    for name, times in monitor.tasks.items():
+        time = times[-1]
+        percent = (time - min_time) / (max_time - min_time)
+        if percent > 0.66:
+            timecolor = "red"
+        elif percent > 0.33:
+            timecolor = "#ffaa00"
+        else:
+            timecolor = "green"
+        agraph.get_node(name).attr["xlabel"] = f"<<font color='{timecolor}'>&#11044;</font> <font color='black'>{times[-1]:.4f}s</font>>"
+    return agraph
+
+
 def none(graph, node):
     """Do-nothing filter function used to display an entire graph using :func:`draw`."""
     return False
