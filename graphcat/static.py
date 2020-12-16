@@ -66,22 +66,28 @@ class StaticGraph(graphcat.graph.Graph):
     def set_task(self, name, fn):
         """Add a task to the graph if it doesn't exist, and set its task function.
 
-        Note that this will mark downstream tasks as unfinished.
+        If the task already exists, its task function will be replaced.  The
+        task will be marked as unfinished if it was created or the new task
+        function tests un-equal to the old function.
 
         Parameters
         ----------
         name: hashable object, required
             Unique name that will identify the task.
         fn: callable, required
-            The `fn` object will be called whenever the task is executed.  It must take two keyword arguments
-            as parameters, `name` and `inputs`.  `name` will contain the unique task name.  `inputs` will
-            be a dict mapping named inputs to sequences of outputs returned from upstream tasks.
+            The `fn` object will be called whenever the task is executed.  It
+            must take three keyword arguments as parameters, `graph`, `name`
+            and `inputs`.  `graph` will be this graph.  `name` will contain the
+            unique task name.  `inputs` will be an instance of :class:`NamedInputs`
+            providing access to the outputs returned from connected upstream tasks.
         """
         if name in self._graph:
+            if self._graph.nodes[name]["fn"] != fn:
+                self.mark_unfinished(name)
             self._graph.nodes[name]["fn"] = fn
         else:
             self._graph.add_node(name, fn=fn, state=graphcat.common.TaskState.UNFINISHED, output=None)
-        self.mark_unfinished(name)
+            self.mark_unfinished(name)
 
 
     def update(self, name):

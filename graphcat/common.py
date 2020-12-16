@@ -25,6 +25,18 @@ import time
 log = logging.getLogger(__name__)
 
 
+class Constant(object):
+    """Callable object that always returns a caller-supplied value."""
+    def __init__(self, value):
+        self._value = value
+
+    def __call__(self, graph, name, inputs):
+        return self._value
+
+    def __eq__(self, other):
+        return isinstance(other, Constant) and self._value == other._value
+
+
 class DeprecationWarning(Warning):
     """Warning category for deprecated code."""
     pass
@@ -237,10 +249,6 @@ def constant(value):
 
         graph.set_task_fn("theta", constant(math.pi / 2))
 
-    See Also
-    --------
-    :class:`Variable`: An alternate method for managing tasks as parameters.
-
     Parameters
     ----------
     value: any value, required
@@ -248,12 +256,10 @@ def constant(value):
 
     Returns
     -------
-    fn: function
+    fn: :class:`Constant`
         Task function that will always return `value` when executed.
     """
-    def implementation(graph, name, inputs):
-        return value
-    return implementation
+    return Constant(value)
 
 
 def delay(seconds):
