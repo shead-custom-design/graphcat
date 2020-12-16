@@ -348,7 +348,7 @@ class Graph(abc.ABC):
         :class:`Exception`
             Any exception raised by a task function will be re-raised by :meth:`output`.
         """
-        raise NotImplementedError()
+        raise NotImplementedError() # pragma: no cover
 
 
     def rename_task(self, oldname, newname):
@@ -484,7 +484,7 @@ class Graph(abc.ABC):
             as parameters, `name` and `inputs`.  `name` will contain the unique task name.  `inputs` will
             be a dict mapping named inputs to sequences of outputs returned from upstream tasks.
         """
-        raise NotImplementedError()
+        raise NotImplementedError() # pragma: no cover
 
 
     def state(self, name):
@@ -536,4 +536,4 @@ class Graph(abc.ABC):
         :class:`Exception`
             Any exception raised by a task function will be re-raised by :meth:`update`.
         """
-        raise NotImplementedError()
+        raise NotImplementedError() # pragma: no cover
