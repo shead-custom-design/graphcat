@@ -318,7 +318,7 @@ def execute(code, locals={}):
     return implementation
 
 
-def null(graph, name, inputs):
+def null(graph, name, inputs, extent=None):
     """Task function that does nothing.
 
     This is the default if you don't specify a function for
@@ -363,7 +363,7 @@ def raise_exception(exception):
     fn: function
         Task function that will always raise `exception` when executed.
     """
-    def implementation(graph, name, inputs):
+    def implementation(graph, name, inputs, extent=None):
         raise exception
     return implementation
 

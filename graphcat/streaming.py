@@ -163,14 +163,14 @@ class NamedInputs(object):
 
     Parameters
     ----------
-    graph: :class:`DynamicGraph`, required
+    graph: :class:`StreamingGraph`, required
         Graph containing a task.
     name: hashable object, required
         Existing task unique name.
     """
     def __init__(self, graph, name):
-        if not isinstance(graph, DynamicGraph):
-            raise ValueError("Graph input must be an instance of DynamicGraph") # pragma: no cover
+        if not isinstance(graph, StreamingGraph):
+            raise ValueError("Graph input must be an instance of StreamingGraph") # pragma: no cover
 
         edges = graph._graph.out_edges(name, data="input")
         self._keys = [input for target, source, input in edges]

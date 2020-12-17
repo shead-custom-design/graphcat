@@ -39,7 +39,7 @@ Documentation
    compatibility.rst
    contributing.rst
    tutorial.ipynb
-   gallery.rst
+   user-guide.rst
    reference.rst
    support.rst
    release-notes.rst
