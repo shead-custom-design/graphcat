@@ -30,7 +30,7 @@ class Constant(object):
     def __init__(self, value):
         self._value = value
 
-    def __call__(self, graph, name, inputs):
+    def __call__(self, graph, name, inputs, extent=None):
         return self._value
 
     def __eq__(self, other):
@@ -95,7 +95,7 @@ class Logger(object):
         """Called when a cycle is detected."""
         self._log.info(f"Task {name} cycle detected.")
 
-    def on_execute(self, graph, name, inputs):
+    def on_execute(self, graph, name, inputs, extent=None):
         """Called when a task is executed."""
         if self._log_inputs:
             self._log.info(f"Task {name} executing. Inputs: {inputs}")
@@ -116,7 +116,7 @@ class Logger(object):
         else:
             self._log.info(f"Task {name} finished.")
 
-    def on_update(self, graph, name):
+    def on_update(self, graph, name, extent=None):
         """Called when a task is updated."""
         self._log.info(f"Task {name} updating.")
 
@@ -136,7 +136,7 @@ class PerformanceMonitor(object):
         graph.on_finished.connect(self._on_finished)
 
 
-    def _on_execute(self, graph, name, inputs):
+    def _on_execute(self, graph, name, inputs, extent=None):
         self._start = time.time()
 
 
@@ -217,7 +217,7 @@ def automatic_dependencies(fn):
         automatically track dependencies.
     """
     @functools.wraps(fn)
-    def implementation(graph, name, inputs):
+    def implementation(graph, name, inputs, extent=None):
         # Remove old, automatically generated dependencies.
         edges = list(graph._graph.out_edges(name, data="input", keys=True))
         for target, source, key, input in edges:
@@ -226,7 +226,7 @@ def automatic_dependencies(fn):
 
         # Keep track of dependencies while the task executes.
         updated = UpdatedTasks(graph)
-        result = fn(graph, name, inputs)
+        result = fn(graph, name, inputs, extent)
 
         # Create new dependencies.
         sources = updated.tasks.difference([name])
@@ -277,7 +277,7 @@ def delay(seconds):
     fn: function
         Task function that will always sleep for `seconds` when executed.
     """
-    def implementation(graph, name, inputs):
+    def implementation(graph, name, inputs, extent=None):
         time.sleep(seconds)
     return implementation
 
@@ -310,7 +310,7 @@ def execute(code, locals={}):
         Task function that will execute Python code when the
         task is executed.
     """
-    def implementation(graph, name, inputs):
+    def implementation(graph, name, inputs, extent=None):
         try:
             return eval(code, {}, dict(locals))
         except Exception as e: # pragma: no cover
@@ -343,7 +343,7 @@ def passthrough(input=None):
     fn: function
         Task function that will pass input `input` index `index` to its output.
     """
-    def implementation(graph, name, inputs):
+    def implementation(graph, name, inputs, extent=None):
         return inputs.getone(input)
     return implementation
 
@@ -368,7 +368,7 @@ def raise_exception(exception):
     return implementation
 
 
-def consume(graph, name, inputs):
+def consume(graph, name, inputs, extent=None):
     """Task function that retrieves all its inputs, but otherwise does nothing.
 
     This is mainly useful for debugging :class:`dynamic graphs<graphcat.dynamic.DynamicGraph>`,

@@ -59,7 +59,7 @@ class EventRecorder(object):
     def on_cycle(self, graph, name):
         self.cycles.append(name)
 
-    def on_execute(self, graph, name, inputs):
+    def on_execute(self, graph, name, inputs, extent=None):
         self.executed.append(name)
         self.inputs.append(inputs)
 
@@ -74,7 +74,7 @@ class EventRecorder(object):
     def on_task_renamed(self, graph, oldname, newname):
         self.task_renamed.append((oldname, newname))
 
-    def on_update(self, graph, name):
+    def on_update(self, graph, name, extent=None):
         self.updated.append(name)
 
 
@@ -99,6 +99,11 @@ def step_impl(context):
 @given(u'an empty static graph')
 def step_impl(context):
     context.graph = graphcat.StaticGraph()
+
+
+@given(u'an empty streaming graph')
+def step_impl(context):
+    context.graph = graphcat.StreamingGraph()
 
 
 @given(u'a log')
@@ -209,6 +214,14 @@ def step_impl(context, names):
         context.graph.add_task(name)
 
 
+@when(u'updating task {name} with no extents an exception should be raised')
+def step_impl(context, name):
+    name = eval(name)
+    context.events = EventRecorder(context.graph)
+    with test.assert_raises(RuntimeError):
+        context.graph.update(name, extent=None)
+
+
 @when(u'updating task {name} an exception should be raised')
 def step_impl(context, name):
     name = eval(name)
@@ -239,6 +252,14 @@ def step_impl(context, links):
     context.events = EventRecorder(context.graph)
     for source, target in links:
         context.graph.clear_links(source, target)
+
+
+@when(u'updating tasks {names} with no extents')
+def step_impl(context, names):
+    names = eval(names)
+    context.events = EventRecorder(context.graph)
+    for name in names:
+        context.graph.update(name, extent=None)
 
 
 @when(u'updating tasks {names}')
@@ -298,6 +319,14 @@ def step_impl(context, names):
 def step_impl(context, links):
     links = eval(links)
     test.assert_equal(sorted(links), sorted(context.graph.links()))
+
+
+@then(u'the outputs of tasks {names} with no extents should be {outputs}')
+def step_impl(context, names, outputs):
+    names = eval(names)
+    outputs = eval(outputs)
+    for name, output in zip(names, outputs):
+        test.assert_equal(context.graph.output(name, extent=None), output)
 
 
 @then(u'the outputs of tasks {names} should be {outputs}')
@@ -467,6 +496,13 @@ def step_impl(context, names):
 def step_impl(context, names):
     names = eval(names)
     test.assert_equal(names, context.events.finished)
+
+
+@then(u'the task {names} outputs with no extents should be {outputs}')
+def step_impl(context, names, outputs):
+    names = eval(names)
+    outputs = eval(outputs)
+    test.assert_equal([context.graph.output(name, extent=None) for name in names], outputs)
 
 
 @then(u'the task {names} outputs should be {outputs}')
