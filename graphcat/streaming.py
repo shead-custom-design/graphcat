@@ -39,12 +39,12 @@ class StreamingGraph(graphcat.graph.Graph):
         super().__init__()
 
 
-    def _output(self, name, extent):
+    def _output(self, name, extent=None):
         self._update(name, extent)
         return self._graph.nodes[name]["output"]
 
 
-    def _update(self, name, extent):
+    def _update(self, name, extent=None):
         # Break cycles
         task = self._graph.nodes[name]
         if task["updating"]:
@@ -79,7 +79,7 @@ class StreamingGraph(graphcat.graph.Graph):
         task["updating"] = False
 
 
-    def output(self, name, extent):
+    def output(self, name, extent=None):
         """Retrieve the output from a task.
 
         This implicitly updates the graph, so the returned value is
@@ -89,8 +89,8 @@ class StreamingGraph(graphcat.graph.Graph):
         ----------
         name: hashable object, required
             Unique task name.
-        extent: hashable object, required
-            Domain object specifying the subset of the task's output to return. 
+        extent: hashable object, optional
+            Domain object specifying the subset of the task's output to return.
 
         Returns
         -------
@@ -136,14 +136,14 @@ class StreamingGraph(graphcat.graph.Graph):
             self.mark_unfinished(name)
 
 
-    def update(self, name, extent):
+    def update(self, name, extent=None):
         """Update a task and all of its transitive dependencies.
 
         Parameters
         ----------
         name: hashable object, required
             Name identifying the task to be updated.
-        extent: hashable object, required
+        extent: hashable object, optional
             Domain object specifying the subset of the task's output to compute.
 
         Raises
@@ -188,7 +188,7 @@ class NamedInputs(object):
         inputs = ", ".join([repr(key) for key in self._keys])
         return f"{{{inputs}}}"
 
-    def get(self, name, extent, default=None):
+    def get(self, name, extent=None, default=None):
         """Return a single input value.
 
         Use this method to return a value when you expect to have either zero
@@ -198,7 +198,7 @@ class NamedInputs(object):
         ----------
         name: hashable object, required
             Name of the input value to return.
-        extent: hashable object, required
+        extent: hashable object, optional
             Domain object specifying the subset of the input's value to return.
         default: any Python value, optional
             If an input matching `name` doesn't exist, this value will be
@@ -221,7 +221,7 @@ class NamedInputs(object):
         else:
             raise KeyError(f"More than one input {name!r}")
 
-    def getall(self, name, extent):
+    def getall(self, name, extent=None):
         """Return multiple input values.
 
         Use this method to return every input value that matches `name`.
@@ -230,7 +230,7 @@ class NamedInputs(object):
         ----------
         name: hashable object, required
             Name of the input value to return.
-        extent: hashable object, required
+        extent: hashable object, optional
             Domain object specifying the subset of each input's value to return.
 
         Returns
@@ -241,7 +241,7 @@ class NamedInputs(object):
         """
         return [value(extent) for key, value in zip(self._keys, self._values) if key == name]
 
-    def getone(self, name, extent):
+    def getone(self, name, extent=None):
         """Return a single input value.
 
         Use this method to return a value when you expect to have exactly one
@@ -251,7 +251,7 @@ class NamedInputs(object):
         ----------
         name: hashable object, required
             Name of the input value to return.
-        extent: hashable object, required
+        extent: hashable object, optional
             Domain object specifying the subset of each input's value to return.
 
         Returns

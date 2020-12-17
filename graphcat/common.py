@@ -188,7 +188,7 @@ class UpdatedTasks(object):
         self._tasks = set()
         graph.on_update.connect(self._on_update)
 
-    def _on_update(self, graph, name):
+    def _on_update(self, graph, name, extent=None):
         self._tasks.add(name)
 
     @property
