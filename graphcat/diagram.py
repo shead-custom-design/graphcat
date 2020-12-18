@@ -19,10 +19,7 @@ try:
 except: # pragma: no cover
     pass
 
-import graphcat.dynamic
 import graphcat.require
-import graphcat.static
-import graphcat.streaming
 
 
 def performance(agraph, monitor):
@@ -72,7 +69,7 @@ def draw(graph, hide=None, rankdir="LR"):
 
     Parameters
     ----------
-    graph: :class:`graphcat.static.StaticGraph` or :class:`graphcat.dynamic.DynamicGraph`, required
+    graph: :class:`graphcat.graph.Graph` derivative, required
         The graph to be visualized.
     hide: Python callable, optional
         Python callable that can be used to hide tasks in the displayed figure.
@@ -103,15 +100,13 @@ def draw(graph, hide=None, rankdir="LR"):
     red = "crimson"
     white = "white"
 
-    if isinstance(graph, graphcat.static.StaticGraph):
-        arrowhead = "normal"
-        edgestyle = "solid"
-    elif isinstance(graph, graphcat.dynamic.DynamicGraph):
-        arrowhead = "onormal"
-        edgestyle = "solid"
-    elif isinstance(graph, graphcat.streaming.StreamingGraph):
+    edgestyle = "solid"
+    if graph.is_streaming:
         arrowhead = "olnormal"
-        edgestyle = "solid"
+    elif graph.is_dynamic:
+        arrowhead = "onormal"
+    else:
+        arrowhead = "normal"
 
     agraph = pygraphviz.AGraph(directed=True, strict=False, ranksep="0.4", rankdir=rankdir)
     agraph.node_attr.update(fontname="Helvetica", fontsize=8, shape="box", style="filled", margin="0.08,0.04", width="0.4", height="0")

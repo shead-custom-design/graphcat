@@ -180,6 +180,18 @@ class Graph(abc.ABC):
         self._on_changed.send(self)
 
 
+    @property
+    @abc.abstractmethod
+    def is_dynamic(self):
+        raise NotImplementedError()
+
+
+    @property
+    @abc.abstractmethod
+    def is_streaming(self):
+        raise NotImplementedError()
+
+
     def links(self, names=None):
         """Return every link originating with the given names.
 

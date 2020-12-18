@@ -118,7 +118,7 @@ def step_impl(context):
 
 @given(u'a graph logger with detailed outputs disabled')
 def step_impl(context):
-    context.logger = graphcat.Logger(context.graph, log_exceptions=False, log_inputs=False, log_outputs=False, log=context.log)
+    context.logger = graphcat.Logger(context.graph, log_exceptions=False, log_inputs=False, log_outputs=False, log_extents=False, log=context.log)
 
 
 @given(u'a performance monitor')

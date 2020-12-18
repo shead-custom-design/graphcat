@@ -60,10 +60,10 @@ class StreamingGraph(graphcat.graph.Graph):
         task["updating"] = True
 
         # Notify observers that the task will be updated.
-        self._on_update.send(self, name=name, extent=extent)
+        self._on_update.send(self, name=name)
 
         # Only execute this task if it isn't already finished.
-        if task["state"] != graphcat.common.TaskState.FINISHED:
+        if (task["extent"] != extent) or (task["state"] != graphcat.common.TaskState.FINISHED):
             try:
                 # Get the task inputs.
                 inputs = NamedInputs(self, name)
@@ -84,6 +84,16 @@ class StreamingGraph(graphcat.graph.Graph):
                 raise e
 
         task["updating"] = False
+
+
+    @property
+    def is_dynamic(self):
+        return True
+
+
+    @property
+    def is_streaming(self):
+        return True
 
 
     def output(self, name, extent=None):

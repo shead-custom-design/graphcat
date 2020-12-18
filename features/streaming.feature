@@ -282,10 +282,10 @@ Feature: Streaming Graphs
         And a graph logger
         When adding tasks ["A"]
         And updating tasks ["A"] with no extents
-        Then the log should contain [("info", "Task A updating."), ("info", "Task A executing. Inputs: {}"), ("info", "Task A finished. Output: None")]
+        Then the log should contain [("info", "Task A updating."), ("info", "Task A executing. Inputs: {} Extent: None"), ("info", "Task A finished. Output: None")]
         When adding tasks ["B"] with functions [graphcat.raise_exception(RuntimeError("Whoops!"))]
         And updating task "B" with no extents an exception should be raised
-        Then the log should contain [("info", "Task B updating."), ("info", "Task B executing. Inputs: {}"), ("error", "Task B failed. Exception: Whoops!")]
+        Then the log should contain [("info", "Task B updating."), ("info", "Task B executing. Inputs: {} Extent: None"), ("error", "Task B failed. Exception: Whoops!")]
 
 
     Scenario: Simplified Graph Logger

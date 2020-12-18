@@ -25,6 +25,34 @@ import time
 log = logging.getLogger(__name__)
 
 
+class Array(object):
+    """Callable object that always returns a caller-supplied array.
+
+    Note
+    ----
+    This callable is compatible with :class:`ArraySlice` extents when
+    used with :class:`graphcat.streaming.StreamingGraph`.
+
+    Parameters
+    ----------
+    value: :class:`numpy.ndarray`-convertable value, required
+        The array that will be returned by this callable.
+    """
+    def __init__(self, value):
+        self._value = value
+
+    def __call__(self, graph, name, inputs, extent=None):
+        return self._value[extent] if extent is not None else self._value
+
+    def __eq__(self, other):
+        return isinstance(other, Array) and self._value == other._value
+
+
+class ArraySlice(object):
+    def __class_getitem__(cls, key):
+        return key
+
+
 class Constant(object):
     """Callable object that always returns a caller-supplied value."""
     def __init__(self, value):
@@ -69,19 +97,16 @@ class Logger(object):
     Update events happen regardless of the state of a task.  Execute events
     only happen if the task isn't already finished.
 
-    Callers can derive from Logger and override :meth:`on_failed`,
-    :meth:`on_finished`, :meth:`on_updated`, and :meth:`on_executed` to
-    customize their behavior.
-
     Parameters
     ----------
     graph: class:`Graph`, required
         The graph whose events will be logged.
     """
-    def __init__(self, graph, log_exceptions=True, log_inputs=True, log_outputs=True, log=log):
+    def __init__(self, graph, log_exceptions=True, log_inputs=True, log_outputs=True, log_extents=True, log=log):
         self._log_exceptions = log_exceptions
         self._log_inputs = log_inputs
         self._log_outputs = log_outputs
+        self._log_extents = log_extents
         self._log = log
 
         graph.on_cycle.connect(self.on_cycle)
@@ -97,10 +122,12 @@ class Logger(object):
 
     def on_execute(self, graph, name, inputs, extent=None):
         """Called when a task is executed."""
+        message = f"Task {name} executing."
         if self._log_inputs:
-            self._log.info(f"Task {name} executing. Inputs: {inputs}")
-        else:
-            self._log.info(f"Task {name} executing.")
+            message += f" Inputs: {inputs}"
+        if self._log_extents and graph.is_streaming:
+            message += f" Extent: {extent}"
+        self._log.info(message)
 
     def on_failed(self, graph, name, exception):
         """Called when a task raises an exception during execution."""
@@ -116,9 +143,10 @@ class Logger(object):
         else:
             self._log.info(f"Task {name} finished.")
 
-    def on_update(self, graph, name, extent=None):
+    def on_update(self, graph, name):
         """Called when a task is updated."""
-        self._log.info(f"Task {name} updating.")
+        message = f"Task {name} updating."
+        self._log.info(message)
 
 
 class PerformanceMonitor(object):
@@ -188,7 +216,7 @@ class UpdatedTasks(object):
         self._tasks = set()
         graph.on_update.connect(self._on_update)
 
-    def _on_update(self, graph, name, extent=None):
+    def _on_update(self, graph, name):
         self._tasks.add(name)
 
     @property
@@ -202,6 +230,32 @@ class UpdatedTasks(object):
             been updated.
         """
         return self._tasks
+
+
+def array(value):
+    """Factory for task functions that return constant values when executed.
+
+    This is useful when creating a task that will act as a parameter
+    for a downstream task::
+
+        graph.add_task("theta", constant(math.pi))
+
+    To change the parameter later, use :func:`constant` again, with
+    :meth:`Graph.set_task_fn` to specify a new function::
+
+        graph.set_task_fn("theta", constant(math.pi / 2))
+
+    Parameters
+    ----------
+    value: any value, required
+        The value to return when the task is executed.
+
+    Returns
+    -------
+    fn: :class:`Array`
+        Task function that will always return `value` when executed.
+    """
+    return Array(value)
 
 
 def automatic_dependencies(fn):

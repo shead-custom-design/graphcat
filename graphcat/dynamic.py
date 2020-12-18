@@ -83,6 +83,16 @@ class DynamicGraph(graphcat.graph.Graph):
         task["updating"] = False
 
 
+    @property
+    def is_dynamic(self):
+        return True
+
+
+    @property
+    def is_streaming(self):
+        return False
+
+
     def output(self, name):
         """Retrieve the output from a task.
 

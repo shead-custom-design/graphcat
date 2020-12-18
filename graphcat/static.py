@@ -45,6 +45,16 @@ class StaticGraph(graphcat.graph.Graph):
         node["state"] = graphcat.common.TaskState.UNFINISHED
 
 
+    @property
+    def is_dynamic(self):
+        return False
+
+
+    @property
+    def is_streaming(self):
+        return False
+
+
     def output(self, name):
         """Retrieve the output from a task.
 
