@@ -35,6 +35,16 @@ class DynamicGraph(graphcat.graph.Graph):
         super().__init__()
 
 
+    def _add_node(self, name, fn):
+        self._graph.add_node(name, fn=fn, state=graphcat.common.TaskState.UNFINISHED, output=None, updating=False)
+
+
+    def _mark_unfinished(self, name):
+        node = self._graph.nodes[name]
+        node["output"] = None
+        node["state"] = graphcat.common.TaskState.UNFINISHED
+
+
     def _output(self, name):
         self._update(name)
         return self._graph.nodes[name]["output"]
@@ -99,33 +109,6 @@ class DynamicGraph(graphcat.graph.Graph):
         self._require_task_present(name)
         self.update(name)
         return self._graph.nodes[name]["output"]
-
-
-    def set_task(self, name, fn):
-        """Add a task to the graph if it doesn't exist, and set its task function.
-
-        If the task already exists, its task function will be replaced.  The
-        task will be marked as unfinished if it was created or the new task
-        function tests un-equal to the old function.
-
-        Parameters
-        ----------
-        name: hashable object, required
-            Unique name that will identify the task.
-        fn: callable, required
-            The `fn` object will be called whenever the task is executed.  It
-            must take three keyword arguments as parameters, `graph`, `name`
-            and `inputs`.  `graph` will be this graph.  `name` will contain the
-            unique task name.  `inputs` will be an instance of :class:`NamedInputs`
-            providing access to the outputs returned from connected upstream tasks.
-        """
-        if name in self._graph:
-            if self._graph.nodes[name]["fn"] != fn:
-                self.mark_unfinished(name)
-            self._graph.nodes[name]["fn"] = fn
-        else:
-            self._graph.add_node(name, fn=fn, state=graphcat.common.TaskState.UNFINISHED, output=None, updating=False)
-            self.mark_unfinished(name)
 
 
     def update(self, name):

@@ -43,8 +43,18 @@ class Graph(abc.ABC):
         self._on_update = blinker.Signal()
 
 
+    @abc.abstractmethod
+    def _add_node(self, name, fn):
+        raise NotImplementedError()
+
+
     def __contains__(self, name):
         return name in self._graph
+
+
+    @abc.abstractmethod
+    def _mark_unfinished(self, name):
+        raise NotImplementedError()
 
 
     def _require_valid_names(self, names):
@@ -213,8 +223,7 @@ class Graph(abc.ABC):
                 names.add(ancestor)
 
         for name in names:
-            self._graph.nodes[name]["output"] = None
-            self._graph.nodes[name]["state"] = graphcat.common.TaskState.UNFINISHED
+            self._mark_unfinished(name)
 
         self._on_changed.send(self)
 
@@ -469,7 +478,6 @@ class Graph(abc.ABC):
         self.set_links(source, (target, input))
 
 
-    @abc.abstractmethod
     def set_task(self, name, fn):
         """Add a task to the graph if it doesn't exist, and set its task function.
 
@@ -484,7 +492,13 @@ class Graph(abc.ABC):
             as parameters, `name` and `inputs`.  `name` will contain the unique task name.  `inputs` will
             be a dict mapping named inputs to sequences of outputs returned from upstream tasks.
         """
-        raise NotImplementedError() # pragma: no cover
+        if name in self._graph:
+            if self._graph.nodes[name]["fn"] != fn:
+                self.mark_unfinished(name)
+            self._graph.nodes[name]["fn"] = fn
+        else:
+            self._add_node(name, fn=fn)
+            self.mark_unfinished(name)
 
 
     def state(self, name):
