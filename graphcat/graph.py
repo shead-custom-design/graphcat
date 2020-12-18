@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Implements computational graphs using static dependency analysis.
+"""Abstract base classes for computational graphs.
 """
 
 import abc
@@ -23,7 +23,7 @@ import networkx
 import graphcat.common
 
 class Graph(abc.ABC):
-    """Base class for computational graphs.
+    """Abstract base class for computational graphs.
 
     The graph is a collection of named tasks, connected by links that define
     dependencies between tasks.  Updating a task implicitly updates all of its
@@ -183,12 +183,14 @@ class Graph(abc.ABC):
     @property
     @abc.abstractmethod
     def is_dynamic(self):
+        """Return :any:`True` if-and-only-if the graph implements dynamic updates."""
         raise NotImplementedError()
 
 
     @property
     @abc.abstractmethod
     def is_streaming(self):
+        """Return :any:`True` if-and-only-if the graph implements streaming (extent-based) updates."""
         raise NotImplementedError()
 
 

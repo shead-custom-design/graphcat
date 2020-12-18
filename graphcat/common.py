@@ -28,15 +28,9 @@ log = logging.getLogger(__name__)
 class Array(object):
     """Callable object that always returns a caller-supplied array.
 
-    Note
-    ----
-    This callable is compatible with :class:`ArraySlice` extents when
-    used with :class:`graphcat.streaming.StreamingGraph`.
-
-    Parameters
-    ----------
-    value: :class:`numpy.ndarray`-convertable value, required
-        The array that will be returned by this callable.
+    See Also
+    --------
+    :func:`array`
     """
     def __init__(self, value):
         self._value = value
@@ -48,13 +42,30 @@ class Array(object):
         return isinstance(other, Array) and self._value == other._value
 
 
-class ArraySlice(object):
+class ArrayExtent(object):
+    """Convenience for creating :class:`Array` compatible streaming extents.
+
+    To generate extents, use any numpy-compatible
+    `indexing notation <https://numpy.org/doc/stable/reference/arrays.indexing.html>`_::
+
+        extent = ArrayExtent[0:4096]
+        extent = ArrayExtent[::2]
+        extent = ArrayExtent[:, 0]
+        ...
+
+    These extents are compatible with :class:`Array`.
+    """
     def __class_getitem__(cls, key):
         return key
 
 
 class Constant(object):
-    """Callable object that always returns a caller-supplied value."""
+    """Callable object that always returns a caller-supplied value.
+
+    See Also
+    --------
+    :func:`constant`
+    """
     def __init__(self, value):
         self._value = value
 
@@ -233,22 +244,17 @@ class UpdatedTasks(object):
 
 
 def array(value):
-    """Factory for task functions that return constant values when executed.
+    """Factory for task functions that return constant array values when executed.
 
-    This is useful when creating a task that will act as a parameter
-    for a downstream task::
-
-        graph.add_task("theta", constant(math.pi))
-
-    To change the parameter later, use :func:`constant` again, with
-    :meth:`Graph.set_task_fn` to specify a new function::
-
-        graph.set_task_fn("theta", constant(math.pi / 2))
+    Note
+    ----
+    This callable is designed to be compatible with :class:`ArrayExtent` extents
+    when used in a :class:`graphcat.streaming.StreamingGraph`.
 
     Parameters
     ----------
-    value: any value, required
-        The value to return when the task is executed.
+    value: :class:`numpy.ndarray`-convertable value, required
+        The array to return when the task is executed.
 
     Returns
     -------

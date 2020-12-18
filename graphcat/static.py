@@ -47,11 +47,13 @@ class StaticGraph(graphcat.graph.Graph):
 
     @property
     def is_dynamic(self):
+        """Returns :any:`False`."""
         return False
 
 
     @property
     def is_streaming(self):
+        """Returns :any:`False`."""
         return False
 
 

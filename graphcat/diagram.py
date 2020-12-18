@@ -22,36 +22,6 @@ except: # pragma: no cover
 import graphcat.require
 
 
-def performance(agraph, monitor):
-    all_times = [times[-1] for times in monitor.tasks.values()]
-    min_time = min(all_times)
-    max_time = max(all_times)
-
-    agraph = agraph.copy()
-    agraph.graph_attr["forcelabels"] = True
-    for name, times in monitor.tasks.items():
-        time = times[-1]
-        percent = (time - min_time) / (max_time - min_time)
-        if percent > 0.66:
-            timecolor = "red"
-        elif percent > 0.33:
-            timecolor = "#ffaa00"
-        else:
-            timecolor = "green"
-        agraph.get_node(name).attr["xlabel"] = f"<<font color='{timecolor}'>&#11044;</font> <font color='black'>{times[-1]:.4f}s</font>>"
-    return agraph
-
-
-def none(graph, node):
-    """Do-nothing filter function used to display an entire graph using :func:`draw`."""
-    return False
-
-
-def leaves(graph, node):
-    """Filter function that hides all leaf nodes when displaying a graph using :func:`draw`."""
-    return graph._graph.out_degree(node) == 0
-
-
 @graphcat.require.loaded_module("pygraphviz")
 def draw(graph, hide=None, rankdir="LR"):
     """Create a diagram of a computational graph.
@@ -80,7 +50,7 @@ def draw(graph, hide=None, rankdir="LR"):
 
     Returns
     -------
-    diagram: :class:`pygraphviz.agraph.AGraph`
+    diagram: :class:`pygraphviz.AGraph`
         Diagrammatic representation of `graph`.  Callers can modify `diagram`
         as needed before using its layout and drawing methods to produce a
         final image.
@@ -133,6 +103,51 @@ def draw(graph, hide=None, rankdir="LR"):
             input = ""
         agraph.add_edge(source, target, label=input) # We want edges to point from dependencies to dependents.
 
+    return agraph
+
+
+def leaves(graph, node):
+    """Filter function that hides all leaf nodes when displaying a graph using :func:`draw`."""
+    return graph._graph.out_degree(node) == 0
+
+
+def none(graph, node):
+    """Do-nothing filter function used to display an entire graph using :func:`draw`."""
+    return False
+
+
+def performance(agraph, monitor):
+    """Add performance monitor information to a graph diagram.
+
+    Parameters
+    ----------
+    agraph: :class:`pygraphviz.AGraph`, required
+        Diagram originally created using :func:`draw`.
+    monitor: :class:`graphcat.common.PerformanceMonitor`, required
+        Performance monitor object containing performance results to be
+        added to `agraph`
+
+    Returns
+    -------
+    diagram: :class:`pygraphviz.AGraph`
+        Input diagram supplemented with performance results from `monitor`.
+    """
+    all_times = [times[-1] for times in monitor.tasks.values()]
+    min_time = min(all_times)
+    max_time = max(all_times)
+
+    agraph = agraph.copy()
+    agraph.graph_attr["forcelabels"] = True
+    for name, times in monitor.tasks.items():
+        time = times[-1]
+        percent = (time - min_time) / (max_time - min_time)
+        if percent > 0.66:
+            timecolor = "red"
+        elif percent > 0.33:
+            timecolor = "#ffaa00"
+        else:
+            timecolor = "green"
+        agraph.get_node(name).attr["xlabel"] = f"<<font color='{timecolor}'>&#11044;</font> <font color='black'>{times[-1]:.4f}s</font>>"
     return agraph
 
 

@@ -85,11 +85,13 @@ class DynamicGraph(graphcat.graph.Graph):
 
     @property
     def is_dynamic(self):
+        """Returns :any:`True`."""
         return True
 
 
     @property
     def is_streaming(self):
+        """Returns :any:`False`."""
         return False
 
 
