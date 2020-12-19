@@ -300,22 +300,30 @@ Feature: Dynamic Graphs
         Then the log should contain [("info", "Task B updating."), ("info", "Task B executing."), ("error", "Task B failed.")]
 
 
+    Scenario: Diagrams
+        Given the pygraphviz module is available
+        And an empty dynamic graph
+        When adding tasks ["A", "B", "C", "D"] with functions [None, None, None, graphcat.raise_exception(RuntimeError("Whoops!"))]
+        And adding links [("A", "B"), ("A", "C"), ("B", "D")]
+        And updating task "D" an exception should be raised
+        Then the graph can be drawn as a diagram
+
+
+    Scenario: Diagram Subgraphs
+        Given an empty dynamic graph
+        When adding tasks ["A", "B", "C", "D"]
+        And adding links [("A", "B"), ("C", "B"), ("B", "D")]
+        When filtering the graph with graphcat.diagram.leaves then the remaining nodes should match ["B", "D"]
+
+
     Scenario: Notebook Display
-        Given the graphcat.diagram module is available
-        And the graphcat.notebook module is available
+        Given the pygraphviz module is available
+        And the IPython module is available
         And an empty dynamic graph
         When adding tasks ["A", "B", "C", "D"] with functions [None, None, None, graphcat.raise_exception(RuntimeError("Whoops!"))]
         And adding links [("A", "B"), ("A", "C"), ("B", "D")]
         And updating task "D" an exception should be raised
         Then displaying the graph in a notebook should produce a visualization
-
-
-    Scenario: Diagram Subgraphs
-        Given the graphcat.diagram module is available
-        And an empty dynamic graph
-        When adding tasks ["A", "B", "C", "D"]
-        And adding links [("A", "B"), ("C", "B"), ("B", "D")]
-        When filtering the graph with graphcat.diagram.leaves then the remaining nodes should match ["B", "D"]
 
 
     Scenario: Named Inputs
@@ -343,8 +351,6 @@ Feature: Dynamic Graphs
         And getting the task "D" input keys returns [0, 1, 1]
         And getting the task "D" input values returns [2, 3, 4]
         And getting the task "D" input items returns [(0, 2), (1, 3), (1, 4)]
-
-
 
 
     Scenario: Retrieving Task Links
@@ -389,7 +395,7 @@ Feature: Dynamic Graphs
     Scenario: Performance Monitor
         Given an empty dynamic graph
         And a performance monitor
-        When adding tasks ["A", "B", "C"] with functions [graphcat.delay(2), graphcat.delay(1), graphcat.delay(0.1)]
+        When adding tasks ["A", "B", "C"] with functions [graphcat.delay(0.3), graphcat.delay(0.2), graphcat.delay(0.1)]
         And adding links [("A", "B"), ("B", "C")]
         And updating tasks ["C"]
         Then the performance monitor output should be {"C": [0.1]}
@@ -399,6 +405,16 @@ Feature: Dynamic Graphs
         When the performance monitor is reset
         Then the performance monitor output should be {}
 
+
+    Scenario: Performance Monitor Diagram
+        Given the pygraphviz module is available
+        And an empty dynamic graph
+        And a performance monitor
+        When adding tasks ["A", "B", "C"] with functions [graphcat.delay(0.3), graphcat.delay(0.2), graphcat.delay(0.1)]
+        And adding links [("A", "B"), ("B", "C")]
+        And updating tasks ["C"]
+        Then the performance monitor output should be {"C": [0.1]}
+        And the graph can be drawn as a diagram with performance overlay
 
 
 

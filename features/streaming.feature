@@ -10,7 +10,7 @@ Feature: Streaming Graphs
         Given an empty streaming graph
         When adding tasks <tasks>
         And adding links <links>
-        And updating tasks <update tasks> with no extents
+        And updating tasks <update tasks> with extents <extents>
         Then the graph should contain tasks <tasks>
         And the graph should contain links <links>
         And the tasks <finished before> should be finished
@@ -22,19 +22,19 @@ Feature: Streaming Graphs
         And the tasks <unfinished after> should be unfinished
 
         Examples:
-            | tasks           | links                 | update tasks | finished before | unfinished before |  added links          | new tasks       | new links                                | finished after  | unfinished after |
-            | ["A", "B", "C"] | [("A", ("B", None))]  | ["A", "B"]   | ["A", "B"]      | ["C"]             |  [("C", ("B", None))] | ["A", "B", "C"] | [("A", ("B", None)), ("C", ("B", None))] | ["A"]           | ["B", "C"]       |
+            | tasks           | links                 | update tasks | extents      | finished before | unfinished before |  added links          | new tasks       | new links                                | finished after  | unfinished after |
+            | ["A", "B", "C"] | [("A", ("B", None))]  | ["A", "B"]   | [None, None] | ["A", "B"]      | ["C"]             |  [("C", ("B", None))] | ["A", "B", "C"] | [("A", ("B", None)), ("C", ("B", None))] | ["A"]           | ["B", "C"]       |
 
         Examples: Parallel Edges
-            | tasks           | links                 | update tasks | finished before | unfinished before |  added links          | new tasks       | new links                                | finished after  | unfinished after |
-            | ["A", "B"]      | [("A", ("B", 0))]     | ["A", "B"]   | ["A", "B"]      | []                |  [("A", ("B", 1))]    | ["A", "B"]      | [("A", ("B", 0)), ("A", ("B", 1))]       | ["A"]           | ["B"]            |
+            | tasks           | links                 | update tasks | extents      | finished before | unfinished before |  added links          | new tasks       | new links                                | finished after  | unfinished after |
+            | ["A", "B"]      | [("A", ("B", 0))]     | ["A", "B"]   | [None, None] | ["A", "B"]      | []                |  [("A", ("B", 1))]    | ["A", "B"]      | [("A", ("B", 0)), ("A", ("B", 1))]       | ["A"]           | ["B"]            |
 
 
     Scenario Outline: Adding Tasks
         Given an empty streaming graph
         When adding tasks <tasks>
         And adding links <links>
-        And updating tasks <update tasks> with no extents
+        And updating tasks <update tasks> with extents <extents>
         Then the graph should contain tasks <tasks>
         And the graph should contain links <links>
         And the tasks <finished before> should be finished
@@ -46,15 +46,15 @@ Feature: Streaming Graphs
         And the tasks <unfinished after> should be unfinished
 
         Examples:
-            | tasks      | links                 | update tasks | finished before | unfinished before |  added tasks       | new tasks       | new links                 | finished after  | unfinished after |
-            | ["A", "B"] | [("A", ("B", None))]  | ["A", "B"]   | ["A", "B"]      | []                |  ["C"]             | ["A", "B", "C"] | [("A", ("B", None))]      | ["A", "B"]      | ["C"]            |
+            | tasks      | links                 | update tasks | extents      | finished before | unfinished before |  added tasks       | new tasks       | new links                 | finished after  | unfinished after |
+            | ["A", "B"] | [("A", ("B", None))]  | ["A", "B"]   | [None, None] | ["A", "B"]      | []                |  ["C"]             | ["A", "B", "C"] | [("A", ("B", None))]      | ["A", "B"]      | ["C"]            |
 
 
     Scenario Outline: Renaming Tasks
         Given an empty streaming graph
         When adding tasks <tasks>
         And adding links <links>
-        And updating tasks <update tasks> with no extents
+        And updating tasks <update tasks> with extents <extents>
         Then the graph should contain tasks <tasks>
         And the graph should contain links <links>
         And the tasks <finished before> should be finished
@@ -67,20 +67,20 @@ Feature: Streaming Graphs
         And the tasks <unfinished after> should be unfinished
 
         Examples: Fan-Out
-            | tasks           | links                                    | update tasks    | finished before | unfinished before | old names  | new names   | new tasks       | new links                                | finished after  | unfinished after |
-            | ["A", "B", "C"] | [("A", ("B", None)), ("A", ("C", None))] | ["A", "B", "C"] | ["A", "B", "C"] | []                | ["A"]      | ["D"]       | ["D", "B", "C"] | [("D", ("B", None)), ("D", ("C", None))] | []              | ["D", "B", "C"]  |
-            | ["A", "B", "C"] | [("A", ("B", None)), ("A", ("C", None))] | ["A", "B", "C"] | ["A", "B", "C"] | []                | ["B"]      | ["D"]       | ["A", "D", "C"] | [("A", ("D", None)), ("A", ("C", None))] | ["A", "C"]      | ["D"]            |
+            | tasks           | links                                    | update tasks    | extents            | finished before | unfinished before | old names  | new names   | new tasks       | new links                                | finished after  | unfinished after |
+            | ["A", "B", "C"] | [("A", ("B", None)), ("A", ("C", None))] | ["A", "B", "C"] | [None, None, None] | ["A", "B", "C"] | []                | ["A"]      | ["D"]       | ["D", "B", "C"] | [("D", ("B", None)), ("D", ("C", None))] | []              | ["D", "B", "C"]  |
+            | ["A", "B", "C"] | [("A", ("B", None)), ("A", ("C", None))] | ["A", "B", "C"] | [None, None, None] | ["A", "B", "C"] | []                | ["B"]      | ["D"]       | ["A", "D", "C"] | [("A", ("D", None)), ("A", ("C", None))] | ["A", "C"]      | ["D"]            |
 
         Examples: Fan-In
-            | tasks           | links                                    | update tasks    | finished before | unfinished before | old names  | new names   | new tasks       | new links                                | finished after  | unfinished after |
-            | ["A", "B", "C"] | [("A", ("B", None)), ("C", ("B", None))] | ["A", "B", "C"] | ["A", "B", "C"] | []                | ["B"]      | ["D"]       | ["A", "D", "C"] | [("A", ("D", None)), ("C", ("D", None))] | ["A", "C"]      | ["D"]            |
+            | tasks           | links                                    | update tasks    | extents            | finished before | unfinished before | old names  | new names   | new tasks       | new links                                | finished after  | unfinished after |
+            | ["A", "B", "C"] | [("A", ("B", None)), ("C", ("B", None))] | ["A", "B", "C"] | [None, None, None] | ["A", "B", "C"] | []                | ["B"]      | ["D"]       | ["A", "D", "C"] | [("A", ("D", None)), ("C", ("D", None))] | ["A", "C"]      | ["D"]            |
 
 
     Scenario Outline: Removing Links
         Given an empty streaming graph
         When adding tasks <tasks>
         And adding links <links>
-        And updating tasks <update tasks> with no extents
+        And updating tasks <update tasks> with extents <extents>
         Then the graph should contain tasks <tasks>
         And the graph should contain links <links>
         And the tasks <finished before> should be finished
@@ -92,19 +92,19 @@ Feature: Streaming Graphs
         And the tasks <unfinished after> should be unfinished
 
         Examples: Fan-Out
-            | tasks           | links                                    | update tasks    | finished before | unfinished before | removed      | new tasks       | new links                | finished after  | unfinished after |
-            | ["A", "B", "C"] | [("A", ("B", None)), ("A", ("C", None))] | ["A", "B", "C"] | ["A", "B", "C"] | []                | [("A", "B")] | ["A", "B", "C"] | [("A", ("C", None))]     | []              | ["A", "B", "C"]  |
+            | tasks           | links                                    | update tasks    | extents            | finished before | unfinished before | removed      | new tasks       | new links                | finished after  | unfinished after |
+            | ["A", "B", "C"] | [("A", ("B", None)), ("A", ("C", None))] | ["A", "B", "C"] | [None, None, None] | ["A", "B", "C"] | []                | [("A", "B")] | ["A", "B", "C"] | [("A", ("C", None))]     | []              | ["A", "B", "C"]  |
 
         Examples: Fan-In
-            | tasks           | links                                    | update tasks    | finished before | unfinished before | removed      | new tasks       | new links                        | finished after  | unfinished after |
-            | ["A", "B", "C"] | [("A", ("B", None)), ("C", ("B", None))] | ["A", "B", "C"] | ["A", "B", "C"] | []                | [("A", "B")] | ["A", "B", "C"] | [("C", ("B", None))]             | ["C"]           | ["A", "B"]       |
+            | tasks           | links                                    | update tasks    | extents            | finished before | unfinished before | removed      | new tasks       | new links                        | finished after  | unfinished after |
+            | ["A", "B", "C"] | [("A", ("B", None)), ("C", ("B", None))] | ["A", "B", "C"] | [None, None, None] | ["A", "B", "C"] | []                | [("A", "B")] | ["A", "B", "C"] | [("C", ("B", None))]             | ["C"]           | ["A", "B"]       |
 
 
     Scenario Outline: Removing Tasks
         Given an empty streaming graph
         When adding tasks <tasks>
         And adding links <links>
-        And updating tasks <update tasks> with no extents
+        And updating tasks <update tasks> with extents <extents>
         Then the graph should contain tasks <tasks>
         And the graph should contain links <links>
         And the tasks <finished before> should be finished
@@ -116,14 +116,14 @@ Feature: Streaming Graphs
         And the tasks <unfinished after> should be unfinished
 
         Examples: Fan-Out
-            | tasks           | links                                    | update tasks    | finished before | unfinished before | removed    | api             | new tasks       | new links                | finished after  | unfinished after |
-            | ["A", "B", "C"] | [("A", ("B", None)), ("A", ("C", None))] | ["A", "B", "C"] | ["A", "B", "C"] | []                | ["A"]      | clear_tasks     | ["B", "C"]      | []                       | []              | ["B", "C"]       |
-            | ["A", "B", "C"] | [("A", ("B", None)), ("A", ("C", None))] | ["A", "B", "C"] | ["A", "B", "C"] | []                | ["B"]      | clear_tasks     | ["A", "C"]      | [("A", ("C", None))]     | ["A", "C"]      | []               |
+            | tasks           | links                                    | update tasks    | extents            | finished before | unfinished before | removed    | api             | new tasks       | new links                | finished after  | unfinished after |
+            | ["A", "B", "C"] | [("A", ("B", None)), ("A", ("C", None))] | ["A", "B", "C"] | [None, None, None] | ["A", "B", "C"] | []                | ["A"]      | clear_tasks     | ["B", "C"]      | []                       | []              | ["B", "C"]       |
+            | ["A", "B", "C"] | [("A", ("B", None)), ("A", ("C", None))] | ["A", "B", "C"] | [None, None, None] | ["A", "B", "C"] | []                | ["B"]      | clear_tasks     | ["A", "C"]      | [("A", ("C", None))]     | ["A", "C"]      | []               |
 
         Examples: Fan-In
-            | tasks           | links                                    | update tasks    | finished before | unfinished before | removed    | api             | new tasks       | new links                | finished after  | unfinished after |
-            | ["A", "B", "C"] | [("A", ("B", None)), ("C", ("B", None))] | ["A", "B", "C"] | ["A", "B", "C"] | []                | ["A"]      | clear_tasks     | ["B", "C"]      | [("C", ("B", None))]     | ["C"]           | ["B"]            |
-            | ["A", "B", "C"] | [("A", ("B", None)), ("C", ("B", None))] | ["A", "B", "C"] | ["A", "B", "C"] | []                | ["B"]      | clear_tasks     | ["A", "C"]      | []                       | ["A", "C"]      | []               |
+            | tasks           | links                                    | update tasks    | extents            | finished before | unfinished before | removed    | api             | new tasks       | new links                | finished after  | unfinished after |
+            | ["A", "B", "C"] | [("A", ("B", None)), ("C", ("B", None))] | ["A", "B", "C"] | [None, None, None] | ["A", "B", "C"] | []                | ["A"]      | clear_tasks     | ["B", "C"]      | [("C", ("B", None))]     | ["C"]           | ["B"]            |
+            | ["A", "B", "C"] | [("A", ("B", None)), ("C", ("B", None))] | ["A", "B", "C"] | [None, None, None] | ["A", "B", "C"] | []                | ["B"]      | clear_tasks     | ["A", "C"]      | []                       | ["A", "C"]      | []               |
 
 
     Scenario Outline: Setting Parameters
@@ -145,7 +145,7 @@ Feature: Streaming Graphs
         And adding links <links>
         Then the graph should contain tasks <tasks>
         And the graph should contain links <links>
-        When updating tasks <update tasks> with no extents
+        When updating tasks <update tasks> with extents <extents>
         Then tasks <updated> are updated
         And tasks <executed> are executed
         And tasks <finished> are finished
@@ -153,53 +153,53 @@ Feature: Streaming Graphs
         And the tasks <unfinished tasks> should be unfinished
 
         Examples: Fan-Out
-            | tasks           | links                                    | update tasks | updated              | executed        | finished        | finished tasks  | unfinished tasks |
-            | ["A", "B", "C"] | [("A", ("B", None)), ("A", ("C", None))] | []           | []                   | []              | []              | []              | ["A", "B", "C"]  |
-            | ["A", "B", "C"] | [("A", ("B", None)), ("A", ("C", None))] | ["A"]        | ["A"]                | ["A"]           | ["A"]           | ["A"]           | ["B", "C"]       |
-            | ["A", "B", "C"] | [("A", ("B", None)), ("A", ("C", None))] | ["A", "A"]   | ["A", "A"]           | ["A"]           | ["A"]           | ["A"]           | ["B", "C"]       |
-            | ["A", "B", "C"] | [("A", ("B", None)), ("A", ("C", None))] | ["B"]        | ["B"]                | ["B"]           | ["B"]           | ["B"]           | ["A", "C"]       |
-            | ["A", "B", "C"] | [("A", ("B", None)), ("A", ("C", None))] | ["B", "C"]   | ["B", "C"]           | ["B", "C"]      | ["B", "C"]      | ["B", "C"]      | ["A"]            |
+            | tasks           | links                                    | update tasks | extents      | updated              | executed        | finished        | finished tasks  | unfinished tasks |
+            | ["A", "B", "C"] | [("A", ("B", None)), ("A", ("C", None))] | []           | []           | []                   | []              | []              | []              | ["A", "B", "C"]  |
+            | ["A", "B", "C"] | [("A", ("B", None)), ("A", ("C", None))] | ["A"]        | [None]       | ["A"]                | ["A"]           | ["A"]           | ["A"]           | ["B", "C"]       |
+            | ["A", "B", "C"] | [("A", ("B", None)), ("A", ("C", None))] | ["A", "A"]   | [None, None] | ["A", "A"]           | ["A"]           | ["A"]           | ["A"]           | ["B", "C"]       |
+            | ["A", "B", "C"] | [("A", ("B", None)), ("A", ("C", None))] | ["B"]        | [None]       | ["B"]                | ["B"]           | ["B"]           | ["B"]           | ["A", "C"]       |
+            | ["A", "B", "C"] | [("A", ("B", None)), ("A", ("C", None))] | ["B", "C"]   | [None, None] | ["B", "C"]           | ["B", "C"]      | ["B", "C"]      | ["B", "C"]      | ["A"]            |
 
         Examples: Fan-In
-            | tasks           | links                                    | update tasks | updated              | executed        | finished        | finished tasks  | unfinished tasks |
-            | ["A", "B", "C"] | [("A", ("C", None)), ("B", ("C", None))] | []           | []                   | []              | []              | []              | ["A", "B", "C"]  |
-            | ["A", "B", "C"] | [("A", ("C", None)), ("B", ("C", None))] | ["A"]        | ["A"]                | ["A"]           | ["A"]           | ["A"]           | ["B", "C"]       |
-            | ["A", "B", "C"] | [("A", ("C", None)), ("B", ("C", None))] | ["C"]        | ["C"]                | ["C"]           | ["C"]           | ["C"]           | ["A", "B"]       |
-            | ["A", "B", "C"] | [("A", ("C", None)), ("B", ("C", None))] | ["C", "A"]   | ["C", "A"]           | ["C", "A"]      | ["C", "A"]      | ["A", "C"]      | ["B"]            |
+            | tasks           | links                                    | update tasks | extents      | updated              | executed        | finished        | finished tasks  | unfinished tasks |
+            | ["A", "B", "C"] | [("A", ("C", None)), ("B", ("C", None))] | []           | []           | []                   | []              | []              | []              | ["A", "B", "C"]  |
+            | ["A", "B", "C"] | [("A", ("C", None)), ("B", ("C", None))] | ["A"]        | [None]       | ["A"]                | ["A"]           | ["A"]           | ["A"]           | ["B", "C"]       |
+            | ["A", "B", "C"] | [("A", ("C", None)), ("B", ("C", None))] | ["C"]        | [None]       | ["C"]                | ["C"]           | ["C"]           | ["C"]           | ["A", "B"]       |
+            | ["A", "B", "C"] | [("A", ("C", None)), ("B", ("C", None))] | ["C", "A"]   | [None, None] | ["C", "A"]           | ["C", "A"]      | ["C", "A"]      | ["A", "C"]      | ["B"]            |
 
         Examples: Cycles
-            | tasks           | links                                                        | update tasks | updated                        | executed        | finished        | finished tasks  | unfinished tasks |
-            | ["A", "B", "C"] | [("A", ("B", None)), ("B", ("C", None)), ("C", ("A", None))] | []           | []                             | []              | []              | []              | ["A", "B", "C"]  |
-            | ["A", "B", "C"] | [("A", ("B", None)), ("B", ("C", None)), ("C", ("A", None))] | ["A"]        | ["A"]                          | ["A"]           | ["A"]           | ["A"]           | ["B", "C"]       |
-            | ["A", "B", "C"] | [("A", ("B", None)), ("B", ("C", None)), ("C", ("A", None))] | ["B"]        | ["B"]                          | ["B"]           | ["B"]           | ["B"]           | ["A", "C"]       |
-            | ["A", "B", "C"] | [("A", ("B", None)), ("B", ("C", None)), ("C", ("A", None))] | ["C"]        | ["C"]                          | ["C"]           | ["C"]           | ["C"]           | ["A", "B"]       |
-            | ["A", "B", "C"] | [("A", ("B", None)), ("B", ("C", None)), ("C", ("A", None))] | ["C", "C"]   | ["C", "C"]                     | ["C"]           | ["C"]           | ["C"]           | ["A", "B"]       |
-            | ["A", "B", "C"] | [("A", ("B", None)), ("B", ("C", None)), ("C", ("A", None))] | ["C", "A"]   | ["C", "A"]                     | ["C", "A"]      | ["C", "A"]      | ["A", "C"]      | ["B"]            |
+            | tasks           | links                                                        | update tasks | extents      | updated                        | executed        | finished        | finished tasks  | unfinished tasks |
+            | ["A", "B", "C"] | [("A", ("B", None)), ("B", ("C", None)), ("C", ("A", None))] | []           | []           | []                             | []              | []              | []              | ["A", "B", "C"]  |
+            | ["A", "B", "C"] | [("A", ("B", None)), ("B", ("C", None)), ("C", ("A", None))] | ["A"]        | [None]       | ["A"]                          | ["A"]           | ["A"]           | ["A"]           | ["B", "C"]       |
+            | ["A", "B", "C"] | [("A", ("B", None)), ("B", ("C", None)), ("C", ("A", None))] | ["B"]        | [None]       | ["B"]                          | ["B"]           | ["B"]           | ["B"]           | ["A", "C"]       |
+            | ["A", "B", "C"] | [("A", ("B", None)), ("B", ("C", None)), ("C", ("A", None))] | ["C"]        | [None]       | ["C"]                          | ["C"]           | ["C"]           | ["C"]           | ["A", "B"]       |
+            | ["A", "B", "C"] | [("A", ("B", None)), ("B", ("C", None)), ("C", ("A", None))] | ["C", "C"]   | [None, None] | ["C", "C"]                     | ["C"]           | ["C"]           | ["C"]           | ["A", "B"]       |
+            | ["A", "B", "C"] | [("A", ("B", None)), ("B", ("C", None)), ("C", ("A", None))] | ["C", "A"]   | [None, None] | ["C", "A"]                     | ["C", "A"]      | ["C", "A"]      | ["A", "C"]      | ["B"]            |
 
 
     Scenario Outline: Task Functions
         Given an empty streaming graph
         When adding tasks <tasks> with functions <functions>
-        Then the outputs of tasks <tasks> with no extents should be <outputs>
+        Then the outputs of tasks <tasks> with extents <extents> should be <outputs>
 
         Examples:
-            | tasks     | functions                               | outputs       |
-            | ["A"]     | [None]                                  | [None]        |
-            | ["A"]     | [graphcat.null]                         | [None]        |
-            | ["A"]     | [graphcat.constant(2)]                  | [2]           |
-            | ["A"]     | [graphcat.constant(3.14)]               | [3.14]        |
-            | ["A"]     | [graphcat.constant("foo")]              | ["foo"]       |
-            | ["A"]     | [graphcat.constant(("foo", 7))]         | [("foo", 7)]  |
-            | ["A"]     | [graphcat.execute("2 + 3")]             | [5]           |
-            | ["A"]     | [graphcat.execute("2 * 3")]             | [6]           |
-            | ["A"]     | [graphcat.execute("'foo' + 'bar'")]     | ["foobar"]    |
+            | tasks     | functions                               | extents | outputs       |
+            | ["A"]     | [None]                                  | [None]  | [None]        |
+            | ["A"]     | [graphcat.null]                         | [None]  | [None]        |
+            | ["A"]     | [graphcat.constant(2)]                  | [None]  | [2]           |
+            | ["A"]     | [graphcat.constant(3.14)]               | [None]  | [3.14]        |
+            | ["A"]     | [graphcat.constant("foo")]              | [None]  | ["foo"]       |
+            | ["A"]     | [graphcat.constant(("foo", 7))]         | [None]  | [("foo", 7)]  |
+            | ["A"]     | [graphcat.execute("2 + 3")]             | [None]  | [5]           |
+            | ["A"]     | [graphcat.execute("2 * 3")]             | [None]  | [6]           |
+            | ["A"]     | [graphcat.execute("'foo' + 'bar'")]     | [None]  | ["foobar"]    |
 
 
     Scenario: Failing Task Function
         Given an empty streaming graph
         When adding tasks ["A", "B", "C"] with functions [graphcat.consume, graphcat.raise_exception(RuntimeError()), graphcat.consume]
         And adding links [("A", "B"), ("B", "C")]
-        And updating task "C" with no extents an exception should be raised
+        And updating task "C" with extent None an exception should be raised
         Then the tasks ["A"] should be unfinished
         And the tasks ["B", "C"] should be failed
 
@@ -237,13 +237,13 @@ Feature: Streaming Graphs
         Given an empty streaming graph
         When adding tasks ["A", "B", "C"] with functions [graphcat.constant(1), graphcat.constant(2), graphcat.constant(3)]
         And adding links [("A", "B"), ("B", "C")]
-        And updating tasks ["A", "B", "C"] with no extents
+        And updating tasks ["A", "B", "C"] with extents [None, None, None]
         Then the tasks ["A", "B", "C"] should be finished
-        And the task ["A", "B", "C"] outputs with no extents should be [1, 2, 3]
+        And the task ["A", "B", "C"] outputs with extents [None, None, None] should be [1, 2, 3]
         When the task "B" function is changed to graphcat.null
         Then the tasks ["A"] should be finished
         And the tasks ["B", "C"] should be unfinished
-        And the task ["A", "B", "C"] outputs with no extents should be [1, None, 3]
+        And the task ["A", "B", "C"] outputs with extents [None, None, None] should be [1, None, 3]
 
 
     Scenario: Expression Tasks
@@ -253,27 +253,27 @@ Feature: Streaming Graphs
         Then the graph should contain tasks ["A", "B", "choice", "expr"]
         And the graph should contain links []
         And the tasks ["A", "B", "choice", "expr"] should be unfinished
-        And the task ["expr"] outputs with no extents should be [7]
+        And the task ["expr"] outputs with extents [None] should be [7]
         And the graph should contain links []
         When changing the expression task "expr" to expression "out('A') if out('choice') else out('B')"
-        Then the task ["expr"] outputs with no extents should be [1]
+        Then the task ["expr"] outputs with extents [None] should be [1]
         And the graph should contain links [("A", ("expr", graphcat.Input.AUTODEPENDENCY)), ("choice", ("expr", graphcat.Input.AUTODEPENDENCY))]
         When the task "A" function is changed to graphcat.constant(3)
-        Then the task ["expr"] outputs with no extents should be [3]
+        Then the task ["expr"] outputs with extents [None] should be [3]
         When the task "choice" function is changed to graphcat.constant(False)
-        Then the task ["expr"] outputs with no extents should be [2]
+        Then the task ["expr"] outputs with extents [None] should be [2]
         And the graph should contain links [("B", ("expr", graphcat.Input.AUTODEPENDENCY)), ("choice", ("expr", graphcat.Input.AUTODEPENDENCY))]
         When the task "B" function is changed to graphcat.constant(4)
-        Then the task ["expr"] outputs with no extents should be [4]
+        Then the task ["expr"] outputs with extents [None] should be [4]
         When renaming tasks ["B"] as ["C"]
         Then the graph should contain tasks ["A", "C", "choice", "expr"]
         And the graph should contain links [("C", ("expr", graphcat.Input.AUTODEPENDENCY)), ("choice", ("expr", graphcat.Input.AUTODEPENDENCY))]
         When changing the expression task "expr" to expression "out('A') if out('choice') else out('C')"
-        Then the task ["expr"] outputs with no extents should be [4]
+        Then the task ["expr"] outputs with extents [None] should be [4]
         When renaming tasks ["expr"] as ["expression"]
         Then the graph should contain tasks ["A", "C", "choice", "expression"]
         And the graph should contain links [("C", ("expression", graphcat.Input.AUTODEPENDENCY)), ("choice", ("expression", graphcat.Input.AUTODEPENDENCY))]
-        And the task ["expression"] outputs with no extents should be [4]
+        And the task ["expression"] outputs with extents [None] should be [4]
 
 
     Scenario: Graph Logger
@@ -281,10 +281,10 @@ Feature: Streaming Graphs
         And a log
         And a graph logger
         When adding tasks ["A"]
-        And updating tasks ["A"] with no extents
+        And updating tasks ["A"] with extents [None]
         Then the log should contain [("info", "Task A updating."), ("info", "Task A executing. Inputs: {} Extent: None"), ("info", "Task A finished. Output: None")]
         When adding tasks ["B"] with functions [graphcat.raise_exception(RuntimeError("Whoops!"))]
-        And updating task "B" with no extents an exception should be raised
+        And updating task "B" with extent None an exception should be raised
         Then the log should contain [("info", "Task B updating."), ("info", "Task B executing. Inputs: {} Extent: None"), ("error", "Task B failed. Exception: Whoops!")]
 
 
@@ -293,39 +293,47 @@ Feature: Streaming Graphs
         And a log
         And a graph logger with detailed outputs disabled
         When adding tasks ["A"]
-        And updating tasks ["A"] with no extents
+        And updating tasks ["A"] with extents [None]
         Then the log should contain [("info", "Task A updating."), ("info", "Task A executing."), ("info", "Task A finished.")]
         When adding tasks ["B"] with functions [graphcat.raise_exception(RuntimeError("Whoops!"))]
-        And updating task "B" with no extents an exception should be raised
+        And updating task "B" with extent None an exception should be raised
         Then the log should contain [("info", "Task B updating."), ("info", "Task B executing."), ("error", "Task B failed.")]
 
 
-    Scenario: Notebook Display
-        Given the graphcat.diagram module is available
-        And the graphcat.notebook module is available
+    Scenario: Diagrams
+        Given the pygraphviz module is available
         And an empty streaming graph
         When adding tasks ["A", "B", "C", "D"] with functions [None, None, None, graphcat.raise_exception(RuntimeError("Whoops!"))]
         And adding links [("A", "B"), ("A", "C"), ("B", "D")]
-        And updating task "D" with no extents an exception should be raised
-        Then displaying the graph in a notebook should produce a visualization
+        And updating task "D" with extent None an exception should be raised
+        Then the graph can be drawn as a diagram
 
 
     Scenario: Diagram Subgraphs
-        Given the graphcat.diagram module is available
-        And an empty streaming graph
+        Given an empty streaming graph
         When adding tasks ["A", "B", "C", "D"]
         And adding links [("A", "B"), ("C", "B"), ("B", "D")]
         When filtering the graph with graphcat.diagram.leaves then the remaining nodes should match ["B", "D"]
+
+
+    Scenario: Notebook Display
+        Given the pygraphviz module is available
+        And the IPython module is available
+        And an empty streaming graph
+        When adding tasks ["A", "B", "C", "D"] with functions [None, None, None, graphcat.raise_exception(RuntimeError("Whoops!"))]
+        And adding links [("A", "B"), ("A", "C"), ("B", "D")]
+        And updating task "D" with extent None an exception should be raised
+        Then displaying the graph in a notebook should produce a visualization
 
 
     Scenario: Named Inputs
         Given an empty streaming graph
         When adding tasks ["A", "B", "C", "D"] with functions [graphcat.constant(2), graphcat.constant(3), graphcat.constant(4), None]
         And adding links [("A", ("D", 0)), ("B", ("D", 1)), ("C", ("D", 1))]
-        And updating tasks ["A"] with no extents
+        And updating tasks ["A"] with extents [None]
         Then tasks ["A"] are executed
         And task "A" has 0 inputs
-        When updating tasks ["D"] with no extents
+        When updating tasks ["D"] with extents [None]
         Then tasks ["D"] are executed
         And task "D" has 3 inputs
         And the task "D" inputs contain 0
@@ -343,8 +351,6 @@ Feature: Streaming Graphs
         And getting the task "D" input keys returns [0, 1, 1]
         And getting the task "D" input values returns [2, 3, 4]
         And getting the task "D" input items returns [(0, 2), (1, 3), (1, 4)]
-
-
 
 
     Scenario: Retrieving Task Links
@@ -382,23 +388,49 @@ Feature: Streaming Graphs
         Given an empty streaming graph
         When adding tasks ["A", "B", "C"] with functions [graphcat.constant(42), graphcat.constant(10), graphcat.passthrough("lhs")]
         And adding links [("A", ("C", "lhs")), ("B", ("C", "rhs"))]
-        And updating tasks ["C"] with no extents
+        And updating tasks ["C"] with extents [None]
         Then the task ["A", "B", "C"] outputs should be [42, 10, 42]
 
 
     Scenario: Performance Monitor
         Given an empty streaming graph
         And a performance monitor
-        When adding tasks ["A", "B", "C"] with functions [graphcat.delay(2), graphcat.delay(1), graphcat.delay(0.1)]
+        When adding tasks ["A", "B", "C"] with functions [graphcat.delay(0.3), graphcat.delay(0.2), graphcat.delay(0.1)]
         And adding links [("A", "B"), ("B", "C")]
-        And updating tasks ["C"] with no extents
+        And updating tasks ["C"] with extents [None]
         Then the performance monitor output should be {"C": [0.1]}
         When tasks ["C"] are marked unfinished
-        And updating tasks ["C"] with no extents
+        And updating tasks ["C"] with extents [None]
         Then the performance monitor output should be {"C": [0.1, 0.1]}
         When the performance monitor is reset
         Then the performance monitor output should be {}
 
 
+    Scenario: Performance Monitor Diagram
+        Given the pygraphviz module is available
+        And an empty streaming graph
+        And a performance monitor
+        When adding tasks ["A", "B", "C"] with functions [graphcat.delay(0.3), graphcat.delay(0.2), graphcat.delay(0.1)]
+        And adding links [("A", "B"), ("B", "C")]
+        And updating tasks ["C"] with extents [None]
+        Then the performance monitor output should be {"C": [0.1]}
+        And the graph can be drawn as a diagram with performance overlay
 
+
+    Scenario: Array Extents
+        Given the numpy module is available
+        And an empty streaming graph
+        When adding tasks ["A"] with functions [graphcat.array(numpy.arange(16))]
+        And updating tasks ["A"] with extents [graphcat.ArrayExtent[0:4]]
+        Then the task ["A"] numpy outputs with extents [graphcat.ArrayExtent[0:4]] should be [[0, 1, 2, 3]]
+        And tasks ["A"] are executed
+        And the task ["A"] numpy outputs with extents [graphcat.ArrayExtent[0:4]] should be [[0, 1, 2, 3]]
+        And tasks ["A"] are executed
+        And the task ["A"] numpy outputs with extents [graphcat.ArrayExtent[0:4:2]] should be [[0, 2]]
+        And tasks ["A", "A"] are executed
+        And the task ["A"] numpy outputs with extents [graphcat.ArrayExtent[0:4:2]] should be [[0, 2]]
+        And tasks ["A", "A"] are executed
+        When the task "A" function is changed to graphcat.array(numpy.arange(16))
+        Then the task ["A"] numpy outputs with extents [graphcat.ArrayExtent[0:4:2]] should be [[0, 2]]
+        And tasks [] are executed
 

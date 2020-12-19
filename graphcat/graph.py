@@ -45,7 +45,7 @@ class Graph(abc.ABC):
 
     @abc.abstractmethod
     def _add_node(self, name, fn):
-        raise NotImplementedError()
+        raise NotImplementedError() # pragma: no cover
 
 
     def __contains__(self, name):
@@ -54,7 +54,7 @@ class Graph(abc.ABC):
 
     @abc.abstractmethod
     def _mark_unfinished(self, name):
-        raise NotImplementedError()
+        raise NotImplementedError() # pragma: no cover
 
 
     def _require_valid_names(self, names):
@@ -184,14 +184,14 @@ class Graph(abc.ABC):
     @abc.abstractmethod
     def is_dynamic(self):
         """Return :any:`True` if-and-only-if the graph implements dynamic updates."""
-        raise NotImplementedError()
+        raise NotImplementedError() # pragma: no cover
 
 
     @property
     @abc.abstractmethod
     def is_streaming(self):
         """Return :any:`True` if-and-only-if the graph implements streaming (extent-based) updates."""
-        raise NotImplementedError()
+        raise NotImplementedError() # pragma: no cover
 
 
     def links(self, names=None):

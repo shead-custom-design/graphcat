@@ -71,12 +71,8 @@ def draw(graph, hide=None, rankdir="LR"):
     white = "white"
 
     edgestyle = "solid"
-    if graph.is_streaming:
-        arrowhead = "olnormal"
-    elif graph.is_dynamic:
-        arrowhead = "onormal"
-    else:
-        arrowhead = "normal"
+    arrowhead = "lnormal" if graph.is_streaming else "normal"
+    arrowhead = "o" + arrowhead if graph.is_dynamic else arrowhead
 
     agraph = pygraphviz.AGraph(directed=True, strict=False, ranksep="0.4", rankdir=rankdir)
     agraph.node_attr.update(fontname="Helvetica", fontsize=8, shape="box", style="filled", margin="0.08,0.04", width="0.4", height="0")
@@ -140,14 +136,17 @@ def performance(agraph, monitor):
     agraph.graph_attr["forcelabels"] = True
     for name, times in monitor.tasks.items():
         time = times[-1]
-        percent = (time - min_time) / (max_time - min_time)
-        if percent > 0.66:
-            timecolor = "red"
-        elif percent > 0.33:
-            timecolor = "#ffaa00"
+        if max_time - min_time > 0:
+            percent = (time - min_time) / (max_time - min_time)
+            if percent > 0.66:
+                timecolor = "red"
+            elif percent > 0.33:
+                timecolor = "#ffaa00"
+            else:
+                timecolor = "green"
         else:
-            timecolor = "green"
-        agraph.get_node(name).attr["xlabel"] = f"<<font color='{timecolor}'>&#11044;</font> <font color='black'>{times[-1]:.4f}s</font>>"
+            timecolor="black"
+        agraph.get_node(name).attr["xlabel"] = f"<<font color='{timecolor}'>&#11044;</font> <font color='black'>{time:.4f}s</font>>"
     return agraph
 
 

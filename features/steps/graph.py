@@ -18,14 +18,22 @@ import unittest.mock
 from behave import *
 
 import graphcat
+import graphcat.diagram
+import graphcat.notebook
 
 try:
-    import graphcat.diagram
+    import pygraphviz
 except:
     pass
 
 try:
-    import graphcat.notebook
+    import IPython
+except:
+    pass
+
+try:
+    import numpy
+    import numpy.testing
 except:
     pass
 
@@ -81,15 +89,11 @@ class EventRecorder(object):
 #################################################################
 # Givens
 
-@given(u'the graphcat.diagram module is available')
-def step_impl(context):
-    if "graphcat.diagram" not in sys.modules:
+@given(u'the {module} module is available')
+def step_impl(context, module):
+    if module not in sys.modules:
         context.scenario.skip()
 
-@given(u'the graphcat.notebook module is available')
-def step_impl(context):
-    if "graphcat.notebook" not in sys.modules:
-        context.scenario.skip()
 
 @given(u'an empty dynamic graph')
 def step_impl(context):
@@ -214,12 +218,13 @@ def step_impl(context, names):
         context.graph.add_task(name)
 
 
-@when(u'updating task {name} with no extents an exception should be raised')
-def step_impl(context, name):
+@when(u'updating task {name} with extent {extent} an exception should be raised')
+def step_impl(context, name, extent):
     name = eval(name)
+    extent = eval(extent)
     context.events = EventRecorder(context.graph)
     with test.assert_raises(RuntimeError):
-        context.graph.update(name, extent=None)
+        context.graph.update(name, extent=extent)
 
 
 @when(u'updating task {name} an exception should be raised')
@@ -254,12 +259,13 @@ def step_impl(context, links):
         context.graph.clear_links(source, target)
 
 
-@when(u'updating tasks {names} with no extents')
-def step_impl(context, names):
+@when(u'updating tasks {names} with extents {extents}')
+def step_impl(context, names, extents):
     names = eval(names)
+    extents = eval(extents)
     context.events = EventRecorder(context.graph)
-    for name in names:
-        context.graph.update(name, extent=None)
+    for name, extent in zip(names, extents):
+        context.graph.update(name, extent=extent)
 
 
 @when(u'updating tasks {names}')
@@ -321,12 +327,13 @@ def step_impl(context, links):
     test.assert_equal(sorted(links), sorted(context.graph.links()))
 
 
-@then(u'the outputs of tasks {names} with no extents should be {outputs}')
-def step_impl(context, names, outputs):
+@then(u'the outputs of tasks {names} with extents {extents} should be {outputs}')
+def step_impl(context, names, extents, outputs):
     names = eval(names)
+    extents = eval(extents)
     outputs = eval(outputs)
-    for name, output in zip(names, outputs):
-        test.assert_equal(context.graph.output(name, extent=None), output)
+    for name, extent, output in zip(names, extents, outputs):
+        test.assert_equal(context.graph.output(name, extent=extent), output)
 
 
 @then(u'the outputs of tasks {names} should be {outputs}')
@@ -369,15 +376,6 @@ def step_impl(context, oldnames, newnames):
 def step_impl(context, names):
     names = eval(names)
     test.assert_equal(names, context.events.updated)
-
-
-@then(u'tasks {names} are executed with inputs {inputs}')
-def step_impl(context, names, inputs):
-    names = eval(names)
-    inputs = eval(inputs)
-
-    test.assert_equal(names, context.events.executed)
-    test.assert_equal(inputs, [inputs.dict() for inputs in context.events.inputs])
 
 
 @then(u'task {name} has {count} inputs')
@@ -498,11 +496,22 @@ def step_impl(context, names):
     test.assert_equal(names, context.events.finished)
 
 
-@then(u'the task {names} outputs with no extents should be {outputs}')
-def step_impl(context, names, outputs):
+@then(u'the task {names} numpy outputs with extents {extents} should be {outputs}')
+def step_impl(context, names, extents, outputs):
     names = eval(names)
+    extents = eval(extents)
     outputs = eval(outputs)
-    test.assert_equal([context.graph.output(name, extent=None) for name in names], outputs)
+    for name, extent, output in zip(names, extents, outputs):
+        numpy.testing.assert_allclose(context.graph.output(name, extent=extent), output)
+
+
+@then(u'the task {names} outputs with extents {extents} should be {outputs}')
+def step_impl(context, names, extents, outputs):
+    names = eval(names)
+    extents = eval(extents)
+    outputs = eval(outputs)
+    for name, extent, output in zip(names, extents, outputs):
+        test.assert_equal(context.graph.output(name, extent=extent), output)
 
 
 @then(u'the task {names} outputs should be {outputs}')
@@ -522,9 +531,20 @@ def step_impl(context, calls):
     context.logger._log.reset_mock()
 
 
+@then(u'the graph can be drawn as a diagram')
+def step_impl(context):
+    agraph = graphcat.diagram.draw(context.graph)
+
+
 @then(u'displaying the graph in a notebook should produce a visualization')
 def step_impl(context):
     graphcat.notebook.display(context.graph)
+
+
+@then(u'the graph can be drawn as a diagram with performance overlay')
+def step_impl(context):
+    agraph = graphcat.diagram.draw(context.graph)
+    agraph = graphcat.diagram.performance(agraph, context.performance_monitor)
 
 
 @then(u'tasks {names} should have links {links}')

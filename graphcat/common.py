@@ -21,6 +21,13 @@ import functools
 import logging
 import time
 
+try:
+    import numpy
+except: # pragma: no cover
+    pass
+
+import graphcat.require
+
 
 log = logging.getLogger(__name__)
 
@@ -39,7 +46,7 @@ class Array(object):
         return self._value[extent] if extent is not None else self._value
 
     def __eq__(self, other):
-        return isinstance(other, Array) and self._value == other._value
+        return isinstance(other, Array) and numpy.all(self._value == other._value)
 
 
 class ArrayExtent(object):
@@ -243,6 +250,7 @@ class UpdatedTasks(object):
         return self._tasks
 
 
+graphcat.require.loaded_module("numpy")
 def array(value):
     """Factory for task functions that return constant array values when executed.
 
