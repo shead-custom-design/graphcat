@@ -7,6 +7,17 @@
 Release Notes
 =============
 
+Graphcat 0.12.0 - December 19, 2020
+-----------------------------------
+
+* Expose the `rankdir` attribute when drawing graph diagrams.
+* Alter graph diagram appearance based on graph type.
+* Added a "User Guide" section to the documentation.
+* Added graph.streaming.StreamingGraph.
+* Greatly reduced code duplication among graph types.
+* Calls to set_task() only mark the task unfinished if the new callable compares unequal to the old.
+* Add support for visualizing performance data in graph diagrams.
+
 Graphcat 0.11.0 - December 13, 2020
 -----------------------------------
 
