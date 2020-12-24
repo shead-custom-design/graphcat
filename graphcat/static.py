@@ -135,8 +135,8 @@ class StaticGraph(graphcat.graph.Graph):
 
         # If a failure occurred, mark all tasks between the failed and updated task.
         if exception is not None:
-            failed_names = set(failed_name) | networkx.ancestors(self._graph, failed_name)
-            failed_names = failed_names & (set(update_name) | networkx.descendants(self._graph, update_name))
+            failed_names = set([failed_name]) | networkx.ancestors(self._graph, failed_name)
+            failed_names = failed_names & (set([update_name]) | networkx.descendants(self._graph, update_name))
             for name in failed_names:
                 task = self._graph.nodes[name]
                 task["output"] = None
