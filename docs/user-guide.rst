@@ -1,7 +1,7 @@
 User Guide
 ==========
 
-The User Guide covers detailed individual topics on how to use Graphcat effectively.
+The User Guide includes detailed individual subjects covering how to use Graphcat effectively.
 
 .. nbgallery::
     :name: user-guide
