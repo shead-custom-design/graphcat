@@ -434,3 +434,33 @@ Feature: Streaming Graphs
         Then the task ["A"] numpy outputs with extents [graphcat.ArrayExtent[0:4:2]] should be [[0, 2]]
         And tasks [] are executed
 
+
+    Scenario: Suppress constant Updates
+        Given an empty streaming graph
+        When adding tasks ["A"] with functions [graphcat.constant(1)]
+        And updating tasks ["A"]
+        Then the tasks ["A"] should be finished
+        And the task ["A"] outputs should be [1]
+        When the task "A" function is changed to graphcat.constant(2)
+        Then the tasks ["A"] should be unfinished
+        And the task ["A"] outputs should be [2]
+        When the task "A" function is changed to graphcat.constant(2)
+        Then the tasks ["A"] should be finished
+        And the task ["A"] outputs should be [2]
+
+
+    Scenario: Suppress passthrough Updates
+        Given an empty streaming graph
+        When adding tasks ["A", "B", "C"] with functions [graphcat.constant("a"), graphcat.constant("b"), graphcat.passthrough(0)]
+        And adding links [("A", ("C", 0)), ("B", ("C", 1))]
+        And updating tasks ["C"]
+        Then the tasks ["A", "C"] should be finished
+        And the tasks ["B"] should be unfinished
+        And the task ["A", "B", "C"] outputs should be ["a", "b", "a"]
+        When the task "C" function is changed to graphcat.passthrough(1)
+        Then the tasks ["A", "B"] should be finished
+        And the tasks ["C"] should be unfinished
+        And the task ["C"] outputs should be ["b"]
+        When the task "C" function is changed to graphcat.passthrough(1)
+        Then the tasks ["A", "B", "C"] should be finished
+        And the task ["C"] outputs should be ["b"]

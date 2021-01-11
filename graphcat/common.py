@@ -167,6 +167,23 @@ class Logger(object):
         self._log.info(message)
 
 
+class Passthrough(object):
+    """Callable object that always returns one of its inputs.
+
+    See Also
+    --------
+    :func:`constant`
+    """
+    def __init__(self, input):
+        self._input = input
+
+    def __call__(self, graph, name, inputs, extent=None):
+        return inputs.getone(self._input)
+
+    def __eq__(self, other):
+        return isinstance(other, Passthrough) and self._input == other._input
+
+
 class PerformanceMonitor(object):
     """Tracks the performance of graph tasks as they're executed.
 
@@ -330,6 +347,15 @@ def constant(value):
     return Constant(value)
 
 
+def consume(graph, name, inputs, extent=None):
+    """Task function that retrieves all its inputs, but otherwise does nothing.
+
+    This is mainly useful for debugging :class:`dynamic graphs<graphcat.dynamic.DynamicGraph>`,
+    since the default :func:`null` task function won't execute upstream nodes.
+    """
+    values = [value() for value in inputs.values()]
+
+
 def delay(seconds):
     """Factory for task functions that sleep for a fixed time.
 
@@ -409,11 +435,9 @@ def passthrough(input=None):
     Returns
     -------
     fn: function
-        Task function that will pass input `input` index `index` to its output.
+        Task function that will pass the input value named `input` to its output.
     """
-    def implementation(graph, name, inputs, extent=None):
-        return inputs.getone(input)
-    return implementation
+    return Passthrough(input)
 
 
 def raise_exception(exception):
@@ -434,13 +458,4 @@ def raise_exception(exception):
     def implementation(graph, name, inputs, extent=None):
         raise exception
     return implementation
-
-
-def consume(graph, name, inputs, extent=None):
-    """Task function that retrieves all its inputs, but otherwise does nothing.
-
-    This is mainly useful for debugging :class:`dynamic graphs<graphcat.dynamic.DynamicGraph>`,
-    since the default :func:`null` task function won't execute upstream nodes.
-    """
-    values = [value() for value in inputs.values()]
 
