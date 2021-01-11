@@ -180,7 +180,8 @@ Feature: Dynamic Graphs
     Scenario Outline: Task Functions
         Given an empty dynamic graph
         When adding tasks <tasks> with functions <functions>
-        Then the outputs of tasks <tasks> should be <outputs>
+        And computing the task <tasks> outputs
+        Then the outputs should be <outputs>
 
         Examples:
             | tasks     | functions                               | outputs       |
@@ -237,13 +238,14 @@ Feature: Dynamic Graphs
         Given an empty dynamic graph
         When adding tasks ["A", "B", "C"] with functions [graphcat.constant(1), graphcat.constant(2), graphcat.constant(3)]
         And adding links [("A", "B"), ("B", "C")]
-        And updating tasks ["A", "B", "C"]
+        And computing the task ["A", "B", "C"] outputs
         Then the tasks ["A", "B", "C"] should be finished
-        And the task ["A", "B", "C"] outputs should be [1, 2, 3]
+        And the outputs should be [1, 2, 3]
         When the task "B" function is changed to graphcat.null
         Then the tasks ["A"] should be finished
         And the tasks ["B", "C"] should be unfinished
-        And the task ["A", "B", "C"] outputs should be [1, None, 3]
+        When computing the task ["A", "B", "C"] outputs
+        Then the outputs should be [1, None, 3]
 
 
     Scenario: Expression Tasks
@@ -253,27 +255,34 @@ Feature: Dynamic Graphs
         Then the graph should contain tasks ["A", "B", "choice", "expr"]
         And the graph should contain links []
         And the tasks ["A", "B", "choice", "expr"] should be unfinished
-        And the task ["expr"] outputs should be [7]
         And the graph should contain links []
+        When computing the task ["expr"] outputs
+        Then the outputs should be [7]
         When changing the expression task "expr" to expression "out('A') if out('choice') else out('B')"
-        Then the task ["expr"] outputs should be [1]
+        And computing the task ["expr"] outputs
+        Then the outputs should be [1]
         And the graph should contain links [("A", ("expr", graphcat.Input.AUTODEPENDENCY)), ("choice", ("expr", graphcat.Input.AUTODEPENDENCY))]
         When the task "A" function is changed to graphcat.constant(3)
-        Then the task ["expr"] outputs should be [3]
+        And computing the task ["expr"] outputs
+        Then the outputs should be [3]
         When the task "choice" function is changed to graphcat.constant(False)
-        Then the task ["expr"] outputs should be [2]
+        And computing the task ["expr"] outputs
+        Then the outputs should be [2]
         And the graph should contain links [("B", ("expr", graphcat.Input.AUTODEPENDENCY)), ("choice", ("expr", graphcat.Input.AUTODEPENDENCY))]
         When the task "B" function is changed to graphcat.constant(4)
-        Then the task ["expr"] outputs should be [4]
+        And computing the task ["expr"] outputs
+        Then the outputs should be [4]
         When renaming tasks ["B"] as ["C"]
         Then the graph should contain tasks ["A", "C", "choice", "expr"]
         And the graph should contain links [("C", ("expr", graphcat.Input.AUTODEPENDENCY)), ("choice", ("expr", graphcat.Input.AUTODEPENDENCY))]
         When changing the expression task "expr" to expression "out('A') if out('choice') else out('C')"
-        Then the task ["expr"] outputs should be [4]
+        And computing the task ["expr"] outputs
+        Then the outputs should be [4]
         When renaming tasks ["expr"] as ["expression"]
         Then the graph should contain tasks ["A", "C", "choice", "expression"]
         And the graph should contain links [("C", ("expression", graphcat.Input.AUTODEPENDENCY)), ("choice", ("expression", graphcat.Input.AUTODEPENDENCY))]
-        And the task ["expression"] outputs should be [4]
+        When computing the task ["expression"] outputs
+        Then the outputs should be [4]
 
 
     Scenario: Graph Logger
@@ -388,8 +397,8 @@ Feature: Dynamic Graphs
         Given an empty dynamic graph
         When adding tasks ["A", "B", "C"] with functions [graphcat.constant(42), graphcat.constant(10), graphcat.passthrough("lhs")]
         And adding links [("A", ("C", "lhs")), ("B", ("C", "rhs"))]
-        And updating tasks ["C"]
-        Then the task ["A", "B", "C"] outputs should be [42, 10, 42]
+        And computing the task ["A", "B", "C"] outputs
+        Then the outputs should be [42, 10, 42]
 
 
     Scenario: Performance Monitor
@@ -417,34 +426,56 @@ Feature: Dynamic Graphs
         And the graph can be drawn as a diagram with performance overlay
 
 
+    Scenario: Suppress array Updates
+        Given the numpy module is available
+        And an empty dynamic graph
+        When adding tasks ["A"] with functions [graphcat.array(numpy.arange(4))]
+        And computing the task ["A"] outputs
+        Then the tasks ["A"] should be finished
+        And the numpy outputs should be [[0, 1, 2, 3]]
+        When the task "A" function is changed to graphcat.array(numpy.arange(3))
+        Then the tasks ["A"] should be unfinished
+        When computing the task ["A"] outputs
+        Then the numpy outputs should be [[0, 1, 2]]
+        When the task "A" function is changed to graphcat.array(numpy.arange(3))
+        Then the tasks ["A"] should be finished
+        When computing the task ["A"] outputs
+        Then the numpy outputs should be [[0, 1, 2]]
+
+
     Scenario: Suppress constant Updates
         Given an empty dynamic graph
         When adding tasks ["A"] with functions [graphcat.constant(1)]
-        And updating tasks ["A"]
+        And computing the task ["A"] outputs
         Then the tasks ["A"] should be finished
-        And the task ["A"] outputs should be [1]
+        And the outputs should be [1]
         When the task "A" function is changed to graphcat.constant(2)
         Then the tasks ["A"] should be unfinished
-        And the task ["A"] outputs should be [2]
+        When computing the task ["A"] outputs
+        Then the outputs should be [2]
         When the task "A" function is changed to graphcat.constant(2)
         Then the tasks ["A"] should be finished
-        And the task ["A"] outputs should be [2]
+        When computing the task ["A"] outputs
+        Then the outputs should be [2]
 
 
     Scenario: Suppress passthrough Updates
         Given an empty dynamic graph
         When adding tasks ["A", "B", "C"] with functions [graphcat.constant("a"), graphcat.constant("b"), graphcat.passthrough(0)]
         And adding links [("A", ("C", 0)), ("B", ("C", 1))]
-        And updating tasks ["C"]
+        And computing the task ["C"] outputs
         Then the tasks ["A", "C"] should be finished
         And the tasks ["B"] should be unfinished
-        And the task ["A", "B", "C"] outputs should be ["a", "b", "a"]
+        And the outputs should be ["a"]
         When the task "C" function is changed to graphcat.passthrough(1)
-        Then the tasks ["A", "B"] should be finished
-        And the tasks ["C"] should be unfinished
-        And the task ["C"] outputs should be ["b"]
+        Then the tasks ["A"] should be finished
+        And the tasks ["B", "C"] should be unfinished
+        When computing the task ["C"] outputs
+        Then the outputs should be ["b"]
+        And the tasks ["A", "B", "C"] should be finished
         When the task "C" function is changed to graphcat.passthrough(1)
         Then the tasks ["A", "B", "C"] should be finished
-        And the task ["C"] outputs should be ["b"]
+        When computing the task ["C"] outputs
+        Then the outputs should be ["b"]
 
 

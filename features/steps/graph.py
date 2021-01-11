@@ -312,6 +312,21 @@ def step_impl(context, hide, names):
     test.assert_equal(sorted(remaining), sorted(names))
 
 
+@when(u'computing the task {names} outputs with extents {extents}')
+def step_impl(context, names, extents):
+    names = eval(names)
+    extents = eval(extents)
+    context.events = EventRecorder(context.graph)
+    context.outputs = [context.graph.output(name, extent=extent) for name, extent in zip(names, extents)]
+
+
+@when(u'computing the task {names} outputs')
+def step_impl(context, names):
+    names = eval(names)
+    context.events = EventRecorder(context.graph)
+    context.outputs = [context.graph.output(name) for name in names]
+
+
 #################################################################
 # Thens
 
@@ -327,21 +342,17 @@ def step_impl(context, links):
     test.assert_equal(sorted(links), sorted(context.graph.links()))
 
 
-@then(u'the outputs of tasks {names} with extents {extents} should be {outputs}')
-def step_impl(context, names, extents, outputs):
-    names = eval(names)
-    extents = eval(extents)
+@then(u'the outputs should be {outputs}')
+def step_impl(context, outputs):
     outputs = eval(outputs)
-    for name, extent, output in zip(names, extents, outputs):
-        test.assert_equal(context.graph.output(name, extent=extent), output)
+    test.assert_equal(outputs, context.outputs)
 
 
-@then(u'the outputs of tasks {names} should be {outputs}')
-def step_impl(context, names, outputs):
-    names = eval(names)
+@then(u'the numpy outputs should be {outputs}')
+def step_impl(context, outputs):
     outputs = eval(outputs)
-    for name, output in zip(names, outputs):
-        test.assert_equal(context.graph.output(name), output)
+    for a, b in zip(outputs, context.outputs):
+        numpy.testing.assert_allclose(a, b)
 
 
 @then(u'the tasks {names} should be failed')
@@ -494,31 +505,6 @@ def step_impl(context, names):
 def step_impl(context, names):
     names = eval(names)
     test.assert_equal(names, context.events.finished)
-
-
-@then(u'the task {names} numpy outputs with extents {extents} should be {outputs}')
-def step_impl(context, names, extents, outputs):
-    names = eval(names)
-    extents = eval(extents)
-    outputs = eval(outputs)
-    for name, extent, output in zip(names, extents, outputs):
-        numpy.testing.assert_allclose(context.graph.output(name, extent=extent), output)
-
-
-@then(u'the task {names} outputs with extents {extents} should be {outputs}')
-def step_impl(context, names, extents, outputs):
-    names = eval(names)
-    extents = eval(extents)
-    outputs = eval(outputs)
-    for name, extent, output in zip(names, extents, outputs):
-        test.assert_equal(context.graph.output(name, extent=extent), output)
-
-
-@then(u'the task {names} outputs should be {outputs}')
-def step_impl(context, names, outputs):
-    names = eval(names)
-    outputs = eval(outputs)
-    test.assert_equal([context.graph.output(name) for name in names], outputs)
 
 
 @then(u'the log should contain {calls}')
