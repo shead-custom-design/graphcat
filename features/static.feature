@@ -324,6 +324,8 @@ Feature: Static Graphs
         And adding links [("A", "B"), ("A", "C"), ("B", "D")]
         And updating task "D" an exception should be raised
         Then displaying the graph in a notebook should produce a visualization
+        When the graph is converted to a diagram
+        Then the diagram can be displayed in a notebook
 
 
     Scenario: Named Inputs

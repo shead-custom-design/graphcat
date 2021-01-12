@@ -39,14 +39,16 @@ def draw(graph, hide=None, rankdir="LR"):
 
     Parameters
     ----------
-    graph: :class:`graphcat.graph.Graph` derivative, required
+    graph: :class:`graphcat.graph.Graph` derivative or :class:`pygraphviz.AGraph`, required
         The graph to be visualized.
     hide: Python callable, optional
         Python callable that can be used to hide tasks in the displayed figure.
-        If :any:`None` (the default), all tasks will be displayed.
+        If :any:`None` (the default), all tasks will be displayed.  Ignored if
+        `graph` is an instance of :class:`pygraphviz.AGraph`.
     rankdir: :class:`str`, optional
         Graphviz rankdir attribute that determines the direction of data flow
         within the diagram.  Default: ``"LR"``, which is left-to-right flow.
+        Ignored if `graph` is an instance of :class:`pygraphviz.AGraph`.
 
     Returns
     -------
@@ -59,6 +61,9 @@ def draw(graph, hide=None, rankdir="LR"):
     --------
     :func:`graphcat.notebook.display` - displays a graph in a Jupyter notebook.
     """
+
+    if isinstance(graph, pygraphviz.AGraph):
+        return graph
 
     if hide is None:
         hide = none

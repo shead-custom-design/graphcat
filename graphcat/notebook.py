@@ -33,14 +33,16 @@ def display(graph, hide=None, rankdir="LR"):
 
     Parameters
     ----------
-    graph: :class:`graphcat.Graph`, required
+    graph: :class:`graphcat.Graph` or :class:`pygraphviz.AGraph`, required
         The graph to be visualized.
     hide: Python callable, optional
         Python callable that can be used to hide tasks in the displayed figure.
-        If :any:`None` (the default), all tasks will be displayed.
+        If :any:`None` (the default), all tasks will be displayed.  Ignored if
+        `graph` is a :class:`pygraphviz.AGraph`.
     rankdir: :class:`str`, optional
         Graphviz rankdir attribute that determines the direction of data flow
         within the diagram.  Default: ``"LR"``, which is left-to-right flow.
+        Ignored if `graph` is a :class:`pygraphviz.AGraph`.
     """
 
     agraph = graphcat.diagram.draw(graph, hide=hide, rankdir=rankdir)

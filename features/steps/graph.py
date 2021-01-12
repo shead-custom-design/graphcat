@@ -327,6 +327,11 @@ def step_impl(context, names):
     context.outputs = [context.graph.output(name) for name in names]
 
 
+@when(u'the graph is converted to a diagram')
+def step_impl(context):
+    context.agraph = graphcat.diagram.draw(context.graph)
+
+
 #################################################################
 # Thens
 
@@ -531,6 +536,11 @@ def step_impl(context):
 @then(u'displaying the graph in a notebook should produce a visualization')
 def step_impl(context):
     graphcat.notebook.display(context.graph)
+
+
+@then(u'the diagram can be displayed in a notebook')
+def step_impl(context):
+    graphcat.notebook.display(context.agraph)
 
 
 @then(u'the graph can be drawn as a diagram with performance overlay')
