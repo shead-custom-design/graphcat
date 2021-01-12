@@ -13,13 +13,13 @@ Feature: Static Graphs
         And updating tasks <update tasks>
         Then the graph should contain tasks <tasks>
         And the graph should contain links <links>
-        And the tasks <finished before> should be finished
-        And the tasks <unfinished before> should be unfinished
+        And the task <finished before> state is finished
+        And the task <unfinished before> state is unfinished
         When adding links <added links>
         Then the graph should contain tasks <new tasks>
         And the graph should contain links <new links>
-        And the tasks <finished after> should be finished
-        And the tasks <unfinished after> should be unfinished
+        And the task <finished after> state is finished
+        And the task <unfinished after> state is unfinished
 
         Examples:
             | tasks           | links                 | update tasks | finished before | unfinished before |  added links          | new tasks       | new links                                | finished after  | unfinished after |
@@ -37,13 +37,13 @@ Feature: Static Graphs
         And updating tasks <update tasks>
         Then the graph should contain tasks <tasks>
         And the graph should contain links <links>
-        And the tasks <finished before> should be finished
-        And the tasks <unfinished before> should be unfinished
+        And the task <finished before> state is finished
+        And the task <unfinished before> state is unfinished
         When adding tasks <added tasks>
         Then the graph should contain tasks <new tasks>
         And the graph should contain links <new links>
-        And the tasks <finished after> should be finished
-        And the tasks <unfinished after> should be unfinished
+        And the task <finished after> state is finished
+        And the task <unfinished after> state is unfinished
 
         Examples:
             | tasks      | links                 | update tasks | finished before | unfinished before |  added tasks       | new tasks       | new links                 | finished after  | unfinished after |
@@ -57,14 +57,14 @@ Feature: Static Graphs
         And updating tasks <update tasks>
         Then the graph should contain tasks <tasks>
         And the graph should contain links <links>
-        And the tasks <finished before> should be finished
-        And the tasks <unfinished before> should be unfinished
+        And the task <finished before> state is finished
+        And the task <unfinished before> state is unfinished
         When renaming tasks <old names> as <new names>
         Then tasks <old names> should be renamed to <new names>
         Then the graph should contain tasks <new tasks>
         And the graph should contain links <new links>
-        And the tasks <finished after> should be finished
-        And the tasks <unfinished after> should be unfinished
+        And the task <finished after> state is finished
+        And the task <unfinished after> state is unfinished
 
         Examples: Fan-Out
             | tasks           | links                                    | update tasks    | finished before | unfinished before | old names  | new names   | new tasks       | new links                                | finished after  | unfinished after |
@@ -83,13 +83,13 @@ Feature: Static Graphs
         And updating tasks <update tasks>
         Then the graph should contain tasks <tasks>
         And the graph should contain links <links>
-        And the tasks <finished before> should be finished
-        And the tasks <unfinished before> should be unfinished
+        And the task <finished before> state is finished
+        And the task <unfinished before> state is unfinished
         When removing links <removed>
         Then the graph should contain tasks <new tasks>
         And the graph should contain links <new links>
-        And the tasks <finished after> should be finished
-        And the tasks <unfinished after> should be unfinished
+        And the task <finished after> state is finished
+        And the task <unfinished after> state is unfinished
 
         Examples: Fan-Out
             | tasks           | links                                    | update tasks    | finished before | unfinished before | removed      | new tasks       | new links                | finished after  | unfinished after |
@@ -107,13 +107,13 @@ Feature: Static Graphs
         And updating tasks <update tasks>
         Then the graph should contain tasks <tasks>
         And the graph should contain links <links>
-        And the tasks <finished before> should be finished
-        And the tasks <unfinished before> should be unfinished
+        And the task <finished before> state is finished
+        And the task <unfinished before> state is unfinished
         When removing tasks <removed> with <api>
         Then the graph should contain tasks <new tasks>
         And the graph should contain links <new links>
-        And the tasks <finished after> should be finished
-        And the tasks <unfinished after> should be unfinished
+        And the task <finished after> state is finished
+        And the task <unfinished after> state is unfinished
 
         Examples: Fan-Out
             | tasks           | links                                    | update tasks    | finished before | unfinished before | removed    | api             | new tasks       | new links                | finished after  | unfinished after |
@@ -149,8 +149,8 @@ Feature: Static Graphs
         Then tasks <updated> are updated
         And tasks <executed> are executed
         And tasks <finished> are finished
-        And the tasks <finished tasks> should be finished
-        And the tasks <unfinished tasks> should be unfinished
+        And the task <finished tasks> state is finished
+        And the task <unfinished tasks> state is unfinished
 
         Examples: Fan-Out
             | tasks           | links                                    | update tasks | updated              | executed        | finished        | finished tasks  | unfinished tasks |
@@ -192,8 +192,8 @@ Feature: Static Graphs
         When adding tasks ["A", "B", "C"] with functions [graphcat.null, graphcat.raise_exception(RuntimeError()), graphcat.null]
         And adding links [("A", "B"), ("B", "C")]
         And updating task "C" an exception should be raised
-        Then the tasks ["A"] should be finished
-        And the tasks ["B", "C"] should be failed
+        Then the task ["A"] state is finished
+        And the task ["B", "C"] state is failed
 
 
     Scenario: Adding Duplicate Tasks
@@ -230,11 +230,11 @@ Feature: Static Graphs
         When adding tasks ["A", "B", "C"] with functions [graphcat.constant(1), graphcat.constant(2), graphcat.constant(3)]
         And adding links [("A", "B"), ("B", "C")]
         And computing the task ["A", "B", "C"] outputs
-        Then the tasks ["A", "B", "C"] should be finished
+        Then the task ["A", "B", "C"] state is finished
         And the outputs should be [1, 2, 3]
         When the task "B" function is changed to graphcat.null
-        Then the tasks ["A"] should be finished
-        And the tasks ["B", "C"] should be unfinished
+        Then the task ["A"] state is finished
+        And the task ["B", "C"] state is unfinished
         When computing the task ["A", "B", "C"] outputs
         Then the outputs should be [1, None, 3]
 
@@ -245,7 +245,7 @@ Feature: Static Graphs
         And adding an expression task "expr" with expression "3+4"
         Then the graph should contain tasks ["A", "B", "choice", "expr"]
         And the graph should contain links []
-        And the tasks ["A", "B", "choice", "expr"] should be unfinished
+        And the task ["A", "B", "choice", "expr"] state is unfinished
         And the graph should contain links []
         When computing the task ["expr"] outputs
         Then the outputs should be [7]
@@ -420,14 +420,14 @@ Feature: Static Graphs
         And an empty static graph
         When adding tasks ["A"] with functions [graphcat.array(numpy.arange(4))]
         And computing the task ["A"] outputs
-        Then the tasks ["A"] should be finished
+        Then the task ["A"] state is finished
         And the numpy outputs should be [[0, 1, 2, 3]]
         When the task "A" function is changed to graphcat.array(numpy.arange(3))
-        Then the tasks ["A"] should be unfinished
+        Then the task ["A"] state is unfinished
         When computing the task ["A"] outputs
         Then the numpy outputs should be [[0, 1, 2]]
         When the task "A" function is changed to graphcat.array(numpy.arange(3))
-        Then the tasks ["A"] should be finished
+        Then the task ["A"] state is finished
         When computing the task ["A"] outputs
         Then the numpy outputs should be [[0, 1, 2]]
 
@@ -436,14 +436,14 @@ Feature: Static Graphs
         Given an empty static graph
         When adding tasks ["A"] with functions [graphcat.constant(1)]
         And computing the task ["A"] outputs
-        Then the tasks ["A"] should be finished
+        Then the task ["A"] state is finished
         And the outputs should be [1]
         When the task "A" function is changed to graphcat.constant(2)
-        Then the tasks ["A"] should be unfinished
+        Then the task ["A"] state is unfinished
         When computing the task ["A"] outputs
         Then the outputs should be [2]
         When the task "A" function is changed to graphcat.constant(2)
-        Then the tasks ["A"] should be finished
+        Then the task ["A"] state is finished
         When computing the task ["A"] outputs
         Then the outputs should be [2]
 
@@ -453,15 +453,15 @@ Feature: Static Graphs
         When adding tasks ["A", "B", "C"] with functions [graphcat.constant("a"), graphcat.constant("b"), graphcat.passthrough(0)]
         And adding links [("A", ("C", 0)), ("B", ("C", 1))]
         And computing the task ["C"] outputs
-        Then the tasks ["A", "B", "C"] should be finished
+        Then the task ["A", "B", "C"] state is finished
         And the outputs should be ["a"]
         When the task "C" function is changed to graphcat.passthrough(1)
-        Then the tasks ["A", "B"] should be finished
-        And the tasks ["C"] should be unfinished
+        Then the task ["A", "B"] state is finished
+        And the task ["C"] state is unfinished
         When computing the task ["C"] outputs
         Then the outputs should be ["b"]
         When the task "C" function is changed to graphcat.passthrough(1)
-        Then the tasks ["A", "B", "C"] should be finished
+        Then the task ["A", "B", "C"] state is finished
         When computing the task ["C"] outputs
         Then the outputs should be ["b"]
 
@@ -470,11 +470,11 @@ Feature: Static Graphs
         Given an empty static graph
         When adding tasks ["A", "B", "C"] with functions [graphcat.passthrough(), graphcat.passthrough(), graphcat.passthrough()]
         And adding links [("A", "B"), ("B", "C"), ("C", "A")]
-        Then the tasks ["A", "B", "C"] should be unfinished
+        Then the task ["A", "B", "C"] state is unfinished
         When computing the task ["C"] outputs
         Then tasks ["A", "B", "C"] are updated
         And tasks ["A", "B", "C"] are executed
         And tasks ["A", "B", "C"] are finished
-        And tasks [] detected cycles
+        And tasks [] detect cycles
         And the outputs should be [None]
 

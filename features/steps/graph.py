@@ -355,21 +355,21 @@ def step_impl(context, outputs):
         numpy.testing.assert_allclose(a, b)
 
 
-@then(u'the tasks {names} should be failed')
+@then(u'the task {names} state is failed')
 def step_impl(context, names):
     names = eval(names)
     for name in names:
         test.assert_equal(context.graph.state(name), graphcat.TaskState.FAILED)
 
 
-@then(u'the tasks {names} should be finished')
+@then(u'the task {names} state is finished')
 def step_impl(context, names):
     names = eval(names)
     for name in names:
         test.assert_equal(context.graph.state(name), graphcat.TaskState.FINISHED)
 
 
-@then(u'the tasks {names} should be unfinished')
+@then(u'the task {names} state is unfinished')
 def step_impl(context, names):
     names = eval(names)
     for name in names:
@@ -495,7 +495,7 @@ def step_impl(context, name, values):
     test.assert_equal(values, [(key, value()) for key, value in inputs.items()])
 
 
-@then(u'tasks {names} detected cycles')
+@then(u'tasks {names} detect cycles')
 def step_impl(context, names):
     names = eval(names)
     test.assert_equal(names, context.events.cycles)
