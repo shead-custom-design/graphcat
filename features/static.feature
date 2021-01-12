@@ -167,15 +167,6 @@ Feature: Static Graphs
             | ["A", "B", "C"] | [("A", ("C", None)), ("B", ("C", None))] | ["C"]        | ["A", "B", "C"]      | ["A", "B", "C"] | ["A", "B", "C"] | ["A", "B", "C"] | []               |
             | ["A", "B", "C"] | [("A", ("C", None)), ("B", ("C", None))] | ["C", "A"]   | ["A", "B", "C", "A"] | ["A", "B", "C"] | ["A", "B", "C"] | ["A", "B", "C"] | []               |
 
-        Examples: Cycles
-            | tasks           | links                                                        | update tasks | updated                        | executed        | finished        | finished tasks  | unfinished tasks |
-            | ["A", "B", "C"] | [("A", ("B", None)), ("B", ("C", None)), ("C", ("A", None))] | []           | []                             | []              | []              | []              | ["A", "B", "C"]  |
-            | ["A", "B", "C"] | [("A", ("B", None)), ("B", ("C", None)), ("C", ("A", None))] | ["A"]        | ["B", "C", "A"]                | ["B", "C", "A"] | ["B", "C", "A"] | ["A", "B", "C"] | []               |
-            | ["A", "B", "C"] | [("A", ("B", None)), ("B", ("C", None)), ("C", ("A", None))] | ["B"]        | ["C", "A", "B"]                | ["C", "A", "B"] | ["C", "A", "B"] | ["A", "B", "C"] | []               |
-            | ["A", "B", "C"] | [("A", ("B", None)), ("B", ("C", None)), ("C", ("A", None))] | ["C"]        | ["A", "B", "C"]                | ["A", "B", "C"] | ["A", "B", "C"] | ["A", "B", "C"] | []               |
-            | ["A", "B", "C"] | [("A", ("B", None)), ("B", ("C", None)), ("C", ("A", None))] | ["C", "C"]   | ["A", "B", "C", "A", "B", "C"] | ["A", "B", "C"] | ["A", "B", "C"] | ["A", "B", "C"] | []               |
-            | ["A", "B", "C"] | [("A", ("B", None)), ("B", ("C", None)), ("C", ("A", None))] | ["C", "A"]   | ["A", "B", "C", "B", "C", "A"] | ["A", "B", "C"] | ["A", "B", "C"] | ["A", "B", "C"] | []               |
-
 
     Scenario Outline: Task Functions
         Given an empty static graph
@@ -474,4 +465,16 @@ Feature: Static Graphs
         When computing the task ["C"] outputs
         Then the outputs should be ["b"]
 
+
+    Scenario: Cycles
+        Given an empty static graph
+        When adding tasks ["A", "B", "C"] with functions [graphcat.passthrough(), graphcat.passthrough(), graphcat.passthrough()]
+        And adding links [("A", "B"), ("B", "C"), ("C", "A")]
+        Then the tasks ["A", "B", "C"] should be unfinished
+        When computing the task ["C"] outputs
+        Then tasks ["A", "B", "C"] are updated
+        And tasks ["A", "B", "C"] are executed
+        And tasks ["A", "B", "C"] are finished
+        And tasks [] detected cycles
+        And the outputs should be [None]
 

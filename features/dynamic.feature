@@ -167,15 +167,6 @@ Feature: Dynamic Graphs
             | ["A", "B", "C"] | [("A", ("C", None)), ("B", ("C", None))] | ["C"]        | ["C"]                | ["C"]           | ["C"]           | ["C"]           | ["A", "B"]       |
             | ["A", "B", "C"] | [("A", ("C", None)), ("B", ("C", None))] | ["C", "A"]   | ["C", "A"]           | ["C", "A"]      | ["C", "A"]      | ["A", "C"]      | ["B"]            |
 
-        Examples: Cycles
-            | tasks           | links                                                        | update tasks | updated                        | executed        | finished        | finished tasks  | unfinished tasks |
-            | ["A", "B", "C"] | [("A", ("B", None)), ("B", ("C", None)), ("C", ("A", None))] | []           | []                             | []              | []              | []              | ["A", "B", "C"]  |
-            | ["A", "B", "C"] | [("A", ("B", None)), ("B", ("C", None)), ("C", ("A", None))] | ["A"]        | ["A"]                          | ["A"]           | ["A"]           | ["A"]           | ["B", "C"]       |
-            | ["A", "B", "C"] | [("A", ("B", None)), ("B", ("C", None)), ("C", ("A", None))] | ["B"]        | ["B"]                          | ["B"]           | ["B"]           | ["B"]           | ["A", "C"]       |
-            | ["A", "B", "C"] | [("A", ("B", None)), ("B", ("C", None)), ("C", ("A", None))] | ["C"]        | ["C"]                          | ["C"]           | ["C"]           | ["C"]           | ["A", "B"]       |
-            | ["A", "B", "C"] | [("A", ("B", None)), ("B", ("C", None)), ("C", ("A", None))] | ["C", "C"]   | ["C", "C"]                     | ["C"]           | ["C"]           | ["C"]           | ["A", "B"]       |
-            | ["A", "B", "C"] | [("A", ("B", None)), ("B", ("C", None)), ("C", ("A", None))] | ["C", "A"]   | ["C", "A"]                     | ["C", "A"]      | ["C", "A"]      | ["A", "C"]      | ["B"]            |
-
 
     Scenario Outline: Task Functions
         Given an empty dynamic graph
@@ -478,4 +469,16 @@ Feature: Dynamic Graphs
         When computing the task ["C"] outputs
         Then the outputs should be ["b"]
 
+
+    Scenario: Cycles
+        Given an empty dynamic graph
+        When adding tasks ["A", "B", "C"] with functions [graphcat.passthrough(), graphcat.passthrough(), graphcat.passthrough()]
+        And adding links [("A", "B"), ("B", "C"), ("C", "A")]
+        Then the tasks ["A", "B", "C"] should be unfinished
+        When computing the task ["C"] outputs
+        Then tasks ["C", "B", "A"] are updated
+        And tasks ["C", "B", "A"] are executed
+        And tasks ["A", "B", "C"] are finished
+        And tasks ["C"] detected cycles
+        And the outputs should be [None]
 

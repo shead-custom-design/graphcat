@@ -495,6 +495,12 @@ def step_impl(context, name, values):
     test.assert_equal(values, [(key, value()) for key, value in inputs.items()])
 
 
+@then(u'tasks {names} detected cycles')
+def step_impl(context, names):
+    names = eval(names)
+    test.assert_equal(names, context.events.cycles)
+
+
 @then(u'tasks {names} are executed')
 def step_impl(context, names):
     names = eval(names)
