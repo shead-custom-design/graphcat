@@ -286,6 +286,10 @@ Feature: Static Graphs
         When adding tasks ["B"] with functions [graphcat.raise_exception(RuntimeError("Whoops!"))]
         And updating task "B" an exception should be raised
         Then the log should contain [("info", "Task B updating."), ("info", "Task B executing. Inputs: {}"), ("error", "Task B failed. Exception: Whoops!")]
+        When adding tasks ["C"]
+        And adding links [("A", "C"), ("C", "A")]
+        And updating tasks ["C"]
+        Then the log should contain [("info", "Task C cycle detected."), ("info", "Task A updating."), ("info", "Task A executing. Inputs: {None: None}"), ("info", "Task A finished. Output: None"), ("info", "Task C updating."), ("info", "Task C executing. Inputs: {None: None}"), ("info", "Task C finished. Output: None")]
 
 
     Scenario: Simplified Graph Logger
@@ -477,6 +481,6 @@ Feature: Static Graphs
         Then tasks ["A", "B", "C"] are updated
         And tasks ["A", "B", "C"] are executed
         And tasks ["A", "B", "C"] are finished
-        And tasks [] detect cycles
+        And tasks ["C"] detect cycles
         And the outputs should be [None]
 

@@ -108,6 +108,13 @@ class StaticGraph(graphcat.graph.Graph):
         failed_name = None
         exception = None
 
+        # Identify cycles
+        try:
+            cycle = networkx.find_cycle(self._graph, source=name)
+            self._on_cycle.send(self, name=cycle[0][0])
+        except networkx.NetworkXNoCycle:
+            pass
+
         # Iterate over every task to be executed, in order ...
         for name in networkx.dfs_postorder_nodes(self._graph, name):
             task = self._graph.nodes[name]

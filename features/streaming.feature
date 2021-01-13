@@ -280,12 +280,16 @@ Feature: Streaming Graphs
         Given an empty streaming graph
         And a log
         And a graph logger
-        When adding tasks ["A"]
+        When adding tasks ["A"] with functions [graphcat.consume]
         And updating tasks ["A"] with extents [None]
         Then the log should contain [("info", "Task A updating."), ("info", "Task A executing. Inputs: {} Extent: None"), ("info", "Task A finished. Output: None")]
         When adding tasks ["B"] with functions [graphcat.raise_exception(RuntimeError("Whoops!"))]
         And updating task "B" with extent None an exception should be raised
         Then the log should contain [("info", "Task B updating."), ("info", "Task B executing. Inputs: {} Extent: None"), ("error", "Task B failed. Exception: Whoops!")]
+        When adding tasks ["C"] with functions [graphcat.consume]
+        And adding links [("A", "C"), ("C", "A")]
+        And updating tasks ["C"]
+        Then the log should contain [("info", "Task C updating."), ("info", "Task C executing. Inputs: {None} Extent: None"), ("info", "Task A updating."), ("info", "Task A executing. Inputs: {None} Extent: None"), ("info", "Task C cycle detected."), ("info", "Task A finished. Output: None"), ("info", "Task C finished. Output: None")]
 
 
     Scenario: Simplified Graph Logger
