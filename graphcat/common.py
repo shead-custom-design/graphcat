@@ -33,7 +33,7 @@ log = logging.getLogger(__name__)
 
 
 class Array(object):
-    """Callable object that always returns a caller-supplied array.
+    """Task function callable that always returns a caller-supplied array.
 
     See Also
     --------
@@ -46,7 +46,7 @@ class Array(object):
         return self._value[extent] if extent is not None else self._value
 
     def __eq__(self, other):
-        return isinstance(other, Array) and numpy.all(self._value == other._value)
+        return type(self) is type(other) and numpy.all(self._value == other._value)
 
 
 class ArrayExtent(object):
@@ -67,7 +67,7 @@ class ArrayExtent(object):
 
 
 class Constant(object):
-    """Callable object that always returns a caller-supplied value.
+    """Task function callable that always returns a caller-supplied value.
 
     See Also
     --------
@@ -80,7 +80,26 @@ class Constant(object):
         return self._value
 
     def __eq__(self, other):
-        return isinstance(other, Constant) and self._value == other._value
+        return type(self) is type(other) and self._value == other._value
+
+
+class Delay(object):
+    """Task function callable that sleeps for a fixed time.
+
+    This is mainly useful for testing and debugging.
+
+    See Also
+    --------
+    :func:`delay`
+    """ 
+    def __init__(self, seconds):
+        self._seconds = seconds
+
+    def __call__(self, graph, name, inputs, extent=None):
+        time.sleep(self._seconds)
+
+    def __eq__(self, other):
+        return type(self) is type(other) and self._seconds == other._seconds
 
 
 class DeprecationWarning(Warning):
@@ -168,11 +187,11 @@ class Logger(object):
 
 
 class Passthrough(object):
-    """Callable object that always returns one of its inputs.
+    """Task function callable that always returns an upstream input.
 
     See Also
     --------
-    :func:`constant`
+    :func:`passthrough`
     """
     def __init__(self, input):
         self._input = input
@@ -181,7 +200,7 @@ class Passthrough(object):
         return inputs.getone(self._input)
 
     def __eq__(self, other):
-        return isinstance(other, Passthrough) and self._input == other._input
+        return type(self) is type(other) and self._input == other._input
 
 
 class PerformanceMonitor(object):
@@ -227,6 +246,25 @@ class PerformanceMonitor(object):
             been updated.
         """
         return dict(self._tasks)
+
+
+class RaiseException(object):
+    """Task function callable that always raises an exception.
+
+    This is mainly useful for testing and debugging.
+
+    See Also
+    --------
+    :func:`raise_exception`
+    """
+    def __init__(self, exception):
+        self._exception = exception
+
+    def __call__(self, graph, name, inputs, extent=None):
+        raise self._exception
+
+    def __eq__(self, other):
+        return type(self) is type(other) and self._exception == other._exception
 
 
 class TaskState(enum.Enum):
@@ -359,7 +397,7 @@ def consume(graph, name, inputs, extent=None):
 def delay(seconds):
     """Factory for task functions that sleep for a fixed time.
 
-    This is useful for testing and debugging.
+    This is mainly useful for testing and debugging.
 
     Parameters
     ----------
@@ -371,9 +409,7 @@ def delay(seconds):
     fn: function
         Task function that will always sleep for `seconds` when executed.
     """
-    def implementation(graph, name, inputs, extent=None):
-        time.sleep(seconds)
-    return implementation
+    return Delay(seconds)
 
 
 def execute(code, locals={}):
@@ -443,7 +479,7 @@ def passthrough(input=None):
 def raise_exception(exception):
     """Factory for task functions that raise an exception when executed.
 
-    This is useful for debugging and pedagogy.
+    This is mainly useful for testing and debugging.
 
     Parameters
     ----------
@@ -455,7 +491,5 @@ def raise_exception(exception):
     fn: function
         Task function that will always raise `exception` when executed.
     """
-    def implementation(graph, name, inputs, extent=None):
-        raise exception
-    return implementation
+    return RaiseException(exception)
 

@@ -426,54 +426,59 @@ Feature: Streaming Graphs
     Scenario: Suppress array Updates
         Given the numpy module is available
         And an empty streaming graph
-        When adding tasks ["A"] with functions [graphcat.array(numpy.arange(4))]
-        And computing the task ["A"] outputs
-        Then the task ["A"] state is finished
-        And the numpy outputs should be [[0, 1, 2, 3]]
-        When the task "A" function is changed to graphcat.array(numpy.arange(3))
+        When adding tasks ["A"] with functions [graphcat.array(numpy.arange(2))]
         Then the task ["A"] state is unfinished
-        When computing the task ["A"] outputs
-        Then the numpy outputs should be [[0, 1, 2]]
-        When the task "A" function is changed to graphcat.array(numpy.arange(3))
+        When updating tasks ["A"]
         Then the task ["A"] state is finished
-        When computing the task ["A"] outputs
-        Then the numpy outputs should be [[0, 1, 2]]
+        When the task "A" function is changed to graphcat.array(numpy.arange(4))
+        Then the task ["A"] state is unfinished
+        When updating tasks ["A"]
+        Then the task ["A"] state is finished
+        When the task "A" function is changed to graphcat.array(numpy.arange(4))
+        Then the task ["A"] state is finished
 
 
     Scenario: Suppress constant Updates
         Given an empty streaming graph
         When adding tasks ["A"] with functions [graphcat.constant(1)]
-        And computing the task ["A"] outputs
+        Then the task ["A"] state is unfinished
+        When updating tasks ["A"]
         Then the task ["A"] state is finished
-        And the outputs should be [1]
         When the task "A" function is changed to graphcat.constant(2)
         Then the task ["A"] state is unfinished
-        When computing the task ["A"] outputs
-        Then the outputs should be [2]
+        When updating tasks ["A"]
+        Then the task ["A"] state is finished
         When the task "A" function is changed to graphcat.constant(2)
         Then the task ["A"] state is finished
-        When computing the task ["A"] outputs
-        Then the outputs should be [2]
+
+
+    Scenario: Suppress delay Updates
+        Given an empty streaming graph
+        When adding tasks ["A"] with functions [graphcat.delay(0.1)]
+        Then the task ["A"] state is unfinished
+        When updating tasks ["A"]
+        Then the task ["A"] state is finished
+        When the task "A" function is changed to graphcat.delay(0.2)
+        Then the task ["A"] state is unfinished
+        When updating tasks ["A"]
+        Then the task ["A"] state is finished
+        When the task "A" function is changed to graphcat.delay(0.2)
+        Then the task ["A"] state is finished
 
 
     Scenario: Suppress passthrough Updates
         Given an empty streaming graph
         When adding tasks ["A", "B", "C"] with functions [graphcat.constant("a"), graphcat.constant("b"), graphcat.passthrough(0)]
         And adding links [("A", ("C", 0)), ("B", ("C", 1))]
-        And computing the task ["C"] outputs
-        Then the task ["A", "C"] state is finished
-        And the task ["B"] state is unfinished
-        And the outputs should be ["a"]
+        Then the task ["C"] state is unfinished
+        When updating tasks ["C"]
+        Then the task ["C"] state is finished
         When the task "C" function is changed to graphcat.passthrough(1)
-        Then the task ["A"] state is finished
-        And the task ["B", "C"] state is unfinished
-        When computing the task ["C"] outputs
-        Then the outputs should be ["b"]
-        And the task ["A", "B", "C"] state is finished
+        Then the task ["C"] state is unfinished
+        When updating tasks ["C"]
+        Then the task ["C"] state is finished
         When the task "C" function is changed to graphcat.passthrough(1)
-        Then the task ["A", "B", "C"] state is finished
-        When computing the task ["C"] outputs
-        Then the outputs should be ["b"]
+        Then the task ["C"] state is finished
 
 
     Scenario: Cycles
