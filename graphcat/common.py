@@ -437,12 +437,6 @@ def delay(seconds):
     return Delay(seconds)
 
 
-def execute(code, symbols=None):
-    """.. deprecated:: 0.13.0"""
-    warnings.warn("graphcat.common.execute() is deprecated, use graphcat.common.evaluate() instead.")
-    return evaluate(code, symbols=symbols)
-
-
 def evaluate(code, symbols=None):
     """Factory for task functions that evaluate Python expressions.
 
