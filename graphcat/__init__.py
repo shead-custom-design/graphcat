@@ -15,7 +15,7 @@
 """Functionality for managing and executing computational graphs.
 """
 
-__version__ = "0.13.0"
+__version__ = "0.14.0-dev"
 
 import logging
 
