@@ -401,7 +401,7 @@ class Graph(abc.ABC):
 
 
     def set_expression(self, name, expression, symbols=None):
-        """Create a task that will execute a Python expression.
+        """Create a task that evaluates a Python expression, returning its value.
 
         The task will automatically track implicit dependencies that
         arise from executing the expression.
@@ -411,14 +411,15 @@ class Graph(abc.ABC):
         name: hashable object, required
             Unique name for the new expression task.
         expression: string, required
-            Python expression that will be executed whenever the task is executed.
-        symbols: dict, optional
-            Optional dictionary containing symbols that will be available for
-            use in the expression.  If :any:`None` (the default), the
-            expression will have access to `graph`, `name`, `inputs`, and
-            `extent`, matching the arguments to a normal task function.
+            Python expression that will be evaluated whenever the task is executed.
+        symbols: callable, optional
+            Function that returns a Python dict containing symbols that will be
+            available to the expression when it's executed.  If :any:`None` (the
+            default), the :func:`graphcat.common.builtins` function will be used, which gives the
+            expression access to `graph`, `name`, `inputs`, and `extent` objects
+            that match the arguments to a normal task function.
         """
-        fn = graphcat.common.execute(expression, symbols)
+        fn = graphcat.common.evaluate(expression, symbols)
         fn = graphcat.common.automatic_dependencies(fn)
         self.set_task(name, fn)
 

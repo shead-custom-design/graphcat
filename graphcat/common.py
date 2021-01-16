@@ -20,6 +20,7 @@ import enum
 import functools
 import logging
 import time
+import warnings
 
 import networkx
 
@@ -367,6 +368,14 @@ def automatic_dependencies(fn):
 
 
 def builtins(graph, name, inputs, extent=None):
+    """Returns standard builtin symbols for expression tasks:
+
+    :graph: The :class:`graphcat.graph.Graph` executing the task.
+    :name: Unique name of the task being executed.
+    :inputs: Named inputs for the task being executed.
+    :extent: Optional extent object for streaming graphs.
+
+    """
     return {
         "graph": graph,
         "name": name,
@@ -429,7 +438,13 @@ def delay(seconds):
 
 
 def execute(code, symbols=None):
-    """Factory for task functions that execute Python expressions.
+    """.. deprecated:: 0.13.0"""
+    warnings.warn("graphcat.common.execute() is deprecated, use graphcat.common.evaluate() instead.")
+    return evaluate(code, symbols=symbols)
+
+
+def evaluate(code, symbols=None):
+    """Factory for task functions that evaluate Python expressions.
 
     If your expressions can access the output from other tasks in the graph,
     you will want to use this function with the :func:`automatic_dependencies`
@@ -446,11 +461,12 @@ def execute(code, symbols=None):
     ----------
     code: string, required
         Python code to be executed when the task is executed.
-    symbols: dict, optional
-        Python dict containing symbols that will be available to the expression
-        when it's executed.  If :any:`None` (the default), the expression will
-        have access to `graph`, `name`, `inputs`, and `extent`, matching the
-        arguments to a normal task function.
+    symbols: callable, optional
+        Function that returns a Python dict containing symbols that will be
+        available to the expression when it's executed.  If :any:`None` (the
+        default), the :func:`builtins` function will be used, which gives the
+        expression access to `graph`, `name`, `inputs`, and `extent` objects
+        that match the arguments to a normal task function.
 
     Returns
     -------
