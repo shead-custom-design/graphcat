@@ -133,21 +133,13 @@ def step_impl(context):
 #################################################################
 # Whens
 
-class NodeOutput(object):
-    def __init__(self, graph):
-        self._graph = graph
-
-    def __call__(self, name):
-        return self._graph.output(name)
-
 
 @when(u'adding an expression task {name} with expression {expression}')
 def step_impl(context, name, expression):
     name = eval(name)
     expression = eval(expression)
     context.events = EventRecorder(context.graph)
-    locals = {"out": NodeOutput(context.graph)}
-    context.graph.set_expression(name, expression, locals)
+    context.graph.set_expression(name, expression)
 
 
 @when(u'changing the expression task {name} to expression {expression}')
@@ -155,8 +147,7 @@ def step_impl(context, name, expression):
     name = eval(name)
     expression = eval(expression)
     context.events = EventRecorder(context.graph)
-    locals = {"out": NodeOutput(context.graph)}
-    context.graph.set_expression(name, expression, locals)
+    context.graph.set_expression(name, expression)
 
 
 @when(u'adding tasks {names} with functions {functions}')

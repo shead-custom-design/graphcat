@@ -21,6 +21,8 @@ import functools
 import logging
 import time
 
+import networkx
+
 try:
     import numpy
 except: # pragma: no cover
@@ -109,8 +111,8 @@ class DeprecationWarning(Warning):
 
 class Input(enum.Enum):
     """Enumerates special :class:`Graph` named inputs."""
-    AUTODEPENDENCY = 1
-    """Named input for links that are generated automatically for use as dependencies, not data sources."""
+    IMPLICIT = 1
+    """Named input for links that are generated automatically for use as implicit dependencies, not data sources."""
 
 
 class Logger(object):
@@ -341,22 +343,36 @@ def automatic_dependencies(fn):
     """
     @functools.wraps(fn)
     def implementation(graph, name, inputs, extent=None):
-        # Remove old, automatically generated dependencies.
+        # Remove old implicit dependencies.
         edges = list(graph._graph.out_edges(name, data="input", keys=True))
         for target, source, key, input in edges:
-            if input == Input.AUTODEPENDENCY:
+            if input == Input.IMPLICIT:
                 graph._graph.remove_edge(target, source, key)
 
-        # Keep track of dependencies while the task executes.
+        # Keep track of all dependencies while the task executes.
         updated = UpdatedTasks(graph)
         result = fn(graph, name, inputs, extent)
 
-        # Create new dependencies.
-        sources = updated.tasks.difference([name])
-        for source in sources:
-            graph._graph.add_edge(name, source, input=Input.AUTODEPENDENCY)
+        # Filter out dependencies that are already explicitly captured.
+        dependencies = updated.tasks
+        dependencies = dependencies.difference(networkx.descendants(graph._graph, name))
+        dependencies = dependencies.difference([name])
+
+        # Create new implicit dependencies with what remains.
+        for source in dependencies:
+            graph._graph.add_edge(name, source, input=Input.IMPLICIT)
+
         return result
     return implementation
+
+
+def builtins(graph, name, inputs, extent=None):
+    return {
+        "graph": graph,
+        "name": name,
+        "inputs": inputs,
+        "extent": extent,
+    }
 
 
 def constant(value):
@@ -412,7 +428,7 @@ def delay(seconds):
     return Delay(seconds)
 
 
-def execute(code, locals={}):
+def execute(code, symbols=None):
     """Factory for task functions that execute Python expressions.
 
     If your expressions can access the output from other tasks in the graph,
@@ -430,9 +446,11 @@ def execute(code, locals={}):
     ----------
     code: string, required
         Python code to be executed when the task is executed.
-    locals: dict, optional
-        Python dict containing local data that will be available
-        to the expression when it's executed.
+    symbols: dict, optional
+        Python dict containing symbols that will be available to the expression
+        when it's executed.  If :any:`None` (the default), the expression will
+        have access to `graph`, `name`, `inputs`, and `extent`, matching the
+        arguments to a normal task function.
 
     Returns
     -------
@@ -440,9 +458,12 @@ def execute(code, locals={}):
         Task function that will execute Python code when the
         task is executed.
     """
+    if symbols is None:
+        symbols = builtins
+
     def implementation(graph, name, inputs, extent=None):
         try:
-            return eval(code, {}, dict(locals))
+            return eval(code, {}, symbols(graph, name, inputs, extent))
         except Exception as e: # pragma: no cover
             raise RuntimeError(f"Uncaught exception executing expression {code!r}: {e}")
     return implementation

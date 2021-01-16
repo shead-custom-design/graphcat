@@ -249,29 +249,29 @@ Feature: Dynamic Graphs
         And the graph should contain links []
         When computing the task ["expr"] outputs
         Then the outputs should be [7]
-        When changing the expression task "expr" to expression "out('A') if out('choice') else out('B')"
+        When changing the expression task "expr" to expression "graph.output('A') if graph.output('choice') else graph.output('B')"
         And computing the task ["expr"] outputs
         Then the outputs should be [1]
-        And the graph should contain links [("A", ("expr", graphcat.Input.AUTODEPENDENCY)), ("choice", ("expr", graphcat.Input.AUTODEPENDENCY))]
+        And the graph should contain links [("A", ("expr", graphcat.Input.IMPLICIT)), ("choice", ("expr", graphcat.Input.IMPLICIT))]
         When the task "A" function is changed to graphcat.constant(3)
         And computing the task ["expr"] outputs
         Then the outputs should be [3]
         When the task "choice" function is changed to graphcat.constant(False)
         And computing the task ["expr"] outputs
         Then the outputs should be [2]
-        And the graph should contain links [("B", ("expr", graphcat.Input.AUTODEPENDENCY)), ("choice", ("expr", graphcat.Input.AUTODEPENDENCY))]
+        And the graph should contain links [("B", ("expr", graphcat.Input.IMPLICIT)), ("choice", ("expr", graphcat.Input.IMPLICIT))]
         When the task "B" function is changed to graphcat.constant(4)
         And computing the task ["expr"] outputs
         Then the outputs should be [4]
         When renaming tasks ["B"] as ["C"]
         Then the graph should contain tasks ["A", "C", "choice", "expr"]
-        And the graph should contain links [("C", ("expr", graphcat.Input.AUTODEPENDENCY)), ("choice", ("expr", graphcat.Input.AUTODEPENDENCY))]
-        When changing the expression task "expr" to expression "out('A') if out('choice') else out('C')"
+        And the graph should contain links [("C", ("expr", graphcat.Input.IMPLICIT)), ("choice", ("expr", graphcat.Input.IMPLICIT))]
+        When changing the expression task "expr" to expression "graph.output('A') if graph.output('choice') else graph.output('C')"
         And computing the task ["expr"] outputs
         Then the outputs should be [4]
         When renaming tasks ["expr"] as ["expression"]
         Then the graph should contain tasks ["A", "C", "choice", "expression"]
-        And the graph should contain links [("C", ("expression", graphcat.Input.AUTODEPENDENCY)), ("choice", ("expression", graphcat.Input.AUTODEPENDENCY))]
+        And the graph should contain links [("C", ("expression", graphcat.Input.IMPLICIT)), ("choice", ("expression", graphcat.Input.IMPLICIT))]
         When computing the task ["expression"] outputs
         Then the outputs should be [4]
 

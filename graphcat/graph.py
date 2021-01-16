@@ -400,7 +400,7 @@ class Graph(abc.ABC):
         self._on_task_renamed.send(self, oldname=oldname, newname=newname)
 
 
-    def set_expression(self, name, expression, locals={}):
+    def set_expression(self, name, expression, symbols=None):
         """Create a task that will execute a Python expression.
 
         The task will automatically track implicit dependencies that
@@ -412,11 +412,13 @@ class Graph(abc.ABC):
             Unique name for the new expression task.
         expression: string, required
             Python expression that will be executed whenever the task is executed.
-        locals: dict, optional
-            Optional dictionary containing local objects that will be available for
-            use in the expression.
+        symbols: dict, optional
+            Optional dictionary containing symbols that will be available for
+            use in the expression.  If :any:`None` (the default), the
+            expression will have access to `graph`, `name`, `inputs`, and
+            `extent`, matching the arguments to a normal task function.
         """
-        fn = graphcat.common.execute(expression, locals)
+        fn = graphcat.common.execute(expression, symbols)
         fn = graphcat.common.automatic_dependencies(fn)
         self.set_task(name, fn)
 
