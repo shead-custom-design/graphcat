@@ -182,9 +182,9 @@ Feature: Dynamic Graphs
             | ["A"]     | [graphcat.constant(3.14)]               | [3.14]        |
             | ["A"]     | [graphcat.constant("foo")]              | ["foo"]       |
             | ["A"]     | [graphcat.constant(("foo", 7))]         | [("foo", 7)]  |
-            | ["A"]     | [graphcat.execute("2 + 3")]             | [5]           |
-            | ["A"]     | [graphcat.execute("2 * 3")]             | [6]           |
-            | ["A"]     | [graphcat.execute("'foo' + 'bar'")]     | ["foobar"]    |
+            | ["A"]     | [graphcat.evaluate("2 + 3")]             | [5]           |
+            | ["A"]     | [graphcat.evaluate("2 * 3")]             | [6]           |
+            | ["A"]     | [graphcat.evaluate("'foo' + 'bar'")]     | ["foobar"]    |
 
 
     Scenario: Failing Task Function

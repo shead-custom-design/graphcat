@@ -182,9 +182,9 @@ Feature: Streaming Graphs
             | ["A"]     | [graphcat.constant(3.14)]               | [None]  | [3.14]        |
             | ["A"]     | [graphcat.constant("foo")]              | [None]  | ["foo"]       |
             | ["A"]     | [graphcat.constant(("foo", 7))]         | [None]  | [("foo", 7)]  |
-            | ["A"]     | [graphcat.execute("2 + 3")]             | [None]  | [5]           |
-            | ["A"]     | [graphcat.execute("2 * 3")]             | [None]  | [6]           |
-            | ["A"]     | [graphcat.execute("'foo' + 'bar'")]     | [None]  | ["foobar"]    |
+            | ["A"]     | [graphcat.evaluate("2 + 3")]             | [None]  | [5]           |
+            | ["A"]     | [graphcat.evaluate("2 * 3")]             | [None]  | [6]           |
+            | ["A"]     | [graphcat.evaluate("'foo' + 'bar'")]     | [None]  | ["foobar"]    |
 
 
     Scenario: Failing Task Function
