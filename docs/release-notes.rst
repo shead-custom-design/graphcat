@@ -7,6 +7,18 @@
 Release Notes
 =============
 
+Graphcat 0.13.0 - January 16, 2021
+----------------------------------
+
+* Fix a bug marking failed tasks in static graphs.
+* Suppress unnecessary updates using graphcat.passthrough(), graphcat.delay(), and graphcat.raise_exception().
+* Improve consistency throughout the regression test suite.
+* Make it easier to display customized graph diagrams.
+* Static graphs emit the on_cycle signal when a cycle is detected.
+* Expose standard task function arguments in expressions, but give domain developers the ability to override or remove them.
+* Expression tasks sometimes create redundant implicit dependencies.
+* Deprecate graphcat.execute() in favor of graphcat.evaluate().
+
 Graphcat 0.12.0 - December 19, 2020
 -----------------------------------
 
