@@ -7,6 +7,11 @@
 Release Notes
 =============
 
+Graphcat 1.0.0 - February 2, 2021
+---------------------------------
+
+* First stable release of the Graphcat API!
+
 Graphcat 0.13.0 - January 16, 2021
 ----------------------------------
 

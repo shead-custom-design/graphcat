@@ -18,7 +18,7 @@ import re
 setup(
     name="graphcat",
     classifiers=[
-        "Development Status :: 4 - Beta",
+        "Development Status :: 5 - Production/Stable",
         "Intended Audience :: Developers",
         "Intended Audience :: Education",
         "Intended Audience :: Information Technology",
@@ -31,8 +31,6 @@ setup(
         "Topic :: Software Development :: Libraries :: Python Modules",
     ],
     description="Lightweight, flexible toolkit for managing computational graphs.",
-    extras_require={
-    },
     install_requires=[
         "blinker",
         "networkx",

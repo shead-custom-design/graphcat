@@ -10,10 +10,11 @@ Compatibility
 A quick disclaimer on backwards-compatibility for Graphcat users:
 
 Graphcat follows the `Semantic Versioning <http://semver.org>`_ standard for
-assigning version numbers in a way that has specific meaning.  As of this
-writing Graphcat releases are still in the `0.y.z` development phase, which
-means (among other things) that the API may change at any time.  We try not to
-be abusive about it, but you should be prepared for the occasional bump on the
-road to the 1.0 release.
+assigning version numbers in a way that has specific meaning.  Graphcat version
+numbers follow <major>.<minor>.<patch> numbering.  Releases with different
+major API numbers are API incompatible.  Minor version numbers signify new
+features that are backwards-compatible with the current major version .  Patch
+numbers indicate bug fixes that are backwards-compatible with the current major
+and minor version.
 
 
