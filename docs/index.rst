@@ -8,18 +8,17 @@ Welcome!
 Welcome to Graphcat ... the lightweight, flexible Python library for managing
 computational graphs.
 
-If you have a workflow composed of tasks, and the tasks need to be completed in
-the right order, and the individual tasks are time-consuming so that you don't
-want to execute a task unless it's really necessary, keeping track of which
-tasks need to be executed can become extremely complex as your workflow grows,
-branches, and merges.
+Suppose you have a workflow composed of tasks, and the tasks need to be
+completed in a specific order, and you never want to execute a task unless it's
+really necessary: keeping track of which tasks need to be executed and when can
+become extremely complex as your workflow grows, branches, and merges.
 
-Graphcat is a tool that allows you to explicitly capture this kind of workflow
-in a *computational graph*, managing the details of executing each task in the
+Graphcat is a tool that allows you to explicitly capture a workflow in a
+*computational graph*, managing the details of executing each task in the
 proper order and at the proper time, no matter the state of the graph or the
 complexity of the workflow.  Graphcat doesn't care what kind of data your graph
 manages, doesn't dictate how you name the entities in the graph, provides
-advanced functionality like loops and expression-based tasks, and is easy to
+advanced functionality like streaming and expression-based tasks, and is easy to
 learn, with features including the following:
 
 * Tasks defined using standard Python functions or callables.

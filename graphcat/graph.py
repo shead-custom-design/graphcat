@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Abstract base classes for computational graphs.
+"""Abstract interfaces for computational graphs.
 """
 
 import abc
@@ -78,6 +78,13 @@ class Graph(abc.ABC):
     def add_links(self, source, targets):
         """Add links between `source` and `targets`.
 
+        Note that calling :meth:`add_links` multiple times will create
+        multiple, parallel links between tasks.
+
+        See Also
+        --------
+        :meth:`set_links`, which is the idempotent alternative to :meth:`add_links`.
+
         Parameters
         ----------
         source: hashable object, required
@@ -116,7 +123,7 @@ class Graph(abc.ABC):
 
         See Also
         --------
-        :meth:`set_task` : Modifies tasks, creating them if they don't already exist.
+        :meth:`set_task` : idempotent alternative to :meth:`add_task`.
 
         Parameters
         ----------

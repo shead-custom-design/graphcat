@@ -10,7 +10,7 @@ Dependencies
 Minimum Requirements
 --------------------
 
-To use Graphcat you will need, at a minimum, Python 3 (duh):
+To use Graphcat you will need Python 3:
 
 * Python 3 - http://python.org
 
@@ -21,10 +21,10 @@ using pip, these are automatically installed for you):
 * networkx - network analysis in Python - https://networkx.github.io
 
 If you are using Jupyter notebooks, you will want the following to
-enable Graphcat's notebook integration:
+enable Graphcat's optional notebook integration:
 
-* PyGraphviz - Python interface for Graphviz - https://pygraphviz.github.io
 * Graphviz - graph visualization software - http://www.graphviz.org
+* PyGraphviz - Python interface for Graphviz - https://pygraphviz.github.io
 
 Source Installation
 -------------------

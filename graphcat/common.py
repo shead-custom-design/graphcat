@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Helpers that aren't specific to any one graph type.
+"""Helper classes and functions that can be used with more than one graph type.
 """
 
 import collections
@@ -36,11 +36,16 @@ log = logging.getLogger(__name__)
 
 
 class Array(object):
-    """Task function callable that always returns a caller-supplied array.
+    """Task function callable that returns a caller-supplied array.
+
+    Parameters
+    ----------
+    value: :class:`numpy.ndarray` convertable object, required
+        The array to use as the output for this callable.
 
     See Also
     --------
-    :func:`array`
+    :func:`array` - factory function for :class:`Array` instances.
     """
     def __init__(self, value):
         self._value = value
@@ -53,7 +58,7 @@ class Array(object):
 
 
 class ArrayExtent(object):
-    """Convenience for creating :class:`Array` compatible streaming extents.
+    """Helper for creating :class:`Array` compatible streaming extents.
 
     To generate extents, use any numpy-compatible
     `indexing notation <https://numpy.org/doc/stable/reference/arrays.indexing.html>`_::
@@ -70,11 +75,16 @@ class ArrayExtent(object):
 
 
 class Constant(object):
-    """Task function callable that always returns a caller-supplied value.
+    """Task function callable that returns a caller-supplied value.
+
+    Parameters
+    ----------
+    value: any Python object, required
+        The value to use as the output for this callable.
 
     See Also
     --------
-    :func:`constant`
+    :func:`constant` - factory function for :class:`Constant` instances.
     """
     def __init__(self, value):
         self._value = value
@@ -91,10 +101,15 @@ class Delay(object):
 
     This is mainly useful for testing and debugging.
 
+    Parameters
+    ----------
+    seconds: number, required
+        The number of seconds to sleep when executed.
+
     See Also
     --------
-    :func:`delay`
-    """ 
+    :func:`delay` - factory function for :class:`Delay` instances.
+    """
     def __init__(self, seconds):
         self._seconds = seconds
 
@@ -111,7 +126,7 @@ class DeprecationWarning(Warning):
 
 
 class Input(enum.Enum):
-    """Enumerates special :class:`Graph` named inputs."""
+    """Enumerates special :class:`graphcat.graph.Graph` named inputs."""
     IMPLICIT = 1
     """Named input for links that are generated automatically for use as implicit dependencies, not data sources."""
 
@@ -126,20 +141,21 @@ class Logger(object):
         logger = graphcat.Logger(graph)
 
     This is useful for debugging and pedagogy.  The logger will
-    generate output for four types of event:
+    generate output for five types of event:
 
-    * updated - called when a task is updated.
-    * cycle - called when a cycle is detected during updating.
-    * executed - called when a task is executed.
-    * finished - called if a task executes successfully.
-    * failed - called if a task raises an exception during execution.
+    * cycle - a cycle is detected during updating.
+    * executed - a task is executed.
+    * failed - a task raises an exception during execution.
+    * finished - a task executes successfully.
+    * updated - a task is updated.
 
     Update events happen regardless of the state of a task.  Execute events
-    only happen if the task isn't already finished.
+    only happen if the task isn't already finished.  Failed and finished events
+    only happen if a task is executed.
 
     Parameters
     ----------
-    graph: class:`Graph`, required
+    graph: class:`graphcat.graph.Graph`, required
         The graph whose events will be logged.
     """
     def __init__(self, graph, log_exceptions=True, log_inputs=True, log_outputs=True, log_extents=True, log=log):
@@ -192,9 +208,16 @@ class Logger(object):
 class Passthrough(object):
     """Task function callable that always returns an upstream input.
 
+    Parameters
+    ----------
+    input: hashable object, required
+        Name of the input to be returned when this task is executed.  Note that
+        there must be exactly one connection to the named input, or an
+        exception will be raised.
+
     See Also
     --------
-    :func:`passthrough`
+    :func:`passthrough` - factory function for :class:`Passthrough` instances.
     """
     def __init__(self, input):
         self._input = input
@@ -211,8 +234,8 @@ class PerformanceMonitor(object):
 
     Parameters
     ----------
-    graph: :class:`Graph`, required
-        Graph to watch for task execution.
+    graph: :class:`graphcat.graph.Graph`, required
+        Graph whose performance will be monitored.
     """
     def __init__(self, graph):
         self.reset()
@@ -244,21 +267,26 @@ class PerformanceMonitor(object):
 
         Returns
         -------
-        tasks: :class:`set`
-            Python :class:`set` containing the names for every task that has
-            been updated.
+        tasks: :class:`dict` containing :class:`list` values.
+            Maps the name of every task that has been updated to an array
+            containing execution times.
         """
         return dict(self._tasks)
 
 
 class RaiseException(object):
-    """Task function callable that always raises an exception.
+    """Task function callable that raises an exception when executed.
 
     This is mainly useful for testing and debugging.
 
+    Parameters
+    ----------
+    exception: :class:`Exception`, required
+        The exception to be raised when the task is executed.
+
     See Also
     --------
-    :func:`raise_exception`
+    :func:`raise_exception` - factory function for :class:`RaiseException` instances.
     """
     def __init__(self, exception):
         self._exception = exception
@@ -271,9 +299,17 @@ class RaiseException(object):
 
 
 class TaskState(enum.Enum):
-    """Enumerates :class:`Graph` task states."""
+    """Enumerates :class:`graphcat.graph.Graph` task states.
+
+    Every task within a :class:`graphcat.graph.Graph` will always be in one of
+    the following states.
+
+    See Also
+    --------
+    :meth:`graphcat.graph.Graph.state` - returns the state of a task.
+    """
     UNFINISHED = 1
-    """The task is out-of-date and should be executed during the next update."""
+    """The task is out-of-date and will be executed during the next update."""
     FAILED = 2
     """The task or one of it's dependencies failed during the last update."""
     FINISHED = 3
@@ -285,7 +321,7 @@ class UpdatedTasks(object):
 
     Parameters
     ----------
-    graph: :class:`Graph`, required
+    graph: :class:`graphcat.graph.Graph`, required
         Graph to watch for task updates.
     """
     def __init__(self, graph):
@@ -302,15 +338,15 @@ class UpdatedTasks(object):
         Returns
         -------
         tasks: :class:`set`
-            Python :class:`set` containing the names for every task that has
-            been updated.
+            Python :class:`set` containing the name of every task that has been
+            updated.
         """
         return self._tasks
 
 
 graphcat.require.loaded_module("numpy")
 def array(value):
-    """Factory for task functions that return constant array values when executed.
+    """Factory for task functions that return array values when executed.
 
     Note
     ----
@@ -334,11 +370,11 @@ def automatic_dependencies(fn):
     """Function decorator that automatically tracks dependencies.
 
     Use this to decorate task functions that need dependency tracking, such as
-    :func:`execute`.
+    :func:`evaluate`.
 
     See Also
     --------
-    :meth:`Graph.set_expression`
+    :meth:`graphcat.graph.Graph.set_expression`
         Convenience method that configures a task to evaluate expressions and
         automatically track dependencies.
     """
@@ -368,13 +404,11 @@ def automatic_dependencies(fn):
 
 
 def builtins(graph, name, inputs, extent=None):
-    """Returns standard builtin symbols for expression tasks:
+    """Returns standard builtin symbols for expression tasks.
 
-    :graph: The :class:`graphcat.graph.Graph` executing the task.
-    :name: Unique name of the task being executed.
-    :inputs: Named inputs for the task being executed.
-    :extent: Optional extent object for streaming graphs.
-
+    See Also
+    --------
+    :func:`evaluate` - uses :func:`builtins` as the default for the `symbols` argument.
     """
     return {
         "graph": graph,
@@ -442,12 +476,12 @@ def evaluate(code, symbols=None):
 
     If your expressions can access the output from other tasks in the graph,
     you will want to use this function with the :func:`automatic_dependencies`
-    decorator, or use :meth:`Graph.set_expression` which sets up dependency
+    decorator, or use :meth:`graphcat.graph.Graph.set_expression` which sets up dependency
     tracking for you.
 
     See Also
     --------
-    :meth:`Graph.set_expression`
+    :meth:`graphcat.graph.Graph.set_expression`
         Convenience method that configures a task to evaluate expressions and
         automatically track dependencies.
 
@@ -459,8 +493,8 @@ def evaluate(code, symbols=None):
         Function that returns a Python dict containing symbols that will be
         available to the expression when it's executed.  If :any:`None` (the
         default), the :func:`builtins` function will be used, which gives the
-        expression access to `graph`, `name`, `inputs`, and `extent` objects
-        that match the arguments to a normal task function.
+        expression access to the same `graph`, `name`, `inputs`, and `extent`
+        objects as a normal task function.
 
     Returns
     -------
