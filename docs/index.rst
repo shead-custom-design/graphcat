@@ -11,7 +11,9 @@ computational graphs.
 Suppose you have a workflow composed of tasks, and the tasks need to be
 completed in a specific order, and you never want to execute a task unless it's
 really necessary: keeping track of which tasks need to be executed and when can
-become extremely complex as your workflow grows, branches, and merges.
+become extremely complex as your workflow grows, branches, and merges:
+
+.. image:: ../artwork/workflow.svg
 
 Graphcat is a tool that allows you to explicitly capture a workflow in a
 *computational graph*, managing the details of executing each task in the
