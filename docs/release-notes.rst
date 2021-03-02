@@ -7,6 +7,12 @@
 Release Notes
 =============
 
+Graphcat 1.0.1 - March 1, 2021
+------------------------------
+
+* Many documentation updates.
+* Improve diagram edge label layout.
+
 Graphcat 1.0.0 - February 2, 2021
 ---------------------------------
 
