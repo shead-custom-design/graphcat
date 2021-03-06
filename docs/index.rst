@@ -13,7 +13,10 @@ completed in a specific order, and you never want to execute a task unless it's
 really necessary: keeping track of which tasks need to be executed and when can
 become extremely complex as your workflow grows, branches, and merges:
 
-.. image:: ../artwork/workflow.svg
+.. figure:: ../artwork/workflow.svg
+
+    Sample image processing workflow.  Boxes are tasks to be performed,
+    edges represent data flow / dependencies between tasks.
 
 Graphcat is a tool that allows you to explicitly capture a workflow in a
 *computational graph*, managing the details of executing each task in the
