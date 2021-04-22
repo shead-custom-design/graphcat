@@ -16,6 +16,8 @@ from setuptools import setup, find_packages
 import re
 
 setup(
+    author="Timothy M. Shead",
+    author_email="tim@shead-custom-design.com",
     name="graphcat",
     classifiers=[
         "Development Status :: 5 - Production/Stable",
