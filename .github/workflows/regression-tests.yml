@@ -33,3 +33,5 @@ jobs:
     - name: Coveralls
       #uses: AndreMiras/coveralls-python-action@develop
       run: coveralls
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
