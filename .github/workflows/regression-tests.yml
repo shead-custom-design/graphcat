@@ -30,8 +30,11 @@ jobs:
       run: coverage run --source graphcat -m behave
     - name: Coverage Results
       run: coverage report
-    - name: Coveralls
-      #uses: AndreMiras/coveralls-python-action@develop
-      run: coveralls
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    - name: Upload Coverage to Codecov
+      uses: codecov/codecov-action@v1
+      
+#    - name: Coveralls
+#      #uses: AndreMiras/coveralls-python-action@develop
+#      run: coveralls
+#      env:
+#        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
