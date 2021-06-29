@@ -22,7 +22,7 @@ jobs:
         python-version: ${{ matrix.python-version }}
     - name: Install Dependencies
       run: |
-        sudo apt-get install graphviz
+        sudo apt-get install graphviz-dev
         python -m pip install --upgrade pip
         pip install behave coverage ipython ipywidgets nbformat numpy Pillow pygraphviz
         python setup.py develop
