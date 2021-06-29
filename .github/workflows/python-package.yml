@@ -22,8 +22,9 @@ jobs:
         python-version: ${{ matrix.python-version }}
     - name: Install Dependencies
       run: |
+        sudo apt-get install graphviz
         python -m pip install --upgrade pip
-        pip install behave coverage ipython ipywidgets nbformat numpy Pillow
+        pip install behave coverage ipython ipywidgets nbformat numpy Pillow pygraphviz
         python setup.py develop
     - name: Run Tests
       run: coverage run --source graphcat -m behave
