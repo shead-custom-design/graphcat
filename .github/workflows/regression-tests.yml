@@ -24,11 +24,12 @@ jobs:
       run: |
         sudo apt-get install graphviz graphviz-dev
         python -m pip install --upgrade pip
-        pip install behave coverage ipython ipywidgets nbformat numpy Pillow pygraphviz
+        pip install behave coverage coveralls ipython ipywidgets nbformat numpy Pillow pygraphviz
         python setup.py develop
     - name: Run Tests
       run: coverage run --source graphcat -m behave
     - name: Coverage Results
       run: coverage report
     - name: Coveralls
-      uses: AndreMiras/coveralls-python-action@develop
+      #uses: AndreMiras/coveralls-python-action@develop
+      run: coveralls
