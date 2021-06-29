@@ -12,7 +12,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: [3.7]
+        python-version: [3.7, 3.8, 3.9]
 
     steps:
     - uses: actions/checkout@v2
@@ -30,10 +30,9 @@ jobs:
       run: coverage run --source graphcat -m behave
     - name: Coverage report
       run: coverage report
-    - name: Upload coverage to Codecov
-      uses: codecov/codecov-action@v1
+#    - name: Upload coverage to Codecov
+#      uses: codecov/codecov-action@v1
     - name: Upload coverage to Coveralls
-#      #uses: AndreMiras/coveralls-python-action@develop
       run: coveralls --service=github
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
