@@ -27,3 +27,5 @@ jobs:
         python setup.py develop
     - name: Run Tests
       run: coverage run --source graphcat -m behave
+    - name: Coveralls
+      uses: AndreMiras/coveralls-python-action@develop
