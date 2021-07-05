@@ -1,6 +1,6 @@
 blinker
 ipython
-nbsphinx
+nbsphinx>=0.8.6
 networkx
 pygraphviz
 sphinx-gallery

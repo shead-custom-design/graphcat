@@ -2,10 +2,10 @@
   :width: 200px
   :align: right
 
-.. _contributing:
+.. _developers:
 
-Contributing
-============
+Developers
+==========
 
 Even if you're not in a position to contribute code to Graphcat, there are many
 ways you can help the project out:

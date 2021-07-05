@@ -39,15 +39,15 @@ Documentation
    :maxdepth: 2
 
    installation.rst
-   dependencies.rst
-   compatibility.rst
-   contributing.rst
    tutorial.ipynb
    user-guide.rst
    reference.rst
+   projects.rst
+   compatibility.rst
+   dependencies.rst
+   developers.rst
    support.rst
    release-notes.rst
-   projects.rst
 
 Indices and tables
 ==================
