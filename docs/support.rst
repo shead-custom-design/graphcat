@@ -9,15 +9,18 @@ The Graphcat documentation:
 
 * http://graphcat.readthedocs.io
 
-Visit our GitHub repository for access to source code, continuous integration test results, issue tracker, and the wiki:
+Visit our GitHub repository for access to source code, test results, issue
+tracker, and the wiki:
 
 * http://github.com/shead-custom-design/graphcat
 
-Our coverage statistics are updated automatically when modifications are committed:
+Our coverage statistics are updated automatically when modifications are
+committed:
 
 * https://coveralls.io/r/shead-custom-design/graphcat
 
-For Graphcat questions, comments, or suggestions, get in touch with the team using chat at:
+For Graphcat questions, comments, or suggestions, get in touch with the team
+using chat at:
 
 * https://graphcat.zulipchat.com
 
