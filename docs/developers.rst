@@ -2,10 +2,10 @@
   :width: 200px
   :align: right
 
-.. _contributing:
+.. _developers:
 
-Contributing
-============
+Developers
+==========
 
 Even if you're not in a position to contribute code to Graphcat, there are many
 ways you can help the project out:
@@ -22,7 +22,7 @@ If you haven't already, you'll want to get familiar with the Graphcat repository
 at http://github.com/shead-custom-design/graphcat ... there, you'll find the Graphcat
 sources, issue tracker, and wiki.
 
-Next, you'll need to install Graphcat's :ref:`dependencies`.  Then, you'll be
+Next, you'll need to install Graphcat's dependencies, listed in setup.py.  Then, you'll be
 ready to get Graphcat's source code and use setuptools to install it. To do
 this, you'll almost certainly want to use "develop mode".  Develop mode is a a
 feature provided by setuptools that links the Graphcat source code into the

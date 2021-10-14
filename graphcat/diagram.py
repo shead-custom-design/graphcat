@@ -102,7 +102,7 @@ def draw(graph, hide=None, rankdir="LR"):
     for target, source, input in subgraph.edges(data="input"):
         if input is None:
             input = ""
-        agraph.add_edge(source, target, label=input) # We want edges to point from dependencies to dependents.
+        agraph.add_edge(source, target, label=f"  {input}  ") # We want edges to point from dependencies to dependents.
 
     return agraph
 
