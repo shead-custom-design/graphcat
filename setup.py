@@ -47,7 +47,7 @@ setup(
         "Coverage": "https://coveralls.io/r/shead-custom-design/graphcat",
         "Documentation": "https://graphcat.readthedocs.io",
         "Issue Tracker": "https://github.com/shead-custom-design/graphcat/issues",
-        "Regression Tests": "https://travis-ci.org/shead-custom-design/graphcat",
+        "Regression Tests": "https://github.com/shead-custom-design/graphcat/actions",
         "Source": "https://github.com/shead-custom-design/graphcat",
     },
     scripts=[

@@ -7,6 +7,12 @@
 Release Notes
 =============
 
+Graphcat 1.0.2 - October 13, 2021
+---------------------------------
+
+* Switched from Travis-CI to Github Actions for regression tests.
+* Organized and streamlined the documentation.
+
 Graphcat 1.0.1 - March 1, 2021
 ------------------------------
 
