@@ -44,7 +44,6 @@ Documentation
    reference.rst
    projects.rst
    compatibility.rst
-   dependencies.rst
    developers.rst
    support.rst
    release-notes.rst
