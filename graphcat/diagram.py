@@ -117,6 +117,11 @@ def none(graph, node):
     return False
 
 
+def parameters(graph, node):
+    """Filter function that hides "parameter" nodes."""
+    return isinstance(graph._graph.nodes[node]["fn"], (graphcat.Array, graphcat.Constant))
+
+
 def performance(agraph, monitor):
     """Add performance monitor information to a graph diagram.
 
