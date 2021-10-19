@@ -313,11 +313,18 @@ Feature: Dynamic Graphs
         Then the graph can be drawn as a diagram
 
 
-    Scenario: Diagram Subgraphs
+    Scenario: Diagram Without Leaves
         Given an empty dynamic graph
         When adding tasks ["A", "B", "C", "D"]
         And adding links [("A", "B"), ("C", "B"), ("B", "D")]
         When filtering the graph with graphcat.diagram.leaves then the remaining nodes should match ["B", "D"]
+
+
+    Scenario: Diagram Without Parameters
+        Given an empty static graph
+        When adding tasks ["A", "B", "C", "D"] with functions [None, None, graphcat.constant(3), None]
+        And adding links [("A", "B"), ("C", "B"), ("B", "D")]
+        When filtering the graph with graphcat.diagram.parameters then the remaining nodes should match ["A", "B", "D"]
 
 
     Scenario: Notebook Display
