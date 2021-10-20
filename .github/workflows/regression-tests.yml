@@ -27,11 +27,10 @@ jobs:
         pip install behave coverage coveralls ipython ipywidgets nbformat numpy Pillow pygraphviz
         python setup.py develop
     - name: Run tests
-      run: coverage run --source graphcat -m behave
-    - name: Coverage report
-      run: coverage report
-#    - name: Upload coverage to Codecov
-#      uses: codecov/codecov-action@v1
+      run: |
+        coverage run --parallel-mode --source graphcat -m behave
+        coverage combine
+        coverage report
     - name: Upload coverage to Coveralls
       run: coveralls --service=github
       env:
