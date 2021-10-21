@@ -7,6 +7,14 @@
 Release Notes
 =============
 
+Graphcat 1.0.3 - October 21, 2021
+---------------------------------
+
+* Added a diagram filter for hiding "parameter" nodes.
+* Added Python 3.10 to the CI build.
+* Updated the way we collect code coverage data.
+* Switched from Zulip to Github Discussions for support.
+
 Graphcat 1.0.2 - October 13, 2021
 ---------------------------------
 
