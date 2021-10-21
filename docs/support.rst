@@ -19,10 +19,9 @@ committed:
 
 * https://coveralls.io/r/shead-custom-design/graphcat
 
-For Graphcat questions, comments, or suggestions, get in touch with the team
-using chat at:
+For Graphcat questions, comments, or suggestions, get in touch with the team at:
 
-* https://graphcat.zulipchat.com
+* https://github.com/shead-custom-design/graphcat/discussions
 
 Otherwise, you can contact Tim directly:
 

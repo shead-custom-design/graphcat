@@ -43,7 +43,7 @@ setup(
     maintainer_email="tim@shead-custom-design.com",
     packages=find_packages(),
     project_urls={
-        "Chat": "https://graphcat.zulipchat.com",
+        "Chat": "https://github.com/shead-custom-design/graphcat/discussions",
         "Coverage": "https://coveralls.io/r/shead-custom-design/graphcat",
         "Documentation": "https://graphcat.readthedocs.io",
         "Issue Tracker": "https://github.com/shead-custom-design/graphcat/issues",
