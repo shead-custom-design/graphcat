@@ -12,14 +12,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import glob
 import os
 import shutil
 import subprocess
 
-if os.path.exists(".coverage"):
-    os.remove(".coverage")
+for path in glob.glob(".coverage*"):
+    os.remove(path)
 if os.path.exists(".cover"):
     shutil.rmtree(".cover")
-subprocess.call(["coverage", "run", "--source", "graphcat", "-m", "behave"])
+subprocess.call(["coverage", "run", "--parallel-mode", "--source", "graphcat", "-m", "behave"])
+subprocess.call(["coverage", "combine"])
 subprocess.call(["coverage", "report"])
 subprocess.call(["coverage", "html", "--directory", ".cover"])
