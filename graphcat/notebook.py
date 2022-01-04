@@ -14,13 +14,12 @@
 
 """Integration with Jupyter notebooks, https://jupyter.org"""
 
-try:
-    import IPython.display
-except: # pragma: no cover
-    pass
-
 import graphcat.diagram
+import graphcat.optional
 import graphcat.require
+
+
+IPython = graphcat.optional.module("IPython.display")
 
 
 @graphcat.require.loaded_module("IPython.display")

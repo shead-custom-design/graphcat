@@ -24,12 +24,11 @@ import warnings
 
 import networkx
 
-try:
-    import numpy
-except: # pragma: no cover
-    pass
-
+import graphcat.optional
 import graphcat.require
+
+
+numpy = graphcat.optional.module("numpy")
 
 
 log = logging.getLogger(__name__)

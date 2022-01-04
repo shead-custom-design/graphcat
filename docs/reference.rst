@@ -16,6 +16,7 @@ Contents:
    graphcat.dynamic.rst
    graphcat.graph.rst
    graphcat.notebook.rst
+   graphcat.optional.rst
    graphcat.require.rst
    graphcat.static.rst
    graphcat.streaming.rst

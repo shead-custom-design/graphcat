@@ -14,12 +14,11 @@
 
 """Functionality for drawing diagrams of computational graphs."""
 
-try:
-    import pygraphviz
-except: # pragma: no cover
-    pass
-
+import graphcat.optional
 import graphcat.require
+
+
+pygraphviz = graphcat.optional.module("pygraphviz")
 
 
 @graphcat.require.loaded_module("pygraphviz")
