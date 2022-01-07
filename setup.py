@@ -18,7 +18,6 @@ import re
 setup(
     author="Timothy M. Shead",
     author_email="tim@shead-custom-design.com",
-    name="graphcat",
     classifiers=[
         "Development Status :: 5 - Production/Stable",
         "Intended Audience :: Developers",
@@ -41,6 +40,7 @@ setup(
     See the Graphcat documentation at http://graphcat.readthedocs.io, and the Graphcat sources at http://github.com/shead-custom-design/graphcat""",
     maintainer="Timothy M. Shead",
     maintainer_email="tim@shead-custom-design.com",
+    name="graphcat",
     packages=find_packages(),
     project_urls={
         "Chat": "https://github.com/shead-custom-design/graphcat/discussions",
