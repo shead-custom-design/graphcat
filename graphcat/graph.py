@@ -116,7 +116,7 @@ class Graph(abc.ABC):
         self.mark_unfinished(unfinished)
 
 
-    def add_task(self, name, fn=None):
+    def add_task(self, name, fn=None, params=None):
         """Add a task to the graph.
 
         This function will raise an exception if the task already exists.
@@ -130,20 +130,41 @@ class Graph(abc.ABC):
         name: hashable object, required
             Unique label that will identify the task.
         fn: callable, optional
-            The `fn` object will be called whenever the task is executed.  It must take two keyword arguments
-            as parameters, `label` and `inputs`.  `name` will contain the unique task name.  `inputs` will
-            be a dict mapping named inputs to a sequence of outputs returned from upstream tasks.
-            If :any:`None` (the default), :func:`graphcat.common.null` will be used.
+            The `fn` object will be called whenever the task is executed.  It
+            must take two keyword arguments as parameters, `label` and
+            `inputs`.  `name` will contain the unique task name.  `inputs` will
+            be a dict mapping named inputs to a sequence of outputs returned
+            from upstream tasks.  If :any:`None` (the default),
+            :func:`graphcat.common.null` will be used.
+        params: dict, optional
+            Most non-trivial tasks have parameters that affect their operation.
+            Because individually creating and linking each parameters as a
+            separate task tiresome and verbose, you can pass parameters in this
+            dict and they will be created and linked automatically.  Each
+            parameter name will be created by concatenating `name` with a
+            dictionary key, separated by a slash "/".
 
         Raises
         ------
         :class:`ValueError`
             If `label` already exists.
+
+        Returns
+        -------
+        :class:`~TaskReference`
+            A reference to the newly-added task that can be used to simplify
+            adding more tasks to the graph.
         """
         self._require_task_absent(name)
         if fn is None:
             fn = graphcat.common.null
         self.set_task(name, fn)
+
+        if params is not None:
+            for key, value in params.items():
+                self.set_parameter(name, key, f"{name}/{key}", value)
+
+        return graphcat.common.TaskReference(self, name)
 
 
     def clear_links(self, source, target):
