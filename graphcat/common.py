@@ -297,6 +297,35 @@ class RaiseException(object):
         return type(self) is type(other) and self._exception == other._exception
 
 
+class TaskReference(object):
+    def __init__(self, graph, name):
+        self._graph = graph
+        self._name = name
+
+
+    def add(self, name, fn=None, params=None, input=None):
+        task = self._graph.add_task(name, fn=fn, params=params)
+        self._graph.add_links(self._name, (name, input))
+        return task
+
+
+    def connect(self, task, input=None):
+        if isinstance(task, TaskReference):
+            task = task.name
+        self._graph.add_links(self._name, (task, input))
+        return TaskReference(self._graph, task)
+
+
+    @property
+    def graph(self):
+        return self._graph
+
+
+    @property
+    def name(self):
+        return self._name
+
+
 class TaskState(enum.Enum):
     """Enumerates :class:`graphcat.graph.Graph` task states.
 
