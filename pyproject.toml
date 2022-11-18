@@ -27,6 +27,28 @@ maintainers = [{name="Timothy M. Shead", email="tim@shead-custom-design.com"}]
 name="graphcat"
 requires-python = ">=3.8"
 
+[project.optional-dependencies]
+all = [
+    "behave",
+    "coverage",
+    "ipython",
+    "nbsphinx",
+    "sphinx >= 3.5",
+    "sphinx-gallery < 0.11",
+    "sphinx_rtd_theme",
+]
+doc = [
+    "ipython",
+    "nbsphinx",
+    "sphinx >= 3.5",
+    "sphinx-gallery < 0.11",
+    "sphinx_rtd_theme",
+]
+test = [
+    "behave",
+    "coverage",
+]
+
 [project.readme]
 text = "Graphcat provides a lightweight, flexible toolkit for managing computational graphs.  See the Graphcat documentation at http://graphcat.readthedocs.io, and the Graphcat sources at http://github.com/shead-custom-design/graphcat"
 content-type = "text/plain"
