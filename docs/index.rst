@@ -41,12 +41,11 @@ Documentation
    installation.rst
    tutorial.ipynb
    user-guide.rst
+   development.rst
    reference.rst
-   projects.rst
    compatibility.rst
-   developers.rst
-   support.rst
    release-notes.rst
+   support.rst
 
 Indices and tables
 ==================
