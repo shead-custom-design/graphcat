@@ -7,6 +7,16 @@
 Release Notes
 =============
 
+Graphcat 1.0.4 - November 18, 2022
+----------------------------------
+
+* Reduced the amount of boilerplate for optional functionality.
+* Switched to pyproject.toml for packaging.
+* Switched to flit for building.
+* Minimum Python version is 3.8, due to upstream changes.
+* Began testing with Python 3.11.
+* Added optional dependencies for documentation and testing.
+
 Graphcat 1.0.3 - October 21, 2021
 ---------------------------------
 
