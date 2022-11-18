@@ -1,0 +1,40 @@
+[build-system]
+requires = ["flit_core >=3.2,<4"]
+build-backend = "flit_core.buildapi"
+
+[project]
+authors = [{name="Timothy M. Shead", email="tim@shead-custom-design.com"}]
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Education",
+    "Intended Audience :: Information Technology",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: Apache Software License",
+    "Natural Language :: English",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Topic :: Scientific/Engineering",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+]
+dependencies = [
+    "blinker",
+    "networkx",
+]
+description="Lightweight, flexible toolkit for managing computational graphs."
+dynamic = ["version"]
+maintainers = [{name="Timothy M. Shead", email="tim@shead-custom-design.com"}]
+name="graphcat"
+requires-python = ">=3.8"
+
+[project.readme]
+text = "Graphcat provides a lightweight, flexible toolkit for managing computational graphs.  See the Graphcat documentation at http://graphcat.readthedocs.io, and the Graphcat sources at http://github.com/shead-custom-design/graphcat"
+content-type = "text/plain"
+
+[project.urls]
+"Chat" = "https://github.com/shead-custom-design/graphcat/discussions"
+"Coverage" = "https://coveralls.io/r/shead-custom-design/graphcat"
+"Documentation" = "https://graphcat.readthedocs.io"
+"Issue Tracker" = "https://github.com/shead-custom-design/graphcat/issues"
+"Regression Tests" = "https://github.com/shead-custom-design/graphcat/actions"
+"Source" = "https://github.com/shead-custom-design/graphcat"
