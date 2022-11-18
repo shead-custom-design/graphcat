@@ -1,8 +1,9 @@
 *.egg-info
 *.pyc
-.ipynb_checkpoints
+.DS_Store
 .cover
 .coverage
+.ipynb_checkpoints
 artwork/backup
 artwork/ipr
 dist
