@@ -25,7 +25,7 @@ jobs:
         sudo apt-get install graphviz graphviz-dev
         python -m pip install --upgrade pip
         pip install behave coverage coveralls ipython ipywidgets nbformat numpy Pillow pygraphviz
-        python setup.py develop
+        pip install .
     - name: Run tests
       run: |
         coverage run --parallel-mode --source graphcat -m behave
