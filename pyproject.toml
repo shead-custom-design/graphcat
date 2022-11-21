@@ -33,6 +33,7 @@ all = [
     "coverage",
     "ipython",
     "nbsphinx",
+    "numpy",
     "pygraphviz",
     "sphinx >= 3.5",
     "sphinx-gallery < 0.11",
@@ -48,6 +49,7 @@ doc = [
 test = [
     "behave",
     "coverage",
+    "numpy",
     "pygraphviz",
 ]
 vis = [
