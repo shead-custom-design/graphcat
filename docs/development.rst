@@ -17,8 +17,19 @@ source code, issue tracker, discussions, and wiki.
 Next, you'll need to install all of the extra dependencies needed for Graphcat development::
 
     $ pip install graphcat[all]
-    
-Then, you’ll be ready to obtain Graphcat’s source code and install it using “editable mode”. Editable mode is a feature provided by pip that links the Graphcat source code into the install directory instead of copying it ... that way you can edit the source code in your git sandbox, and you don’t have to keep re-installing it to test your changes:
+
+To build the documentation you'll also need the `pandoc <https://pandoc.org>`_ universal document
+converter, which - regrettably - can't be installed with pip ... if you use
+`Conda <https://docs.conda.io/en/latest/>`_ (which we strongly recommend), you
+can install it easily::
+
+    $ conda install pandoc
+
+Then, you’ll be ready to obtain Graphcat’s source code and install it using
+“editable mode”. Editable mode is a feature provided by pip that links the
+Graphcat source code into the install directory instead of copying it ... that
+way you can edit the source code in your git sandbox, and you don’t have to
+keep re-installing it to test your changes::
 
 $ git clone https://github.com/shead-custom-design/graphcat.git
 $ cd graphcat
