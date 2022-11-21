@@ -32,7 +32,7 @@ keep re-installing it to test your changes::
 
 $ git clone https://github.com/shead-custom-design/graphcat.git
 $ cd graphcat
-$ pip install --editable.
+$ pip install --editable .
 
 Versioning
 ----------
