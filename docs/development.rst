@@ -14,16 +14,15 @@ If you haven't already, you'll want to get familiar with the Graphcat repository
 at http://github.com/shead-custom-design/graphcat ... there, you'll find the Graphcat
 source code, issue tracker, discussions, and wiki.
 
+You'll need to install `Graphviz <https://graphviz.org>`_ and `pandoc <https://pandoc.org>`_,
+neither of which can be installed via pip.  If you use `Conda <https://docs.conda.io/en/latest/>`_
+(which we strongly recommend), you can install them as follows::
+
+    $ conda install graphviz pandoc
+
 Next, you'll need to install all of the extra dependencies needed for Graphcat development::
 
     $ pip install graphcat[all]
-
-To build the documentation you'll also need the `pandoc <https://pandoc.org>`_ universal document
-converter, which - regrettably - can't be installed with pip ... if you use
-`Conda <https://docs.conda.io/en/latest/>`_ (which we strongly recommend), you
-can install it easily::
-
-    $ conda install pandoc
 
 Then, you’ll be ready to obtain Graphcat’s source code and install it using
 “editable mode”. Editable mode is a feature provided by pip that links the
