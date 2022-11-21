@@ -7,6 +7,12 @@
 Release Notes
 =============
 
+Graphcat 1.0.5 - November 20, 2022
+----------------------------------
+
+* Cleanup and organize documentation.
+* Add numpy and pygraphviz as optional dependencies.
+
 Graphcat 1.0.4 - November 18, 2022
 ----------------------------------
 
