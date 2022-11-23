@@ -25,7 +25,7 @@ description="Lightweight, flexible toolkit for managing computational graphs."
 dynamic = ["version"]
 maintainers = [{name="Timothy M. Shead", email="tim@shead-custom-design.com"}]
 name="graphcat"
-requires-python = ">=3.6"
+requires-python = ">=3.7"
 
 [project.optional-dependencies]
 all = [
