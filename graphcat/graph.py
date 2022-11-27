@@ -547,6 +547,28 @@ class Graph(abc.ABC):
         return self._graph.nodes[name]["state"]
 
 
+    def task_fn(self, name):
+        """Return the function assigned to a task.
+
+        Parameters
+        ----------
+        name: hashable object, required
+            Unique name that identifies the task.
+
+        Returns
+        -------
+        fn: callable
+            Callable object assigned to `name`.
+
+        Raises
+        ------
+        :class:`ValueError`
+            If `name` doesn't exist.
+        """
+        self._require_task_present(name)
+        return self._graph.nodes[name]["fn"]
+
+
     def tasks(self):
         """Return the name of every task in the graph.
 

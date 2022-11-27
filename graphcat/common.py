@@ -297,6 +297,11 @@ class RaiseException(object):
         return type(self) is type(other) and self._exception == other._exception
 
 
+class StopLoop(StopIteration):
+    """Raised by a task function to terminate loop iteration."""
+    pass
+
+
 class TaskState(enum.Enum):
     """Enumerates :class:`graphcat.graph.Graph` task states.
 

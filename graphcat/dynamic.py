@@ -72,6 +72,11 @@ class DynamicGraph(graphcat.graph.Graph):
                 task["output"] = task["fn"](graph=self, name=name, inputs=inputs)
                 task["state"] = graphcat.common.TaskState.FINISHED
                 self._on_finished.send(self, name=name, output=task["output"])
+            except graphcat.common.StopLoop as e:
+                task["output"] = None
+                task["state"] = graphcat.common.TaskState.UNFINISHED
+                task["updating"] = False
+                raise e
             except Exception as e:
                 # The function raised an exception, notify observers.
                 task["output"] = None
